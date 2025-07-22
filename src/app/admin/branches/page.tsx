@@ -1,30 +1,33 @@
 "use client"
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PapiverseLoading } from "@/components/ui/loader";
 import { Select, SelectTrigger } from "@/components/ui/select";
+import { BranchService } from "@/services/BranchService";
 import { UserService } from "@/services/UserService";
+import { Branch } from "@/types/branch";
 import { User } from "@/types/user";
 import { SelectValue } from "@radix-ui/react-select";
-import { Download, Funnel, Info, Plus, SquarePen, Trash2 } from "lucide-react";
+import { BadgeCheck, Download, Funnel, Info, Plus, SquarePen, Trash2 } from "lucide-react";
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-export default function UsersTable() {
+export default function BranchesTable() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
 
-    const [users, setUsers] = useState<User[]>([]);
-    const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+    const [branches, setBranches] = useState<Branch[]>([]);
+    const [filteredBranches, setFilteredBranches] = useState<Branch[]>([]);
 
     useEffect(() => {
         async function fetchData() {
             try {
-                const data = await UserService.getAllUsers();
-                setUsers(data);
+                const data = await BranchService.getAllBranches();
+                setBranches(data);
             } catch (error) { toast.error(`${error}`) }
             finally { setLoading(false) }
         }
@@ -34,12 +37,11 @@ export default function UsersTable() {
     useEffect(() => {
         const find = search.toLowerCase().trim();
         if (find !== '') {
-            setFilteredUsers(users.filter(
-                (i) => i.firstName.toLowerCase().includes(find) ||
-                i.lastName.toLowerCase().includes(find)
+            setFilteredBranches(branches.filter(
+                (i) => i.branchName!.toLowerCase().includes(find)
             ))
-        } else setFilteredUsers(users);
-    }, [search, users]);
+        } else setFilteredBranches(branches);
+    }, [search, branches]);
 
     if (loading) return <PapiverseLoading />
     return(
@@ -51,7 +53,7 @@ export default function UsersTable() {
                     width={40}
                     height={40}
                 />
-                <div className="text-xl font-semibold">All Users</div>
+                <div className="text-xl font-semibold">All Branches</div>
                 <Image
                     src="/images/papiverse_logo.png"
                     alt="KP Logo"
@@ -92,30 +94,32 @@ export default function UsersTable() {
                     </Button>
                     <Button className="!bg-darkorange text-light shadow-xs hover:opacity-90">
                         <Plus />
-                        <Link href="/admin/users/add-user">Add a user</Link>
+                        <Link href="/admin/users/add-branch">Add a branch</Link>
                     </Button>
                 </div>
                 
             </div>
 
-            <div className="grid grid-cols-6 bg-slate-200 font-semibold rounded-sm mt-2">
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50 col-span-2">Full Name</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">E-mail Address</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Username</div>
+            <div className="grid grid-cols-5 bg-slate-200 font-semibold rounded-sm mt-2">
                 <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Branch Name</div>
+                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50 col-span-2">Full Address</div>
+                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Branch Type</div>
                 <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Action</div>
             </div>
 
-            <div className="grid grid-cols-6 bg-light rounded-b-sm shadow-xs">
-                {users.length > 0 ?
-                    filteredUsers.map((item, index) => (
+            <div className="grid grid-cols-5 bg-light rounded-b-sm shadow-xs">
+                {branches.length > 0 ?
+                    filteredBranches.map((item, index) => (
                         <Fragment key={ index }>
-                            <div className="text-sm col-span-2 pl-2 py-1.5 border-b-1">{ `${item.lastName}, ${item.firstName} ${item.middleName}` }</div>
-                            <div className="text-sm pl-2 py-1.5 border-b-1 truncate">{ item.email }</div>
-                            <div className="text-sm pl-2 py-1.5 border-b-1">{ item.username }</div>
-                            <div className="text-sm pl-2 py-1.5 border-b-1 truncate">{ item.branch?.branchName }</div>
+                            <div className="text-sm pl-2 py-1.5 border-b-1">{ item.branchName }</div>
+                            <div className="text-sm pl-2 py-1.5 col-span-2 border-b-1 truncate">{ `${item.streetAddress}, ${item.barangay}, ${item.city}, ${item.province}` }</div>
+                            <div className="text-sm pl-2 py-1.5 border-b-1">
+                                {item.isInternal ? (
+                                    <Badge className="text-xs text-darkgreen font-semibold" variant="secondary"><BadgeCheck />Internal Branch</Badge>
+                                ): (<Badge className="text-xs text-darkred font-semibold" variant="secondary"><BadgeCheck />External Branch</Badge>)}
+                            </div>
                             <div className="flex items-center pl-2 gap-3 border-b-1">
-                                <Link href={`/admin/users/edit-user/${item.id}`}><SquarePen className="w-4 h-4 text-darkgreen" /></Link>
+                                <Link href={`/admin/users/edit-user`}><SquarePen className="w-4 h-4 text-darkgreen" /></Link>
                                 <button><Info className="w-4 h-4" /></button>
                                 <button><Trash2 className="w-4 h-4 text-darkred" /></button>
                             </div>
@@ -124,7 +128,7 @@ export default function UsersTable() {
                     : (<div className="my-2 text-sm text-center col-span-6">There are no existing users yet.</div>)
                 }
             </div>
-            <div className="text-gray text-sm">Showing { filteredUsers.length.toString() } of { filteredUsers.length.toString() } results.</div>
+            <div className="text-gray text-sm">Showing { filteredBranches.length.toString() } of { filteredBranches.length.toString() } results.</div>
         </section>
     )
 }

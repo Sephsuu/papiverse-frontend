@@ -14,56 +14,61 @@ import { Calendar1Icon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { toast } from "sonner";
+import { updateUserFields, userFields, userInit } from "@/lib/form-init";
 import { BranchService } from "@/services/BranchService";
 import { handleChange } from "@/lib/form-handle";
 import { Branch } from "@/types/branch";
 import { AuthService } from "@/services/AuthService";
 import { PapiverseLoading } from "@/components/ui/loader";
-import { User, userFields, userInit } from "@/types/user";
+import { useParams } from "next/navigation";
+import { UserService } from "@/services/UserService";
 
 const genders = ["Male", "Female", "Gay", "Lesbian", "Others"];
 
-export default function AAddUser() {
+export default function EditUser() {
+    const params = useParams();
     const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState(userInit);
     const [branches, setBranches] = useState<Branch[]>([]);
+    const [updatedUser, setUpdatedUser] = useState({});
     const [open, setOpen] = useState(false);
-    const [user, setUser] = useState<User>(userInit);
-    const [date, setDate] = useState<Date | undefined>();
     const [dateOpen, setDateOpen] = useState(false);
+    const [date, setDate] = useState(user.dateOfBirth ? new Date(user.dateOfBirth) : undefined);
 
-    // Fetching all branches on component mount
     useEffect(() => {
-        const fetchBranches = async () => {
+        async function fetchData() {
             try {
-                const response = await BranchService.getAllBranches();
-                if (response) {
-                    setBranches(response);
-                }
-            } catch (error) { toast.error(`${error}`) }
-            finally { setLoading(false) }
+                const userData = await UserService.getUserById(Number(params.id));
+                const branchesData = await BranchService.getAllBranches();
+                setUser(userData);
+                setBranches(branchesData);
+            } catch (error) { toast.success }
+            finally { 
+                setLoading(false); 
+            }
         }
-        fetchBranches();
+        fetchData();
     }, []);
 
-    // Changes the date of birth in the user object when the date is selected
     useEffect(() => {
-        if (date) {
-            setUser(prevUser => ({
-                ...prevUser,
-                dateOfBirth: format(date, "yyyy-MM-dd"),
-            }));
+        if (user.dateOfBirth) {
+            setDate(new Date(user.dateOfBirth));
+            setUser(prev => ({
+                ...prev,
+                branchId: String(selectedBranch?.branchId)
+            }))
+        } else {
+            setDate(undefined);
         }
-    }, [date]);
+    }, [user.dateOfBirth]);
 
-    useEffect(() => {
-        console.log(user);
-        
-    }, [user])
+    const selectedBranch = branches.find(
+        (i) => i.branchId === Number(user.branch.branchId)
+    );
 
-    // Handle form submission
     async function handleSubmit() {
        try{        
-            for (const field of userFields) {
+            for (const field of updateUserFields) {
                 if (
                     user[field] === "" ||
                     user[field] === null ||
@@ -73,72 +78,70 @@ export default function AAddUser() {
                 return; 
                 }
             }
-            if (user.password !== user.confirmPassword) {
-                toast.info("Passwords do not match!");
-                return;
+            const data = await UserService.updateUser(user);
+            if (data) {
+                toast.success("User updated successfully!");
+                setUser(userInit);  
+                setDate(undefined);          
             }
-
-        const data = await AuthService.registerUser(user);
-        if (data) {
-            toast.success("User registered successfully!");
-            setUser(userInit);  
-            setDate(undefined);          
-        }
        }
        catch(error){ toast.error(`${error}`) }
     }
-    
+
     if (loading) return <PapiverseLoading />
     return(
         <section className="flex flex-col w-full h-screen align-center justify-center">
-            <Toaster closeButton position="top-center" />
-            <div className="w-200 mx-auto bg-white shadow-lg rounded-md mt-[-20px] p-8 max-md:w-full max-md:bg-light max-md:shadow-none">
-                <div className="font-semibold text-2xl mb-[-10px] mx-auto">Register New User</div>
+                <Toaster closeButton position="top-center" />
+            <div className="w-200 mx-auto bg-light shadow-lg rounded-md mt-[-20px] p-8 max-md:w-full max-md:bg-light max-md:shadow-none">
+                <div className="font-semibold text-2xl mb-[-10px] mx-auto">Edit User: <span className="text-darkorange">{ user.firstName }</span></div>
                 <div className="grid grid-cols-2 gap-2 mt-4">
                     <div className="flex flex-col gap-1">
                         {/* ACCOUNT DETAILS */}
-                        <div className="m-1">Account Details</div>
+                        <div className="m-1 text-dark">Account Details</div>
                         <Input 
                             placeholder="Enter username" 
-                            className="border-1 border-gray max-md:w-full max-md:mb-4" 
+                            className="border-1 border-dark max-md:w-full max-md:mb-4" 
                             name="username"
                             value={ user.username } 
                             onChange={ e => handleChange(e, setUser) }
                         />
-                        <Input 
-                            placeholder="Enter password" 
-                            type="password"
-                            className="border-1 border-gray max-md:w-full max-md:mb-4" 
-                            name="password" 
-                            value={ user.password }
-                            onChange={ e => handleChange(e, setUser) }
-                        />
-                        <Input 
-                            placeholder="Re-type password" 
-                            type="password"
-                            className="border-1 border-gray max-md:w-full max-md:mb-4" 
-                            name="confirmPassword"
-                            value={ user.confirmPassword }
-                            onChange={ e => handleChange(e, setUser) }
-                        />
+
                         {/* CONTACT INFORMATION */}
-                        <div className="m-1">Contact Information</div>
+                        <div className="m-1 text-dark">Contact Information</div>
                         <Input 
                             placeholder="E-mail Address" 
-                            className="border-1 border-gray"
+                            className="border-1 border-(--dark)"
                             name= "email" 
                             value={ user.email }
                             onChange={ e => handleChange(e, setUser) }
                         />
                         <Input 
                             placeholder="Contact Number" 
-                            className="border-1 border-gray"
+                            className="border-1 border-(--dark)"
                             name= "contactNumber" 
                             value={ user.contactNumber }
                             onChange={ e => handleChange(e, setUser) }
                         />
+                        <div className="text-dark">Select a role</div>
+                        <RadioGroup  className="mt-2 flex" 
+                            value={user.role} name="role" 
+                            onValueChange={(value: string) => {
+                            setUser((prev) => ({
+                                ...prev,
+                                role : value
+                            }))
+                        }}>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="FRANCHISOR" className="border-1 border-(--dark)" id="r1" />
+                                <Label htmlFor="r1">Franchisor</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="FRANCHISEE" className="border-1 border-(--dark)" id="r2" />
+                                <Label htmlFor="r2">Franchisee</Label>
+                            </div>
+                        </RadioGroup>
                         <Button 
-                            className="w-fit mt-4"
+                            className="w-fit mt-8"
                             onClick={ () => setOpen(!open) }
                         >
                             Register
@@ -146,24 +149,24 @@ export default function AAddUser() {
                     </div>
 
                     <div className="flex flex-col gap-1">
-                        <div className="m-1">Personal Information</div>
+                        <div className="m-1 text-dark">Personal Information</div>
                         <Input 
                             placeholder="First Name" 
-                            className="border-1 border-gray max-md:w-full max-md:mb-4" 
+                            className="border-1 border-dark max-md:w-full max-md:mb-4" 
                             name="firstName" 
                             value={ user.firstName }
                             onChange={ e => handleChange(e, setUser) }
                         />
                         <Input 
                             placeholder="Middle Name" 
-                            className="border-1 border-gray max-md:w-full max-md:mb-4"
+                            className="border-1 border-dark max-md:w-full max-md:mb-4"
                             name="middleName" 
                             value={ user.middleName }
                             onChange={ e => handleChange(e, setUser) }
                         />
                         <Input 
                             placeholder="Last Name" 
-                            className="border-1 border-gray max-md:w-full max-md:mb-4"
+                            className="border-1 border-dark max-md:w-full max-md:mb-4"
                             name="lastName" 
                             value={ user.lastName }
                             onChange={ e => handleChange(e, setUser) }
@@ -173,7 +176,7 @@ export default function AAddUser() {
                                 <Button
                                     variant={"outline"}
                                     className={cn(
-                                        "justify-start text-left font-normal border-1 border-gray",
+                                        "justify-start text-left font-normal border-1 border-dark",
                                         !date && "text-muted-foreground"
                                     )}
                                 >
@@ -209,7 +212,7 @@ export default function AAddUser() {
                                 gender: value
                             }))} 
                         >
-                            <SelectTrigger className="w-full border-1 border-gray">
+                            <SelectTrigger className="w-full border-1 border-dark">
                                 <SelectValue placeholder="Select Gender" />
                             </SelectTrigger>
                             <SelectContent>
@@ -227,8 +230,11 @@ export default function AAddUser() {
                                 branchId: value
                             }))} 
                         >
-                            <SelectTrigger className="w-full border-1 border-gray">
-                                <SelectValue className="block w-[100px] truncate" placeholder="Select Branch" />
+                            <SelectTrigger className="w-full border-1 border-dark">
+                                <SelectValue 
+                                    className="block w-[100px] truncate"
+                                    placeholder={selectedBranch ? `${selectedBranch.branchName} Branch` : "Select Branch"}
+                                />
                             </SelectTrigger>
                             <SelectContent>
                                 {
@@ -240,24 +246,6 @@ export default function AAddUser() {
                                 }
                             </SelectContent>
                         </Select>
-                        <div className="text-dark">Select a role</div>
-                        <RadioGroup  className="mt-2 flex" 
-                            value={user.role} name="role" 
-                            onValueChange={(value: string) => {
-                            setUser((prev) => ({
-                                ...prev,
-                                role : value
-                            }))
-                        }}>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="FRANCHISOR" className="border-1 border-gray" id="r1" />
-                                <Label htmlFor="r1">Franchisor</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="FRANCHISEE" className="border-1 border-gray" id="r2" />
-                                <Label htmlFor="r2">Franchisee</Label>
-                            </div>
-                        </RadioGroup>
                     </div>
                 </div>
             </div>`

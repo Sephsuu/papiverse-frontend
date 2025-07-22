@@ -6,15 +6,15 @@ export const adminRoute = [
         icon: UserRound,
         children: [
             { title: 'All Users', href: '/admin/users' },
-            { title: 'Add User', href: '/admin//users/add-user' },
+            { title: 'Add User', href: '/admin/users/add-user' },
         ]
     },
     { 
         title: 'Branches', 
         icon: Store,
         children: [
-            { title: 'Add User', href: '' },
-            { title: 'Users Table', href: '' },
+            { title: 'All Branches', href: '/admin/branches' },
+            { title: 'Add Branch', href: '/admin/branches/add-branch' },
         ]
     },
     { 

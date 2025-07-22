@@ -18,8 +18,19 @@ export default function Login() {
     async function handleSubmit() {
         try {
             setProcess(true);
-            const data = await AuthService.authenticateUser(credentials);
-            if (data) toast.success('Logged in successfully! Please wait patiently.');
+            const token = await AuthService.authenticateUser(credentials);
+            if (token) {
+                localStorage.setItem('token', token);
+                toast.success('Logged in successfully! Please wait patiently.');
+                const claimsRes = await fetch('/api/claims', { credentials: 'include' });
+                console.log(claimsRes);
+                
+                if (claimsRes.ok) {
+                    const claims = await claimsRes.json();
+                    console.log(claims);
+                    
+                }
+            }
         } catch (error) { toast.error(`${error}`) }
         finally {
             setProcess(false);

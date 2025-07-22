@@ -10,7 +10,7 @@ import { ChevronDown } from "lucide-react";
 
 export function AppSidebar() {
     const pathname = usePathname();
-    const hideSidebar = pathname === "/auth";
+    const hideSidebar = pathname === "/auth" || pathname === "/";
     return(
         <>
         {!hideSidebar &&

@@ -1,4 +1,4 @@
-import { BASE_URL } from "@/lib/utils";
+import { BASE_URL, getTokenFromLocalStorage } from "@/lib/utils";
 
 const URL = `${BASE_URL}/branches`; 
 
@@ -8,7 +8,7 @@ export class BranchService {
 			method: 'GET',
 			headers: {'Content-Type' : 'application/json' }
 		});
-
+		
 		if (!res.ok) throw new Error('Bad Response');
 
 		return res.json();
@@ -17,7 +17,10 @@ export class BranchService {
 	static async addBranch(branch: object) {
 		const res = await fetch(`${URL}/add`, {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json'},
+			headers: { 
+				'Content-Type': 'application/json', 
+                'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
+        	},
         	body: JSON.stringify(branch),
 		});
 
@@ -26,6 +29,9 @@ export class BranchService {
 		return res.json();
 	}
 }
+
+// {"branchName":"Krispy Papi Jupiter","streetAddress":"asss","barangay":"www","city":"sww","province":"ssss","zipCode":"sss","branchStatus":"Open","isInternal":false}
+// {"branchName":"Krispy Papi Jupiter","streetAddress":"asss","barangay":"www","city":"sww","province":"ssss","zipCode":"sss","branchStatus":"Open","isInternal":false}
 
 // const BranchService = {
 //     addBranch: async (branch  : object) => {
