@@ -1,4 +1,4 @@
-import { Announcement } from "@/types/announcement";
+
 
 const BASE_URL = 'http://localhost:8080/api/v1/announcements'; 
 
@@ -19,7 +19,6 @@ const AnnouncementService = {
       if (!response.ok) {
         throw new Error('Cannot be added');
       }
-
   
       const data = await response.json();
       return data;

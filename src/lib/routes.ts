@@ -4,25 +4,22 @@ export const adminRoute = [
     { 
         title: 'Users', 
         icon: UserRound,
-        children: [
-            { title: 'All Users', href: '/admin/users' },
-            { title: 'Add User', href: '/admin/users/add-user' },
-        ]
+        href: '/admin/users',
+        children: []
     },
     { 
         title: 'Branches', 
         icon: Store,
-        children: [
-            { title: 'All Branches', href: '/admin/branches' },
-            { title: 'Add Branch', href: '/admin/branches/add-branch' },
-        ]
+        href: '/admin/branches',
+        children: []
     },
     { 
-        title: 'Supplies', 
+        title: 'Inventory', 
         icon: Container,
         children: [
-            { title: 'Add User', href: '' },
-            { title: 'Users Table', href: '' },
+            { title: 'Supplies', href: '/admin/inventory/supplies' },
+            { title: 'Inventories', href: '/admin/inventory/inventories' },
+            { title: 'Order Request', href: '/admin/inventory/order-request' },
         ]
     },
 ]

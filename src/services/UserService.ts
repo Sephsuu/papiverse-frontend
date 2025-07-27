@@ -1,4 +1,5 @@
-import { BASE_URL } from "@/lib/utils";
+import { BASE_URL, getTokenFromLocalStorage } from "@/lib/utils";
+import { User } from "@/types/user";
 
 const URL = `${BASE_URL}/user`; 
 
@@ -6,7 +7,10 @@ export class UserService {
     static async getAllUsers() {
         const res = await fetch(`${URL}/get-users`, {
             method: 'GET',
-            headers: {'Content-Type' : 'application/json' }
+            headers: {
+                'Content-Type' : 'application/json' ,
+                'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
+            }
         });
 
         if (!res.ok) throw new Error('Bad Response');
@@ -17,7 +21,10 @@ export class UserService {
     static async getUserById(id: number) {
         const res = await fetch(`${URL}/find-user?id=${id}`, {
             method: 'GET',
-            headers: {'Content-Type' : 'application/json' }
+            headers: {
+                'Content-Type' : 'application/json' ,
+                'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
+            }
         });
 
         if (!res.ok) throw new Error('Bad Response');
@@ -26,11 +33,12 @@ export class UserService {
     }
 
     static async updateUser(user: object) {
-        console.log(JSON.stringify(user));
-        
         const res = await fetch(`${URL}/update`, {
             method: 'POST',
-            headers: {'Content-Type' : 'application/json' },
+            headers: {
+                'Content-Type' : 'application/json',
+                'Authorization' : `Bearer ${getTokenFromLocalStorage()}` 
+            },
             body: JSON.stringify(user)
         });
 
@@ -39,7 +47,37 @@ export class UserService {
         return res.json();
     }
 
+    static async deleteUser(id: number) {
+        console.log(id);
+        
+        const res = await fetch(`${BASE_URL}/delete-user?id=${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type' : 'application/json', 
+                'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
+            }
+        });
+        console.log(res);
+        
+
+        if (!res.ok) throw new Error('Bad Response');
+
+        return res.json();
+    }
+
 }
+//     deleteUser: async (id: number) => {
+//         const response = await fetch(`${BASE_URL}/delete-user?id=${id}`, {
+//             method: 'POST',
+//             headers: {'Content-Type' : 'application/json' }
+//         });
+        
+//         if (response.ok) {
+//             const text = await response.text();
+//             return text ? JSON.parse(text) : null;
+//         }
+//     },
+
 //     updateUser: async (user: object) => {
 //         const response = await fetch(`${BASE_URL}/update`, {
 //             method: 'POST',
@@ -65,18 +103,6 @@ export class UserService {
 //         }
 //     },
 
-
-//     deleteUser: async (id: number) => {
-//         const response = await fetch(`${BASE_URL}/delete-user?id=${id}`, {
-//             method: 'POST',
-//             headers: {'Content-Type' : 'application/json' }
-//         });
-        
-//         if (response.ok) {
-//             const text = await response.text();
-//             return text ? JSON.parse(text) : null;
-//         }
-//     },
 // };
 
 // export default UserService;

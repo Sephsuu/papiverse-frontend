@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PapiverseLoading } from "@/components/ui/loader";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Toaster } from "@/components/ui/sonner";
@@ -11,14 +12,33 @@ import { handleChange } from "@/lib/form-handle";
 import { BranchService } from "@/services/BranchService";
 import { Branch, branchFields, branchInit } from "@/types/branch";
 import Image from "next/image";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const status = ['Open', 'Under Renovation']  
 
-export default function AddBranch() {
+export default function EditBranch() {
+    const [loading, setLoading] = useState(true);
+    const params = useParams();
     const [open, setOpen] = useState(false);
     const [branch, setBranch] = useState<Branch>(branchInit);
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const data = await BranchService.getBranchById(Number(params.id));
+                setBranch(data);
+            } catch (error) { toast.error(`${error}`) }
+            finally { setLoading(false) }
+        }
+        fetchData();
+    }, []);
+
+    useEffect(() => {
+        console.log(branch);
+        
+    }, [branch])
 
     async function handleSubmit() {
         try{            
@@ -40,10 +60,7 @@ export default function AddBranch() {
         }
     };
 
-    useEffect(() => {
-        console.log(branch);
-        
-    }, [branch])
+    if (loading) return <PapiverseLoading />
     return(
         <section className="relative flex flex-col w-full h-screen align-center justify-center">
             <Toaster closeButton position="top-center" />
@@ -55,14 +72,7 @@ export default function AddBranch() {
                         width={40}
                         height={40}
                     />
-                    <div className="font-semibold text-2xl">Register New Branch</div>
-                    <Image
-                        src="/images/papiverse_logo.png"
-                        alt="KP Logo"
-                        width={100}
-                        height={100}
-                        className="ms-auto"
-                    />
+                    <div className="font-semibold text-2xl">Edit Branch: <span className="text-darkorange">{ branch.branchName }</span></div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 mt-4">
                     {/* BRANCH NAME */}
@@ -94,6 +104,33 @@ export default function AddBranch() {
                                 }
                             </SelectContent>
                         </Select>
+                        <div className="mt-4">Type of Branch</div>
+                        <RadioGroup
+                            className="mt-2 flex"
+                            value={String(branch.isInternal)}              
+                            name="isInternal"
+                            onValueChange={(value) => {
+                                setBranch((prev) => ({
+                                ...prev,
+                                isInternal: value === "true",           
+                                }));
+                            }}
+                        >
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="true" className="border-1 border-dark" id="r1" />
+                                <Label htmlFor="r1">Internal Branch</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="false" className="border-1 border-dark" id="r2" />
+                                <Label htmlFor="r2">External False</Label>
+                            </div>
+                        </RadioGroup>
+                        <Button 
+                            className="w-fit mt-4"
+                            onClick={ () => setOpen(!open) }
+                        >
+                            Register
+                        </Button>
                     </div>
 
                     <div className="flex flex-col gap-1">
@@ -138,42 +175,12 @@ export default function AddBranch() {
                             />
                         </div>
                     </div>
-
-                    <div className="col-span-2">
-                        <div className="mt-4">Type of Branch</div>
-                        <RadioGroup
-                            className="mt-2 flex"
-                            value={String(branch.isInternal)}              
-                            name="isInternal"
-                            onValueChange={(value) => {
-                                setBranch((prev) => ({
-                                ...prev,
-                                isInternal: value === "true",           
-                                }));
-                            }}
-                        >
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="true" className="border-1 border-dark" id="r1" />
-                                <Label htmlFor="r1">Internal Branch</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="false" className="border-1 border-dark" id="r2" />
-                                <Label htmlFor="r2">External False</Label>
-                            </div>
-                        </RadioGroup>
-                        <Button 
-                            className="w-fit mt-6"
-                            onClick={ () => setOpen(!open) }
-                        >
-                            Register
-                        </Button>
-                    </div>
                 </div>
             </div>
 
             <Dialog open={ open } onOpenChange={ setOpen }>
                 <DialogContent className="sm:max-w-md">
-                    <DialogTitle className="text-sm">Are you sure to add branch.</DialogTitle>
+                    <DialogTitle className="text-sm">Are you sure to update branch.</DialogTitle>
                     <div className="grid grid-cols-2 gap-2">
                         <div className="text-sm">Branch Name: </div>
                         <div className="text-sm font-semibold">{ branch.branchName || (<span className="font-normal text-sxm text-darkred">This field is required</span>) }</div>

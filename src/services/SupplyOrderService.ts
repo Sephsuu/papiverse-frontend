@@ -1,79 +1,97 @@
-const BASE_URL = 'http://localhost:8080/api/v1/supply-order'; 
+import { BASE_URL, getTokenFromLocalStorage } from "@/lib/utils";
 
-const SupplyOrderService = {
-    getAllSupply: async () => {
-        const response = await fetch(`${BASE_URL}/get-all`, {
+const URL = `${BASE_URL}/supply-order`;
+
+export class SupplyOrderService {
+    static async getAllSupply() {
+        const res = await fetch(`${URL}/get-all`, {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json', 
+                'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
+            },
         });
 
-        if (!response.ok) {
-            throw new Error('Error adding snow order');
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.message || 'Something went wrong.');
         }
 
-        const data = await response.json();
-        return data;
-    },
+        return res.json();
+    }
 
-    getSupplyOrderById: async (orderId: number) => {
-        const response = await fetch(`${BASE_URL}/get-by-orderId?orderId=${orderId}`, {
+    static async getSupplyOrderById(id: number) {
+        const res = await fetch(`${URL}/get-by-orderId?orderId=${id}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json', 
+                'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
+            },
         });
 
-        if (!response.ok) {
-            throw new Error('Error adding snow order');
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.message || 'Something went wrong.');
         }
 
-        const data = await response.json();
-        return data;
-    },
+        return res.json();
+    }
 
-    getSupplyOrderByBranch: async (branchId: number) => {
-        const response = await fetch(`${BASE_URL}/get-by-branch?id=${branchId}`, {
+    static async getSupplyOrderByBranch(id: number) {
+        const res = await fetch(`${URL}/get-by-branch?id=${id}`, {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json', 
+                'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
+            },
         });
 
-        if (!response.ok) {
-            throw new Error('Error adding snow order');
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.message || 'Something went wrong.');
         }
 
-        const data = await response.json();
-        return data;
-    },
+        return res.json();
+    }
 
-    createSupplyRequest: async (order: object) => {
-        const response = await fetch(`${BASE_URL}/create`, {
+    static async createSupplyOrder(order: object) {
+        const res = await fetch(`${BASE_URL}/create`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json', 
+                'Authorization' : `Bearer ${getTokenFromLocalStorage()}`,
+            },
             body: JSON.stringify(order),
         });
 
-        if (!response.ok) {
-            throw new Error('Login failed');
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.message || 'Something went wrong.');
         }
 
-        const data = await response.json();
-        return data;
-    },
-
-    updateOrderStatus: async (id: number, newStatus: string, meatApproved: boolean, snowApproved: boolean) => {
-        console.log(meatApproved, snowApproved, newStatus, id);
-        
-        
-        const response = await fetch(`${BASE_URL}/update-status?id=${id}&newStatus=${newStatus}&meatApproved=${meatApproved}&snowApproved=${snowApproved}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-        });
-
-        if (!response.ok) {
-            throw new Error('Update failed');
-        }
-
-        const data = await response.json();
-        return data;
+        return res.json();
     }
-};
 
-export default SupplyOrderService;
+    static async updateOrderStatus(id: number, newStatus: string, meatApproved: boolean, snowApproved: boolean) {
+        console.log(id, newStatus, meatApproved, snowApproved);
+        
+        const res = await fetch(`${URL}/update-status?id=${id}&newStatus=${newStatus}&meatApproved=${meatApproved}&snowApproved=${snowApproved}`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json', 
+                'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
+            },
+        });
+        console.log(res);
+        
+
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.message || 'Something went wrong.');
+        }
+
+        return res.json();
+    }
+
+    
+}

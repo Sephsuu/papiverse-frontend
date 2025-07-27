@@ -1,4 +1,5 @@
 import { BASE_URL, getTokenFromLocalStorage } from "@/lib/utils";
+import { Branch } from "@/types/branch";
 
 const URL = `${BASE_URL}/branches`; 
 
@@ -6,28 +7,83 @@ export class BranchService {
 	static async getAllBranches() {
 		const res = await fetch(`${URL}/get-branches`, {
 			method: 'GET',
-			headers: {'Content-Type' : 'application/json' }
+			headers: {
+				'Content-Type' : 'application/json',
+				'Authorization' : `Bearer ${getTokenFromLocalStorage()}` 
+			}
 		});
 		
-		if (!res.ok) throw new Error('Bad Response');
+		if (!res.ok) {
+			const err = await res.json();
+			throw new Error(err.message || 'Something went wrong');
+		}
 
 		return res.json();
 	}
+	
+	static async getBranchById(id: number) {
+		const res = await fetch(`${URL}/find-branch?id=${id}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type' : 'application/json',
+				'Authorization' : `Bearer ${getTokenFromLocalStorage()}` 
+			}
+		});
 
-	static async addBranch(branch: object) {
+		if (!res.ok) {
+			const err = await res.json();
+			throw new Error(err.message || 'Something went wrong');
+		}
+
+		return res.json();
+	}
+	
+	static async addBranch(branch: Branch) {
+		const payload = {
+			...branch,
+			zipCode: Number(branch.zipCode),
+		}
+		
 		const res = await fetch(`${URL}/add`, {
 			method: 'POST',
 			headers: { 
 				'Content-Type': 'application/json', 
                 'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
         	},
-        	body: JSON.stringify(branch),
-		});
+        	body: JSON.stringify(payload),
+		});	
 
-		if (!res.ok) throw new Error('Bad Response');
+		if (!res.ok) {
+			const err = await res.json();
+			throw new Error(err.message || 'Something went wrong');
+		}
 
 		return res.json();
 	}
+
+	static async updateBranch(branch: Branch) {
+		const payload = {
+			...branch,
+			zipCode: Number(branch.zipCode),
+		}
+		const res = await fetch(`${URL}/add`, {
+			method: 'POST',
+			headers: { 
+				'Content-Type': 'application/json', 
+                'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
+        	},
+        	body: JSON.stringify(payload),
+		});
+
+		if (!res.ok) {
+			const err = await res.json();
+			throw new Error(err.message || 'Something went wrong');
+		}
+
+		return res.json();
+	}
+
+
 }
 
 // {"branchName":"Krispy Papi Jupiter","streetAddress":"asss","barangay":"www","city":"sww","province":"ssss","zipCode":"sss","branchStatus":"Open","isInternal":false}

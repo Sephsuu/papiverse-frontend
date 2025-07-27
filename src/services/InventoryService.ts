@@ -1,91 +1,123 @@
-const BASE_URL = 'http://localhost:8080/api/v1/inventory'; 
+import { BASE_URL, getTokenFromLocalStorage } from "@/lib/utils";
+import { Inventory } from "@/types/inventory";
 
-const InventoryService = {
-    getInventoryByBranch: async (branchId: number) => {
-      const response = await fetch(`${BASE_URL}/get-by-branch?id=${branchId}`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json'},
-      });
-      
-      if (!response.ok) {
-        throw new Error('Cannot get inventory by branch');
-      }
+const URL = `${BASE_URL}/inventory`;
 
-      const data = await response.json();
-      return data;
-    },
+export class InventoryService {
+	static async getInventoryByBranch(id: number) {
+		const res = await fetch(`${URL}/get-by-branch?id=${id}`, {
+			method: 'GET',
+			headers: { 
+				'Content-Type': 'application/json', 
+				'Authorization' : `Bearer ${getTokenFromLocalStorage()}`,
+			},
+		})
 
-    createInventory: async (inventory  : object) => {
-      console.log(inventory);
-      
-      const response = await fetch(`${BASE_URL}/create`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json'},
-        body: JSON.stringify(inventory),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Cannot be added');
-      }
+		if (!res.ok) {
+			const err = await res.json();
+			throw new Error(err.message || 'Something went wrong.')
+		}
 
-      const data = await response.json();
-      return data;
-    },
-    deleteInventory: async (inventoryId : number) => {
-       const response = await fetch(`${BASE_URL}/delete?id=${inventoryId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json'},
-      });
-      
-      if (!response.ok) {
-        throw new Error('Cannot be Deleted');
-      }
+		return res.json();
+	}
 
-      return true;
-    },
-    processInput : async (transactionInput : object) => {
-      const response = await fetch(`${BASE_URL}/process-transaction-input`, {
-        method : 'POST',
-        headers : {'Content-Type': 'application/json'},
-        body : JSON.stringify(transactionInput),
-      });
+	static async getInventoryAudits(id: number) {
+		const res = await fetch(`${URL}/get-audits`, {
+			method: 'GET',
+			headers: { 
+				'Content-Type': 'application/json', 
+				'Authorization' : `Bearer ${getTokenFromLocalStorage()}`,
+			},
+		})
 
-      if(!response.ok) {
-          throw new Error('Cannot create input transaction');
-      }
+		if (!res.ok) {
+			const err = await res.json();
+			throw new Error(err.message || 'Something went wrong.')
+		}
 
-      const data = await response.json();
-      return data;
-    },
-    processOrder : async (transactionOrder : object) => {
-      const response = await fetch(`${BASE_URL}/process-transaction-order`, {
-        method : 'POST',
-        headers : {'Content-Type' : 'application/json'},
-        body : JSON.stringify(transactionOrder)
-      });
+		return res.json();
+	}
 
-      if(!response.ok) {
-        throw new Error("Cannot create Order Transaction")
-      }
+	static async createInventory(inventory: Inventory) {
+		const res = await fetch(`${URL}/create`, {
+			method: 'POST',
+			headers: { 
+				'Content-Type': 'application/json', 
+				'Authorization' : `Bearer ${getTokenFromLocalStorage()}`,
+			},
+			body: JSON.stringify(inventory),
+		})
 
-      const data = await response.json();
-      return data;
-    },
-    getAudits : async (branchId : number ) =>  {
-      const response = await fetch(`${BASE_URL}/get-audits`, {
-        method : 'GET',
-        headers : {'Content-type' : 'application/json'}
-      })
+		if (!res.ok) {
+			const err = await res.json();
+			throw new Error(err.message || 'Something went wrong.')
+		}
 
-      if (!response.ok) {
-        throw new Error('Cannot get inventory by branch');
-      }
+		return res.json();
+	}
 
-      const data = await response.json();
-      return data;
-    }
+	static async deleteInventory(id: number) {
+		const res = await fetch(`${URL}/delete?id=${id}`, {
+			method: 'POST',
+			headers: { 
+				'Content-Type': 'application/json', 
+				'Authorization' : `Bearer ${getTokenFromLocalStorage()}`,
+			},
+		})
 
+		if (!res.ok) {
+			const err = await res.json();
+			throw new Error(err.message || 'Something went wrong.')
+		}
+
+		return res.json();
+	}
+
+	static async createInventoryInput(inventory: Inventory) {
+		const payload = {
+			...inventory,
+			quantity: Number(inventory.quantity),
+			type: "IN",
+			source: "INPUT"
+		}
+		console.log(JSON.stringify(payload));
+		
+		const res = await fetch(`${URL}/process-transaction-input`, {
+			method: 'POST',
+			headers: { 
+				'Content-Type': 'application/json', 
+				'Authorization' : `Bearer ${getTokenFromLocalStorage()}`,
+			},
+			body: JSON.stringify(payload),
+		})
+
+		console.log(res);
+		
+
+		if (!res.ok) {
+			const err = await res.json();
+			throw new Error(err.message || 'Something went wrong.')
+		}
+
+		return res.json();
+	}
+
+	static async createInventoryOrder(inventory: Inventory) {
+		const res = await fetch(`${URL}/process-transaction-order`, {
+			method: 'POST',
+			headers: { 
+				'Content-Type': 'application/json', 
+				'Authorization' : `Bearer ${getTokenFromLocalStorage()}`,
+			},
+			body: JSON.stringify(inventory),
+		})
+
+		if (!res.ok) {
+			const err = await res.json();
+			throw new Error(err.message || 'Something went wrong.')
+		}
+
+		return res.json();
+	}
 
 }
-
-export default InventoryService;

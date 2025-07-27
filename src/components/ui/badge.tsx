@@ -43,4 +43,36 @@ function Badge({
   )
 }
 
-export { Badge, badgeVariants }
+function OrderStatusBadge({ status, padding } : { status: string, padding?: string }) {
+  return(
+    <div className={`text-[9px] h-fit w-fit px-2 py-0.5 rounded-sm font-semibold text-light ${padding} 
+        ${status === "PENDING" && "bg-darkyellow"}
+        ${status === "APPROVED" && "bg-darkgreen"}
+        ${status === "TO FOLLOW" && "bg-darkorange"}
+        ${status === "CANCELLED" && "bg-darkred"}
+        ${status === "REJECTED" && "bg-darkred"}
+        ${status === "DELIVERED" && "bg-blue"}
+    `}>
+        { status }
+    </div>
+  );
+}
+
+function OrderStatusLabel({ status, textSize } : { status: string, textSize?: "" }) {
+  return(
+    <div className={`font-semibold ${textSize}`}>Status: <span 
+        className={`
+          ${status === "PENDING" && "text-darkyellow"}
+          ${status === "APPROVED" && "text-darkgreen"}
+          ${status === "TO FOLLOW" && "text-darkorange"}
+          ${status === "REJECTED" && "text-darkred"}
+          ${status === "CANCELLED" && "text-darkred"}
+          ${status === "DELIVERED" && "text-blue"}
+    `}>
+            { status }
+        </span>
+    </div>
+  );
+}
+
+export { Badge, badgeVariants, OrderStatusBadge, OrderStatusLabel }

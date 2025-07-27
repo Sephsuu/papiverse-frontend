@@ -20,6 +20,7 @@ import { Branch } from "@/types/branch";
 import { AuthService } from "@/services/AuthService";
 import { PapiverseLoading } from "@/components/ui/loader";
 import { User, userFields, userInit } from "@/types/user";
+import Image from "next/image";
 
 const genders = ["Male", "Female", "Gay", "Lesbian", "Others"];
 
@@ -55,12 +56,6 @@ export default function AAddUser() {
         }
     }, [date]);
 
-    useEffect(() => {
-        console.log(user);
-        
-    }, [user])
-
-    // Handle form submission
     async function handleSubmit() {
        try{        
             for (const field of userFields) {
@@ -93,7 +88,22 @@ export default function AAddUser() {
         <section className="flex flex-col w-full h-screen align-center justify-center">
             <Toaster closeButton position="top-center" />
             <div className="w-200 mx-auto bg-white shadow-lg rounded-md mt-[-20px] p-8 max-md:w-full max-md:bg-light max-md:shadow-none">
-                <div className="font-semibold text-2xl mb-[-10px] mx-auto">Register New User</div>
+                <div className="flex items-center gap-2">
+                    <Image
+                        src="/images/kp_logo.png"
+                        alt="KP Logo"
+                        width={40}
+                        height={40}
+                    />
+                    <div className="font-semibold text-2xl">Register New User</div>
+                    <Image
+                        src="/images/papiverse_logo.png"
+                        alt="KP Logo"
+                        width={100}
+                        height={100}
+                        className="ms-auto"
+                    />
+                </div>
                 <div className="grid grid-cols-2 gap-2 mt-4">
                     <div className="flex flex-col gap-1">
                         {/* ACCOUNT DETAILS */}

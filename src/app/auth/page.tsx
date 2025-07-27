@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/sonner';
 import { handleChange } from '../../lib/form-handle';
-import { LoaderCircle } from 'lucide-react';
+import { jwtDecode } from 'jwt-decode';
 import { FormLoader } from '@/components/ui/loader';
 import { AuthService } from '@/services/AuthService';
 import { toast } from 'sonner';
@@ -20,16 +20,8 @@ export default function Login() {
             setProcess(true);
             const token = await AuthService.authenticateUser(credentials);
             if (token) {
-                localStorage.setItem('token', token);
-                toast.success('Logged in successfully! Please wait patiently.');
-                const claimsRes = await fetch('/api/claims', { credentials: 'include' });
-                console.log(claimsRes);
-                
-                if (claimsRes.ok) {
-                    const claims = await claimsRes.json();
-                    console.log(claims);
-                    
-                }
+                const res = await AuthService.setCookie(jwtDecode(token));
+                toast.info(res);
             }
         } catch (error) { toast.error(`${error}`) }
         finally {

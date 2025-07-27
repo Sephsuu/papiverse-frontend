@@ -2,7 +2,8 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PapiverseLoading } from "@/components/ui/loader";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { FormLoader, PapiverseLoading } from "@/components/ui/loader";
 import { Select, SelectTrigger } from "@/components/ui/select";
 import { BranchService } from "@/services/BranchService";
 import { UserService } from "@/services/UserService";
@@ -18,7 +19,9 @@ import { toast } from "sonner";
 
 export default function BranchesTable() {
     const [loading, setLoading] = useState(true);
+    const [onProcess, setProcess] = useState(false);
     const [search, setSearch] = useState('');
+    const [toDelete, setDelete] = useState<Branch | undefined>();
 
     const [branches, setBranches] = useState<Branch[]>([]);
     const [filteredBranches, setFilteredBranches] = useState<Branch[]>([]);
@@ -42,6 +45,15 @@ export default function BranchesTable() {
             ))
         } else setFilteredBranches(branches);
     }, [search, branches]);
+
+    async function handleDelete() {
+        try {
+            setProcess(true);
+            const data = await UserService.deleteUser(toDelete?.branchId!);
+            if (data) toast.success(`Branch ${toDelete?.branchName} deleted successfully.`)
+        } catch (error) { toast.error(`${error}`) }
+        finally { setProcess(false); }
+    }
 
     if (loading) return <PapiverseLoading />
     return(
@@ -94,7 +106,7 @@ export default function BranchesTable() {
                     </Button>
                     <Button className="!bg-darkorange text-light shadow-xs hover:opacity-90">
                         <Plus />
-                        <Link href="/admin/users/add-branch">Add a branch</Link>
+                        <Link href="/admin/branches/add-branch">Add a branch</Link>
                     </Button>
                 </div>
                 
@@ -119,9 +131,13 @@ export default function BranchesTable() {
                                 ): (<Badge className="text-xs text-darkred font-semibold" variant="secondary"><BadgeCheck />External Branch</Badge>)}
                             </div>
                             <div className="flex items-center pl-2 gap-3 border-b-1">
-                                <Link href={`/admin/users/edit-user`}><SquarePen className="w-4 h-4 text-darkgreen" /></Link>
+                                <Link href={`/admin/branches/edit-branch/${item.branchId}`}><SquarePen className="w-4 h-4 text-darkgreen" /></Link>
                                 <button><Info className="w-4 h-4" /></button>
-                                <button><Trash2 className="w-4 h-4 text-darkred" /></button>
+                                <button
+                                    onClick={ () => setDelete(item) }
+                                >
+                                    <Trash2 className="w-4 h-4 text-darkred" />
+                                </button>
                             </div>
                         </Fragment>
                     ))
@@ -129,6 +145,27 @@ export default function BranchesTable() {
                 }
             </div>
             <div className="text-gray text-sm">Showing { filteredBranches.length.toString() } of { filteredBranches.length.toString() } results.</div>
+
+            <Dialog open={ !!toDelete } onOpenChange={ (open) => { if (!open) setDelete(undefined) }}>
+                <DialogContent>
+                    <DialogTitle className="text-sm">Are you sure you want to delete branch { `${toDelete?.branchName}` }</DialogTitle>
+                    <div className="flex justify-end items-end gap-2">
+                        <Button 
+                            onClick={ () => setDelete(undefined) }
+                            variant="secondary"
+                        >
+                            Close
+                        </Button>
+                        <Button
+                            className="!bg-darkred"
+                            onClick={ () => handleDelete() }
+                        >
+                            {!onProcess && <Trash2 className="w-4 h-4 text-light" />}
+                            <FormLoader onProcess={ onProcess } label="Delete Branch" loadingLabel="Deleting Branch" /> 
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </section>
     )
 }

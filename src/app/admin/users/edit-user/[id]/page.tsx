@@ -14,7 +14,6 @@ import { Calendar1Icon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { toast } from "sonner";
-import { updateUserFields, userFields, userInit } from "@/lib/form-init";
 import { BranchService } from "@/services/BranchService";
 import { handleChange } from "@/lib/form-handle";
 import { Branch } from "@/types/branch";
@@ -22,13 +21,15 @@ import { AuthService } from "@/services/AuthService";
 import { PapiverseLoading } from "@/components/ui/loader";
 import { useParams } from "next/navigation";
 import { UserService } from "@/services/UserService";
+import { User, userFields, userInit } from "@/types/user";
+import Image from "next/image";
 
 const genders = ["Male", "Female", "Gay", "Lesbian", "Others"];
 
 export default function EditUser() {
     const params = useParams();
     const [loading, setLoading] = useState(true);
-    const [user, setUser] = useState(userInit);
+    const [user, setUser] = useState<User>(userInit);
     const [branches, setBranches] = useState<Branch[]>([]);
     const [updatedUser, setUpdatedUser] = useState({});
     const [open, setOpen] = useState(false);
@@ -53,7 +54,7 @@ export default function EditUser() {
     useEffect(() => {
         if (user.dateOfBirth) {
             setDate(new Date(user.dateOfBirth));
-            setUser(prev => ({
+            setUser((prev: User) => ({
                 ...prev,
                 branchId: String(selectedBranch?.branchId)
             }))
@@ -63,12 +64,12 @@ export default function EditUser() {
     }, [user.dateOfBirth]);
 
     const selectedBranch = branches.find(
-        (i) => i.branchId === Number(user.branch.branchId)
+        (i) => i.branchId === Number(user.branch?.branchId)
     );
 
     async function handleSubmit() {
        try{        
-            for (const field of updateUserFields) {
+            for (const field of userFields) {
                 if (
                     user[field] === "" ||
                     user[field] === null ||
@@ -93,7 +94,22 @@ export default function EditUser() {
         <section className="flex flex-col w-full h-screen align-center justify-center">
                 <Toaster closeButton position="top-center" />
             <div className="w-200 mx-auto bg-light shadow-lg rounded-md mt-[-20px] p-8 max-md:w-full max-md:bg-light max-md:shadow-none">
-                <div className="font-semibold text-2xl mb-[-10px] mx-auto">Edit User: <span className="text-darkorange">{ user.firstName }</span></div>
+                <div className="flex items-center gap-2">
+                    <Image
+                        src="/images/kp_logo.png"
+                        alt="KP Logo"
+                        width={40}
+                        height={40}
+                    />
+                    <div className="font-semibold text-2xl">Edit User: <span className="text-darkorange">{ user.firstName }</span></div>
+                    <Image
+                        src="/images/papiverse_logo.png"
+                        alt="KP Logo"
+                        width={100}
+                        height={100}
+                        className="ms-auto"
+                    />
+                </div>
                 <div className="grid grid-cols-2 gap-2 mt-4">
                     <div className="flex flex-col gap-1">
                         {/* ACCOUNT DETAILS */}
@@ -126,7 +142,7 @@ export default function EditUser() {
                         <RadioGroup  className="mt-2 flex" 
                             value={user.role} name="role" 
                             onValueChange={(value: string) => {
-                            setUser((prev) => ({
+                            setUser((prev: User) => ({
                                 ...prev,
                                 role : value
                             }))
@@ -207,7 +223,7 @@ export default function EditUser() {
                         </Popover>
                         <Select 
                             value={ user.gender ?? "" }
-                            onValueChange={ (value) => setUser(prev => ({
+                            onValueChange={ (value) => setUser((prev: User) => ({
                                 ...prev,
                                 gender: value
                             }))} 
@@ -225,7 +241,7 @@ export default function EditUser() {
                         </Select>
                         <Select 
                             value={ user.branchId ?? "" }
-                            onValueChange={ (value) => setUser(prev => ({
+                            onValueChange={ (value) => setUser((prev: User) => ({
                                 ...prev,
                                 branchId: value
                             }))} 
