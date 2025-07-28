@@ -6,12 +6,14 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/sonner';
 import { handleChange } from '../../lib/form-handle';
-import { jwtDecode } from 'jwt-decode';
 import { FormLoader } from '@/components/ui/loader';
 import { AuthService } from '@/services/AuthService';
 import { toast } from 'sonner';
+import { jwtDecode } from 'jwt-decode'
+import { useRouter } from 'next/navigation';
 
 export default function Login() {
+    const router = useRouter();
     const [credentials, setCredentials] = useState({ username: '', password: '' });
     const [onProcess, setProcess] = useState(false);
 
@@ -20,8 +22,12 @@ export default function Login() {
             setProcess(true);
             const token = await AuthService.authenticateUser(credentials);
             if (token) {
-                const res = await AuthService.setCookie(jwtDecode(token));
+                localStorage.setItem('token', token);
+                const res = await AuthService.setCookie(token);
                 toast.info(res);
+                const claims = await AuthService.getCookie();
+                if (claims.roles[0] === 'FRANCHISOR') router.push('/admin');
+                if (claims.roles[0] === 'FRANCHISEE') router.push('/franchisee');
             }
         } catch (error) { toast.error(`${error}`) }
         finally {

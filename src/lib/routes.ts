@@ -1,4 +1,4 @@
-import { Container, Store, UserRound } from "lucide-react";
+import { Container, Store, UserRound, UsersRound, Wallet } from "lucide-react";
 
 export const adminRoute = [
     { 
@@ -11,6 +11,30 @@ export const adminRoute = [
         title: 'Branches', 
         icon: Store,
         href: '/admin/branches',
+        children: []
+    },
+    { 
+        title: 'Inventory', 
+        icon: Container,
+        children: [
+            { title: 'Supplies', href: '/admin/inventory/supplies' },
+            { title: 'Inventories', href: '/admin/inventory/inventories' },
+            { title: 'Order Request', href: '/admin/inventory/order-request' },
+        ]
+    },
+]
+
+export const franchiseeRoute = [
+    { 
+        title: 'Employees', 
+        icon: UsersRound,
+        href: '/franchisee/employees',
+        children: []
+    },
+    { 
+        title: 'Expenses', 
+        icon: Wallet,
+        href: '/franchisee/expenses',
         children: []
     },
     { 

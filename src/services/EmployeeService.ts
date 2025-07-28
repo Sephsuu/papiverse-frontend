@@ -1,77 +1,99 @@
-const BASE_URL = 'http://localhost:8080/api/v1/employees'; 
+import { BASE_URL, getTokenFromLocalStorage } from "@/lib/utils";
+import { Employee } from "@/types/employee";
 
-const EmployeeService = {
-    getEmployeesByBranch: async (branchId: number) => {
-      const response = await fetch(`${BASE_URL}/get-by-branch?branchId=${branchId}`, {
-          method: 'GET',
-          headers: {'Content-Type' : 'application/json' }
-      });
-  
-      if(!response.ok){
-          throw new Error("Registration Failed");
-      }
-  
-      const data = await response.json();
-      return data;
-    },
+const URL = `${BASE_URL}/employees`;
 
-    getEmployeesById: async (id: number) => {
-       const response = await fetch(`${BASE_URL}/get-by-id?id=${id}`, {
-          method: 'GET',
-          headers: {'Content-Type' : 'application/json' }
-      });
-  
-      if(!response.ok){
-          throw new Error("Registration Failed");
-      }
-  
-      const data = await response.json();
-      return data;
-    },
+export class EmployeeService {
+  	static async getEmployeesByBranch(id: number) {
+		console.log(id);
+		
+		const res = await fetch(`${URL}/get-by-branch?branchId=${id}`, {
+			method: 'GET',	
+			headers: { 
+				'Content-Type': 'application/json',
+				'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
+			}
+		});
+		console.log(res);
+		
 
-    createEmployee: async (expense: object) => {
-      const response = await fetch(`${BASE_URL}/create`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json'},
-        body: JSON.stringify(expense),
-      });
-      
-      
-      if (!response.ok) {
-        throw new Error('Cannot be added');
-      }
+		if (!res.ok) {
+			const err = await res.json();
+			throw new Error(err.message || 'Something went wrong.');
+		}
 
-  
-      const data = await response.json();
-      return data;
-    },
+		return res.json();
+	}
 
-    updateEmployee: async (employee: object) => {
-      console.log(employee);
-      
-      const response = await fetch(`${BASE_URL}/update`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json'},
-          body: JSON.stringify(employee),
-        });
+	static async getEmployeeById(id: number) {
+		const res = await fetch(`${URL}/get-by-id?id=${id}`, {
+			method: 'GET',	
+			headers: { 
+				'Content-Type': 'application/json',
+				'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
+			}
+		});
 
-        console.log(JSON.stringify(employee));
-        
+		if (!res.ok) {
+			const err = await res.json();
+			throw new Error(err.message || 'Something went wrong.');
+		}
 
-        if (!response.ok) {
-          throw new Error('Cannot be added');
-        }
+		return res.json();
+	}
 
-        const data = await response.json();
-        return data;
-    },
+	static async createEmployee(employee: Employee, id: number) {
+		const payload = {
+			...employee,
+			branchId: id
+		}
+		const res = await fetch(`${URL}/create`, {
+			method: 'POST',	
+			headers: { 
+				'Content-Type': 'application/json',
+				'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
+			},
+			body: JSON.stringify(payload)
+		});
 
-    deleteEmployee: async (id: number) => {
-        await fetch(`${BASE_URL}/delete-by-id?id=${id}`, {
-            method: 'POST',
-            headers: {'Content-Type' : 'application/json' }
-        });
-    },
-};
-  
-export default EmployeeService;
+		if (!res.ok) {
+			const err = await res.json();
+			throw new Error(err.message || 'Something went wrong.');
+		}
+
+		return res.json();
+	}
+
+	static async updateEmployee(employee: Employee) {
+		const res = await fetch(`${URL}/update`, {
+			method: 'POST',	
+			headers: { 
+				'Content-Type': 'application/json',
+				'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
+			},
+			body: JSON.stringify(employee)
+		});
+
+		if (!res.ok) {
+			const err = await res.json();
+			throw new Error(err.message || 'Something went wrong.');
+		}
+
+		return res.json();
+	}
+
+	static async deleteEmployee(id: number) {
+		const res = await fetch(`${URL}/delete-by-id?id=${id}`, {
+			method: 'POST',	
+			headers: { 
+				'Content-Type': 'application/json',
+				'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
+			}
+		});
+
+		if (!res.ok) {
+			const err = await res.json();
+			throw new Error(err.message || 'Something went wrong.');
+		}
+	}
+}

@@ -20,11 +20,21 @@ export class AuthService {
 		return data.token;
 	}
 
-	static async setCookie(token: object) {
+	static async getCookie() {
+		const res = await fetch('/api/get-token', {
+			method: 'GET',
+			headers: { 'Content-Type': 'application/json' },
+			credentials: 'include',
+		});
+
+		return res.json();
+	}
+
+	static async setCookie(token: string) {
 		const res = await fetch('/api/set-token', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(token),
+			body: JSON.stringify({ token }),
 		});
 
 		if (res.ok) {

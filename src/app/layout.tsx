@@ -1,12 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/custom/sidebar";
-
-// export const metadata: Metadata = {
-//   title: 'About Us',
-//   description: 'Learn more about our team and mission.',
-// };
 
 export const metadata: Metadata = {
   title: {
@@ -24,10 +17,7 @@ export default function RootLayout({
   return (
     <html>
       <body className="bg-slate-200">
-        <SidebarProvider className="bg-slate-100">
-          <AppSidebar />
-          {children}
-        </SidebarProvider>
+            {children}
       </body>
     </html>
   );

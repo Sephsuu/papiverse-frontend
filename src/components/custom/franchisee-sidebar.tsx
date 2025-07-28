@@ -4,15 +4,16 @@ import { usePathname } from "next/navigation";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarProvider } from "../ui/sidebar";
 import Link from "next/link";
 import Image from "next/image";
-import { adminRoute } from "@/lib/routes";
+import { adminRoute, franchiseeRoute } from "@/lib/routes";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
-import { ChevronDown, ChevronUp, User2 } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
-export function AppSidebar() {
+export function FranchiseeSidebar() {
     const pathname = usePathname();
     const hideSidebar = pathname === "/auth" || pathname === "/";
+
     return(
         <>
         {!hideSidebar &&
@@ -34,7 +35,7 @@ export function AppSidebar() {
                         />
                     </Link>
                     <SidebarMenu className="mt-3">
-                        {adminRoute.map((item, index) => (
+                        {franchiseeRoute.map((item, index) => (
                             item.children.length !== 0 ?
                             <Collapsible className="group/collapsible" key={ index }>
                                 <SidebarMenuItem>

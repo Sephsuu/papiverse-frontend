@@ -1,9 +1,11 @@
+import { log } from 'console';
 import { cookies } from 'next/headers';
-import jwt from 'jsonwebtoken'; // or 'jwt-decode' if you prefer only decoding
 
 export async function POST(request: Request) {
     try {
         const { token } = await request.json();
+        console.log('Received token:', token);
+        
 
         if (!token) {
             return new Response(JSON.stringify({ error: 'Missing token' }), { status: 400 });
@@ -12,6 +14,7 @@ export async function POST(request: Request) {
         const base64Payload = token.split('.')[1];
         const decodedJson = Buffer.from(base64Payload, 'base64').toString();
         const decodedToken = JSON.parse(decodedJson);
+        console.log('Decoded Token:', decodedToken);
 
         const cookieStore = await cookies();
         cookieStore.set('decodedToken', JSON.stringify(decodedToken), {
@@ -26,10 +29,11 @@ export async function POST(request: Request) {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
         });
+
     } catch (error) {
         return new Response(
-        JSON.stringify({ error: 'Failed to process the token.' }),
-        { status: 500 }
+            JSON.stringify({ error: 'Failed to process the token.' }),
+            { status: 500 }
         );
     }
 }
