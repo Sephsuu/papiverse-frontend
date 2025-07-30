@@ -13,6 +13,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { WeeklyExpenses } from "./_components/WeeklyExpenses";
+
+const tabs = [ 'Weekly', 'Monthly', 'Yearly'];
 
 export default function ExpensesTable() {
     const { claims, loading: authLoading } = useAuth();
@@ -21,9 +24,9 @@ export default function ExpensesTable() {
     const [onProcess, setProcess] = useState(false);
     const [search, setSearch] = useState('');
     const [toDelete, setDelete] = useState<Expense>();
+    const [activeTab, setActiveTab] = useState('Weekly');
 
     const [expenses, setExpenses] = useState<Expense[]>([]);
-    const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
 
     useEffect(() => {
         async function fetchData() {
@@ -35,16 +38,6 @@ export default function ExpensesTable() {
         }
         fetchData();
     }, [claims, reload]);
-
-    useEffect(() => {
-        const find = search.toLowerCase().trim();
-        if (find !== '') {
-            setFilteredExpenses(expenses.filter(
-                (i) => i.firstName.toLowerCase().includes(find) ||
-                i.lastName.toLowerCase().includes(find)
-            ))
-        } else setFilteredExpenses(expenses);
-    }, [search, expenses]);
 
     async function handleDelete() {
         try {
@@ -85,7 +78,7 @@ export default function ExpensesTable() {
             <div className="flex items-center mt-2">
                 <input
                     className="py-1 pl-3 rounded-md bg-light shadow-xs w-100"
-                    placeholder="Search for an expense"
+                    placeholder="Search for an expenditure"
                     onChange={ e => setSearch(e.target.value) }
                 />
 
@@ -113,65 +106,27 @@ export default function ExpensesTable() {
                     </Button>
                     <Button className="!bg-darkorange text-light shadow-xs hover:opacity-90">
                         <Plus />
-                        <Link href="/franchisee/employees/add-employee">Add an employee</Link>
+                        <Link href="/franchisee/expenses/add-expense">Add an expenditure</Link>
                     </Button>
                 </div>
             </div>
-
-            <div className="grid grid-cols-3 bg-slate-200 font-semibold rounded-sm mt-2">
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Spender</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Purpose & Payment Method</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Actions</div>
+            <div className="flex w-fit rounded-full bg-light shadow-xs my-2">
+                {tabs.map((item, index) => (
+                    <button 
+                        onClick={ () => setActiveTab(item) }
+                        key={ index }
+                        className={ `w-20 py-0.5 rounded-full text-sm ${activeTab === item && "bg-darkorange text-light"}` }
+                    >
+                        { item }
+                    </button>
+                ))}
             </div>
-
-            <div className="grid grid-cols-3 bg-light rounded-b-sm shadow-xs">
-                {expenses.length > 0 ?
-                    filteredExpenses.map((item, index) => (
-                        <Fragment key={ index }>
-                            <div className="flex items-center gap-2 pl-2 py-2 border-b-1">
-                                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-brown text-lg text-light font-semibold">{ `${item.firstName[0]}${item.lastName[0]}` }</div>
-                                <div className="font-semibold">{ `${item.firstName}, ${item.lastName}` }</div>
-                            </div>
-                            <div className="flex flex-col items-center gap-1 text-sm pl-2 py-1.5 border-b-1 !truncate">
-                                <div className="truncate">{ item.purpose }</div>
-                                <div className="truncate">{ item.paymentMode }</div>
-                            </div>
-                            <div className="flex items-center pl-2 gap-3 border-b-1">
-                                <Link href={`/franchisee/expenses/edit-expense/${item.id}`}><SquarePen className="w-4 h-4 text-darkgreen" /></Link>
-                                <button><Info className="w-4 h-4" /></button>
-                                <button
-                                    onClick={ () => setDelete(item) }
-                                >
-                                    <Trash2 className="w-4 h-4 text-darkred" />
-                                </button>
-                            </div>
-                        </Fragment>
-                    ))
-                    : (<div className="my-2 text-sm text-center col-span-6">There are no existing expenses yet.</div>)
-                }
-            </div>
-            <div className="text-gray text-sm">Showing { filteredExpenses.length.toString() } of { filteredExpenses.length.toString() } results.</div>
-
-            <Dialog open={ !!toDelete } onOpenChange={ (open) => { if (!open) setDelete(undefined) } }>
-                <DialogContent>
-                    <DialogTitle className="text-sm">Are you sure you want to delete expense { toDelete?.purpose }</DialogTitle>
-                        <div className="flex justify-end items-end gap-2">
-                            <Button 
-                                onClick={ () => setDelete(undefined) }
-                                variant="secondary"
-                            >
-                                Close
-                            </Button>
-                            <Button
-                                className="!bg-darkred"
-                                onClick={ () => handleDelete() }
-                            >
-                                {!onProcess && <Trash2 className="w-4 h-4 text-light" />}
-                                <FormLoader onProcess={ onProcess } label="Delete Expense" loadingLabel="Deleting Expense" /> 
-                            </Button>
-                        </div>
-                </DialogContent>
-            </Dialog>
+            {activeTab === 'Weekly' && (
+                <WeeklyExpenses
+                    branchId={ claims.branch.branchId }
+                    search={ search }
+                />
+            )}
         
         </section>
     );

@@ -39,19 +39,27 @@ export class ExpenseService {
     }
 
     static async createExpense(expense: Expense) {
+        const payload = {
+            ...expense,
+            expense: Number(expense.expense),
+            purpose: expense.purpose.toUpperCase(),
+            date: new Date().toISOString().split('T')[0],
+        }
         const res = await fetch(`${URL}/create`, {
             method: 'POST',
             headers: { 
 				'Content-Type': 'application/json',
 				'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
 			},
-            body: JSON.stringify(expense),
+            body: JSON.stringify(payload),
         });
 
         if(!res.ok){
             const err = await res.json();
             throw new Error(err.message || "Something went wrong");
         }
+        console.log(res);
+        
 
         return res.json();
     }

@@ -12,9 +12,9 @@ export function FormLoader({ onProcess, label, loadingLabel }: LoaderProps) {
     else return <>{ label }</>
 }
 
-export function PapiverseLoading() {
+export function PapiverseLoading({ className }: { className?: string }) {
     return(
-        <section className="relative w-full h-screen">
+        <section className={ `relative w-full h-screen ${className}` }>
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-bounce">
                 <Image
                     src="/images/papiverse_logo.png"
