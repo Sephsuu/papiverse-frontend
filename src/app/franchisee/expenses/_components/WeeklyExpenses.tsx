@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { FormLoader, PapiverseLoading } from "@/components/ui/loader";
 import { Toaster } from "@/components/ui/sonner";
+import { formatDateToWords, formatToPeso, getWeekday } from "@/lib/formatter";
 import { ExpenseService } from "@/services/ExpenseService";
 import { Expense } from "@/types/expense";
 import { Info, SquarePen, Trash2 } from "lucide-react";
@@ -41,12 +42,13 @@ export function WeeklyExpenses({ branchId, search }: Props) {
         if (find !== '') {
             setFilteredExpenses(expenses.filter(
                 (i) => i.firstName!.toLowerCase().includes(find) ||
-                i.lastName!.toLowerCase().includes(find)
+                i.lastName!.toLowerCase().includes(find) ||
+                i.purpose!.toLowerCase().includes(find)
             ))
         } else setFilteredExpenses(expenses);
     }, [search, expenses]);
 
-    const groupedExpenses = expenses.reduce<Record<string, Expense[]>>((acc, expense) => {
+    const groupedExpenses = filteredExpenses.reduce<Record<string, Expense[]>>((acc, expense) => {
         if (!acc[expense.date]) {
             acc[expense.date] = [];
         }
@@ -79,38 +81,45 @@ export function WeeklyExpenses({ branchId, search }: Props) {
     return(
         <section className="w-full">
             <Toaster closeButton position="top-center" />
-            <div className="grid grid-cols-3 bg-slate-200 font-semibold rounded-sm mt-2">
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Spender</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Purpose & Payment Method</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Actions</div>
-            </div>
+            
+            {sortedDates.map((date) => {
+                const totalForDate = groupedExpenses[date].reduce((sum, expense) => sum + expense.expense, 0);
+                return(
+                    <div key={ date }>
+                        <div className="grid bg-slate-200 py-2 px-4 rounded-sm shadow-sm">
+                            <div className="flex justify-between">
+                                <div className="flex gap-1 items-center">
+                                    <div className="font-bold text-md">{formatDateToWords(date)}</div>
+                                    <div className="bg-dark h-fit rounded-sm text-light px-2 font-semibold text-[10px]">{ getWeekday(date) }</div>
+                                </div>
+                                <div className="mr-4 font-semibold">Total: <span className="text-darkred">{ formatToPeso(totalForDate) }</span></div>
+                            </div>
 
-            <div className="grid grid-cols-3 bg-light rounded-b-sm shadow-xs">
-                {expenses.length > 0 ?
-                    filteredExpenses.map((item, index) => (
-                        <Fragment key={ index }>
-                            <div className="flex items-center gap-2 pl-2 py-2 border-b-1">
-                                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-brown text-lg text-light font-semibold">{ `${item.firstName![0]}${item.lastName![0]}` }</div>
-                                <div className="font-semibold">{ `${item.firstName}, ${item.lastName}` }</div>
-                            </div>
-                            <div className="gap-1 text-sm pl-2 py-1.5 border-b-1 !truncate">
-                                <div className="truncate">{ item.purpose }</div>
-                                <div className="truncate text-gray">{ item.paymentMode }</div>
-                            </div>
-                            <div className="flex items-center pl-2 gap-3 border-b-1">
-                                <Link href={`/franchisee/expenses/edit-expense/${item.id}`}><SquarePen className="w-4 h-4 text-darkgreen" /></Link>
-                                <button><Info className="w-4 h-4" /></button>
-                                <button
-                                    onClick={ () => setDelete(item) }
-                                >
-                                    <Trash2 className="w-4 h-4 text-darkred" />
-                                </button>
-                            </div>
-                        </Fragment>
-                    ))
-                    : (<div className="my-2 text-sm text-center col-span-6">There are no existing expenses yet.</div>)
-                }
-            </div>
+                            {groupedExpenses[date].map((expense, index) => (
+                                <div key={index} className="grid grid-cols-7 px-4 py-2 bg-gray-100 rounded-sm my-0.5 shadown-sm">
+                                    <div className="flex gap-2 items-center col-span-2">
+                                        <div className="w-8 h-8 bg-brown text-light flex items-center justify-center rounded-full font-semibold">{ expense.firstName![0] }{ expense.lastName![0] }</div>
+                                        <div className="font-semibold text-sm">{ expense.firstName } { expense.lastName }</div>
+                                    </div>
+                                    <div className="col-span-3">
+                                        <div className="text-md text-sm font-semibold">{expense.purpose}</div>
+                                        <div className="text-xs text-gray font-semibold">{expense.paymentMode}</div>
+                                    </div>
+                                    <div className="col-span-1 flex items-center justify-start">
+                                        <div className="font-semibold">{ formatToPeso(expense.expense) }</div>
+                                    </div>
+                                    <div className="flex justify-center gap-2">
+                                        {/* <button onClick={ () => { setToUpdate(expense); setUpdate(!update) }}><SquarePen className="w-4 h-4 text-darkgreen"/></button>
+                                        <button onClick={ () => { setDelete(expense.id); setDestroy(!destroy) } }><Trash2 className="w-4 h-4 text-darkred"/></button>
+                                        <button><Info className="w-4 h-4"/></button> */}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+            })}
+
             <div className="text-gray text-sm">Showing { filteredExpenses.length.toString() } of { filteredExpenses.length.toString() } results.</div>
 
             <Dialog open={ !!toDelete } onOpenChange={ (open) => { if (!open) setDelete(undefined) } }>

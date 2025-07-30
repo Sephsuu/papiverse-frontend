@@ -1,8 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { FormLoader, PapiverseLoading } from "@/components/ui/loader";
+import { PapiverseLoading } from "@/components/ui/loader";
 import { Select, SelectTrigger } from "@/components/ui/select";
 import { Toaster } from "@/components/ui/sonner";
 import { useAuth } from "@/hooks/use-auth";
@@ -21,7 +20,6 @@ export default function InventoryTable() {
     const { claims, loading: authLoading } = useAuth();
     const [loading, setLoading] = useState(true);
     const [reload, setReload] = useState(false);
-    const [onProcess, setProcess] = useState(false);
     const [search, setSearch] = useState('');
     const [toDelete, setDelete] = useState<Inventory | undefined>();
 
@@ -47,19 +45,6 @@ export default function InventoryTable() {
             ))
         } else setFilteredInventories(inventories);
     }, [search, inventories]);
-
-    async function handleDelete() {
-        try {
-            setProcess(true);
-            await SupplyService.deleteSupply(toDelete?.code!);
-            toast.success(`Supply ${toDelete?.name} deleted successfully.`);
-        } catch (error) { toast.error(`${error}`) }
-        finally { 
-            setProcess(false); 
-            setDelete(undefined);
-            setReload(prev => !prev);
-        }
-    }
 
     if (loading || authLoading) return <PapiverseLoading />
     return(
@@ -119,15 +104,14 @@ export default function InventoryTable() {
                 
             </div>
 
-            <div className="grid grid-cols-5 bg-slate-200 font-semibold rounded-sm mt-2">
+            <div className="grid grid-cols-4 bg-slate-200 font-semibold rounded-sm mt-2">
                 <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">SKU ID</div>
                 <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Supply Name</div>
                 <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Stock <span className="font-normal">(qty |unit)</span></div>
                 <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Unit Price</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Action</div>
             </div>
 
-            <div className="grid grid-cols-5 bg-light rounded-b-sm shadow-xs">
+            <div className="grid grid-cols-4 bg-light rounded-b-sm shadow-xs">
                 {inventories.length > 0 ?
                     filteredInventories.map((item, index) => (
                         <Fragment key={ index }>
@@ -138,18 +122,9 @@ export default function InventoryTable() {
                                 <div>{ item.unitMeasurement }</div>
                             </div>
                             <div className="text-sm pl-2 py-1.5 border-b-1">{ formatToPeso(item.unitPrice!) }</div>
-                            <div className="flex items-center pl-2 gap-3 border-b-1">
-                                <Link href={`/admin/inventory/supplies/edit-supply/${item.code}`}><SquarePen className="w-4 h-4 text-darkgreen" /></Link>
-                                <button><Info className="w-4 h-4" /></button>
-                                <button
-                                    onClick={ () => setDelete(item) }
-                                >
-                                    <Trash2 className="w-4 h-4 text-darkred" />
-                                </button>
-                            </div>
                         </Fragment>
                     ))
-                    : (<div className="my-2 text-sm text-center col-span-6">There are no existing inventories yet.</div>)
+                    : (<div className="my-2 text-sm text-center col-span-6">There are no existing users yet.</div>)
                 }
             </div>
             <div className="text-gray text-sm">Showing { filteredInventories.length.toString() } of { filteredInventories.length.toString() } results.</div>
