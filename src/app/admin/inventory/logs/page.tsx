@@ -12,7 +12,6 @@ import { Download, Funnel } from "lucide-react";
 import Image from "next/image";
 import { Fragment, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { LogsAccordion } from "./_components/LogsAccordion";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
 
@@ -38,7 +37,7 @@ export default function InventoryLogs() {
         if (find !== '') {
             setFilteredLogs(logs.filter(
                 (i) => i.source.toLowerCase().includes(find) ||
-                i.orderId.toString().includes(find)
+                i.orderId!.toString().includes(find)
             ))
         } else setFilteredLogs(logs);
     }, [search, logs]);
@@ -61,7 +60,7 @@ export default function InventoryLogs() {
     console.log(groupedByDateAndOrder);
     
     function flattenGroupedLogsWithOrders(
-        groupedLogsByDateOrder: Record<string, Record<string, any[]>>
+        groupedLogsByDateOrder: Record<string, Record<string, InventoryLog[]>>
         ): { date: string; orders: { orderId: string | null; logs: any[] }[] }[] {
         const result: { date: string; orders: { orderId: string | null; logs: any[] }[] }[] = [];
 

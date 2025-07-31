@@ -4,9 +4,10 @@ export interface InventoryLog {
     rawMaterialCode: string;
     rawMaterialName: string;
     branchId: string;
+    branchName?: string;
     quantityChanged: number;
     type: string;
     source: string;
-    orderId: number;
+    orderId: number | null;
     dateTime: string;
 }

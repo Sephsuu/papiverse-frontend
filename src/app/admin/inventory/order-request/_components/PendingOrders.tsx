@@ -9,7 +9,6 @@ import { ViewOrderModal } from "./ViewOrderModal";
 import { ViewFullOrder } from "./ViewFullOrder";
 
 interface Props {
-    claims: any;
     filteredOrders: SupplyOrder[];
     setReload: React.Dispatch<SetStateAction<boolean>>;
     toView: SupplyOrder | undefined;
@@ -18,13 +17,7 @@ interface Props {
     setSelectedOrder: (i: SupplyOrder | undefined) => void;
 }
 
-export function PendingOrders({ claims, filteredOrders, setReload, toView, setToView, selectedOrder, setSelectedOrder }: Props) {
-    if (selectedOrder) return <ViewFullOrder 
-        claims={ claims }
-        selectedOrder={ selectedOrder } 
-        setSelectedOrder={ setSelectedOrder }
-        setReload={ setReload }
-    />
+export function PendingOrders({ filteredOrders, setReload, toView, setToView, selectedOrder, setSelectedOrder }: Props) {
     return(
         <section>
             <div className="flex items-center bg-slate-200 font-semibold rounded-sm mt-2">
@@ -66,16 +59,6 @@ export function PendingOrders({ claims, filteredOrders, setReload, toView, setTo
                 )) : (<div className="my-2 text-sm text-center col-span-6">There are no previous orders yet.</div>)
             }
             <div className="text-gray text-sm ms-2">Showing { filteredOrders.length.toString() } of { filteredOrders.length.toString() } results.</div>
-
-            
-            {toView && (
-                <ViewOrderModal
-                    claims={ claims }
-                    toView={ toView }
-                    setToView={ setToView }
-                    setReload={ setReload }
-                />
-            )}
         </section>
     );
 }

@@ -8,13 +8,14 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { formatDateToWords, formatToPeso } from "@/lib/formatter";
 import { InventoryService } from "@/services/InventoryService";
 import { SupplyOrderService } from "@/services/SupplyOrderService";
+import { Claim } from "@/types/claims";
 import { SupplyOrder } from "@/types/supplyOrder";
 import { Ham, Snowflake } from "lucide-react";
 import React, { SetStateAction, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 interface Props {
-    claims: any;
+    claims: Claim;
     toView: SupplyOrder;
     setToView: (i: SupplyOrder | undefined) => void;
     setReload: React.Dispatch<SetStateAction<boolean>>;

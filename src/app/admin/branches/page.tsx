@@ -8,10 +8,8 @@ import { Select, SelectTrigger } from "@/components/ui/select";
 import { BranchService } from "@/services/BranchService";
 import { UserService } from "@/services/UserService";
 import { Branch } from "@/types/branch";
-import { User } from "@/types/user";
 import { SelectValue } from "@radix-ui/react-select";
 import { BadgeCheck, Download, Funnel, Info, Plus, SquarePen, Trash2 } from "lucide-react";
-import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
@@ -49,7 +47,7 @@ export default function BranchesTable() {
     async function handleDelete() {
         try {
             setProcess(true);
-            const data = await UserService.deleteUser(toDelete?.branchId!);
+            const data = await UserService.deleteUser(toDelete!.branchId!);
             if (data) toast.success(`Branch ${toDelete?.branchName} deleted successfully.`)
         } catch (error) { toast.error(`${error}`) }
         finally { setProcess(false); }

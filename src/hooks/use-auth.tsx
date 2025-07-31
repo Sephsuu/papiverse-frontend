@@ -1,19 +1,32 @@
 "use client"
 
 import { AuthService } from '@/services/AuthService';
+import { Claim } from '@/types/claims';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 interface AuthContextType {
-    claims: any;
+    claims: Claim;
     loading: boolean;
+}
+
+const claimsInit = {
+    branch: {
+        branchId: 0,          // default numeric id, adjust as needed
+        isInternal: false,    // default boolean value
+    },
+    exp: 0,                 // default expiration timestamp (e.g., Unix epoch start)
+    iat: 0,                 // default issued-at timestamp
+    roles: [],              // empty array, no roles assigned yet
+    sub: "",                // empty string for subject
+    userId: 0,  
 }
 
 type AuthProviderProps = React.PropsWithChildren<{}>;
 
-const AuthContext = createContext<AuthContextType>({ claims: null, loading: true });
+const AuthContext = createContext<AuthContextType>({ claims: claimsInit, loading: true });
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-    const [claims, setClaims] = useState(null);
+    const [claims, setClaims] = useState(claimsInit);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -22,7 +35,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 const response = await AuthService.getCookie();
                 setClaims(response);
             } catch (error) {
-                setClaims(null);
+                setClaims(claimsInit);
             } finally {
                 setLoading(false);
             }

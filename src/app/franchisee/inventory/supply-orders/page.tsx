@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { OrderHistory } from "./_components/OrderHistory";
 import { PendingOrders } from "./_components/PendingOrders";
+import { ViewOrderModal } from "@/app/admin/inventory/order-request/_components/ViewOrderModal";
 
 export default function SupplyOrders() {
     const { claims, loading: authLoading } = useAuth();
@@ -53,6 +54,7 @@ export default function SupplyOrders() {
 
     if (loading || authLoading) return <PapiverseLoading />
     if (selectedOrder) return <ViewFullOrder 
+        claims={ claims }
         selectedOrder={ selectedOrder } 
         setSelectedOrder={ setSelectedOrder }
         setReload={ setReload }
@@ -118,6 +120,7 @@ export default function SupplyOrders() {
             </div>
 
             {activeTab && <PendingOrders 
+                claims={ claims }
                 filteredOrders={ filteredOrders.filter(i => ["PENDING", "TO FOLLOW"].includes(i.status)) }
                 setReload={ setReload }
                 toView={ toView }
@@ -134,6 +137,15 @@ export default function SupplyOrders() {
                 selectedOrder={ selectedOrder }
                 setSelectedOrder={ setSelectedOrder }
             />}
+
+            {toView && (
+                <ViewOrderModal
+                    claims={ claims }
+                    toView={ toView }
+                    setToView={ setToView }
+                    setReload={ setReload }
+                />
+            )}
         </section>
     );
 } 

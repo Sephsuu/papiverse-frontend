@@ -9,7 +9,6 @@ import { ViewOrderModal } from "./ViewOrderModal";
 import { ViewFullOrder } from "./ViewFullOrder";
 
 interface Props {
-    claims: any;
     filteredOrders: SupplyOrder[];
     setReload: React.Dispatch<SetStateAction<boolean>>;
     toView: SupplyOrder | undefined;
@@ -18,13 +17,7 @@ interface Props {
     setSelectedOrder: (i: SupplyOrder | undefined) => void;
 }
 
-export function OrderHistory({ claims, filteredOrders, setReload, toView, setToView, selectedOrder, setSelectedOrder }: Props) {
-    if (selectedOrder) return <ViewFullOrder 
-        claims={ claims }
-        selectedOrder={ selectedOrder } 
-        setSelectedOrder={ setSelectedOrder }
-        setReload={ setReload }
-    />
+export function OrderHistory({ filteredOrders, setReload, toView, setToView, selectedOrder, setSelectedOrder }: Props) {
     return(
         <section>
             <div className="flex items-center bg-slate-200 font-semibold rounded-sm mt-2">
@@ -67,15 +60,6 @@ export function OrderHistory({ claims, filteredOrders, setReload, toView, setToV
             }
             <div className="text-gray text-sm ms-2">Showing { filteredOrders.length.toString() } of { filteredOrders.length.toString() } results.</div>
 
-            
-            {toView && (
-                <ViewOrderModal
-                    claims={ claims }
-                    toView={ toView }
-                    setToView={ setToView }
-                    setReload={ setReload }
-                />
-            )}
         </section>
     );
 }

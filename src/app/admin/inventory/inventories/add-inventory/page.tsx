@@ -56,7 +56,7 @@ export default function AddInventory() {
     }, []);
 
     useEffect(() => {
-        setMeasurement(supplies.find(i => i.code === inventory.rawMaterialCode)?.unitMeasurement!)
+        setMeasurement(supplies.find(i => i.code === inventory.rawMaterialCode)!.unitMeasurement!)
     }, [inventory.rawMaterialCode])
 
     if (loading) return <PapiverseLoading />

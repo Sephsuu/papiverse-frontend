@@ -11,9 +11,10 @@ import { OrdersAccordion } from "./OrdersAccordion";
 import { SupplyOrderService } from "@/services/SupplyOrderService";
 import { InventoryService } from "@/services/InventoryService";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Claim } from "@/types/claims";
 
 interface Props {
-    claims: any;
+    claims: Claim;
     filteredOrders: SupplyOrder[];
     setReload: React.Dispatch<SetStateAction<boolean>>;
     toView: SupplyOrder | undefined;
@@ -97,16 +98,6 @@ export function OrderHistory({ claims, filteredOrders, setReload, toView, setToV
                 )) : (<div className="my-2 text-sm text-center col-span-6">There are no previous orders yet.</div>)
             }
             <div className="text-gray text-sm ms-2">Showing { filteredOrders.length.toString() } of { filteredOrders.length.toString() } results.</div>
-
-            
-            {toView && (
-                <ViewOrderModal
-                    claims={ claims }
-                    toView={ toView }
-                    setToView={ setToView }
-                    setReload={ setReload }
-                />
-            )}
         </section>
     );
 }

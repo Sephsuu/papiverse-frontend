@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { formatDateToWords, formatToPeso } from "@/lib/formatter";
 import { InventoryService } from "@/services/InventoryService";
 import { SupplyOrderService } from "@/services/SupplyOrderService";
+import { Claim } from "@/types/claims";
 import { SupplyOrder } from "@/types/supplyOrder";
 import { Ham, Snowflake } from "lucide-react";
 import Image from "next/image";
@@ -14,7 +15,7 @@ import { SetStateAction, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 interface Props {
-    claims: any;
+    claims: Claim;
     editable?: true | boolean;
     selectedOrder: SupplyOrder;
     setSelectedOrder: (i: SupplyOrder | undefined) => void;

@@ -15,6 +15,7 @@ import { ViewFullOrder } from "./_components/ViewFullOrder";
 import { PendingOrders } from "./_components/PendingOrders";
 import { OrderHistory } from "./_components/OrderHistory";
 import { useAuth } from "@/hooks/use-auth";
+import { ViewOrderModal } from "./_components/ViewOrderModal";
 
 
 export default function OrderSupplyTable() {
@@ -119,7 +120,6 @@ export default function OrderSupplyTable() {
             </div>
 
             {activeTab && <PendingOrders 
-                claims={ claims }
                 filteredOrders={ filteredOrders.filter(i => ["PENDING", "TO FOLLOW"].includes(i.status)) }
                 setReload={ setReload }
                 toView={ toView }
@@ -128,7 +128,6 @@ export default function OrderSupplyTable() {
                 setSelectedOrder={ setSelectedOrder }
             />}
             {!activeTab && <OrderHistory 
-                claims={ claims }
                 filteredOrders={ filteredOrders.filter(i => ["APPROVED", "REJECTED", "DELIVERED"].includes(i.status)) }
                 setReload={ setReload }
                 toView={ toView }
@@ -136,6 +135,15 @@ export default function OrderSupplyTable() {
                 selectedOrder={ selectedOrder }
                 setSelectedOrder={ setSelectedOrder }
             />}
+
+            {toView && (
+                <ViewOrderModal
+                    claims={ claims }
+                    toView={ toView }
+                    setToView={ setToView }
+                    setReload={ setReload }
+                />
+            )}
 
         </section>
     );
