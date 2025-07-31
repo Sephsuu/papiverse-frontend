@@ -13,14 +13,6 @@ export default function AdminPage() {
     console.log(claims);
     
 
-    useEffect(() => {
-        async function fetchData() {
-            const data = await UserService.getUserById(claims.userId);
-            setUser(data);
-        }
-        fetchData();
-    }, [claims])
-
     if (loading) return <PapiverseLoading />
     return(
         <section>
