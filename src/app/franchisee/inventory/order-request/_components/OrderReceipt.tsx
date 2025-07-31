@@ -55,8 +55,8 @@ export function OrderReceipt({ claims, setActiveForm, selectedItems }: Props) {
         try {
             setProcess(true);
 
-            const updatedMeatOrder = {...meatOrder, id: "MEAT-058", branchId: claims.branch.branchId, categoryItems: meatReceipt, totalAmount: null};
-            const updatedSnowOrder = {...snowOrder, id: "SNOW-058", branchId: claims.branch.branchId, categoryItems: snowFrostReceipt, totalAmount: null};
+            const updatedMeatOrder = {...meatOrder, id: "MEAT-059", branchId: claims.branch.branchId, categoryItems: meatReceipt, totalAmount: null};
+            const updatedSnowOrder = {...snowOrder, id: "SNOW-059", branchId: claims.branch.branchId, categoryItems: snowFrostReceipt, totalAmount: null};
             
             setMeatOrder(updatedMeatOrder);
             setSnowOrder(updatedSnowOrder);
