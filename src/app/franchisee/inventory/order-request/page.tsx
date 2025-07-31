@@ -41,7 +41,7 @@ export default function OrderRequest() {
     }, []);    
 
     const handleSelect = async (code: string) => {
-        if (!selectedItems.find((item: any) => item.code === code)) {
+        if (!selectedItems.find((item: SupplyItem) => item.code === code)) {
             const selectedItem = supplies.find(item => item.code === code);
             if (selectedItem) {
             setSelectedItems([
@@ -55,7 +55,7 @@ export default function OrderRequest() {
     };
 
     const handleQuantityChange = async (code: string, quantity: number) => {
-        setSelectedItems(selectedItems.map((item: any) => 
+        setSelectedItems(selectedItems.map((item: SupplyItem) => 
             item.code === code 
                 ? { ...item, quantity: quantity || 0 } 
                 : item
@@ -63,7 +63,7 @@ export default function OrderRequest() {
     };
 
     const handleRemove = async (code: string) => {
-        setSelectedItems(selectedItems.filter((item: any) => item.code !== code));
+        setSelectedItems(selectedItems.filter((item: SupplyItem) => item.code !== code));
     };
 
     if (loading) return <PapiverseLoading />

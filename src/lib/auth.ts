@@ -1,3 +1,4 @@
+import { Claim } from "@/types/claims";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -38,18 +39,12 @@ export async function requireRole(allowedRoles: string[]) {
 
 export async function requirePermission(permission: string) {
     const token = await requireAuth();
-
-    if (!token.permissions?.includes(permission)) {
-        redirect('/unauthorized');
+        if (!token.permissions?.includes(permission)) {
+            redirect('/unauthorized');
+        }
+        return token;
     }
 
-    return token;
-    }
-
-    export function hasRole(token: any, roles: string[]): boolean {
+    export function hasRole(token: Claim, roles: string[]): boolean {
     return roles.includes(token.roles[0]);
-}
-
-export function hasPermission(token: any, permission: string): boolean {
-    return token.permissions?.includes(permission) || false;
 }
