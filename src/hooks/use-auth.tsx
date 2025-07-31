@@ -21,7 +21,7 @@ const claimsInit = {
     userId: 0,  
 }
 
-type AuthProviderProps = React.PropsWithChildren<{}>;
+type AuthProviderProps = React.PropsWithChildren<object>;
 
 const AuthContext = createContext<AuthContextType>({ claims: claimsInit, loading: true });
 

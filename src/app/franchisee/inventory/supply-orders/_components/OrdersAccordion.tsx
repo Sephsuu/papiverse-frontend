@@ -31,7 +31,7 @@ export function OrdersAccordion({ order }: { order: SupplyOrder}) {
                             <div className="mt-2 text-sm">{ formatToPeso(order.meatCategory!.categoryTotal ) }</div>
                         </ AccordionContent>
                     ) : (
-                        <AccordionContent className="text-center text-gray py-1 font-semibold">You don't have an order for meat</AccordionContent>
+                        <AccordionContent className="text-center text-gray py-1 font-semibold">You don&apos;t have an order for meat</AccordionContent>
                     )}
             </AccordionItem>
             <AccordionItem value={ String(order.snowfrostCategory!.snowFrostOrderId) }>
