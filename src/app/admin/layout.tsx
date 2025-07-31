@@ -21,7 +21,7 @@ export default async function RootLayout({
   await requireRole(['FRANCHISOR']);
   return (
     <AuthProvider>
-      <SidebarProvider className="bg-slate-100">
+      <SidebarProvider className="bg-slate-100 max-w-[2560px] mx-auto">
         <AdminSidebar />
         {children}
       </SidebarProvider>

@@ -5,6 +5,7 @@ import { FormLoader } from "@/components/ui/loader";
 import { Separator } from "@/components/ui/separator";
 import { Toaster } from "@/components/ui/sonner";
 import { formatDateToWords, formatToPeso } from "@/lib/formatter";
+import { InventoryService } from "@/services/InventoryService";
 import { SupplyOrderService } from "@/services/SupplyOrderService";
 import { SupplyOrder } from "@/types/supplyOrder";
 import { Ham, Snowflake } from "lucide-react";
@@ -13,12 +14,14 @@ import { SetStateAction, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 interface Props {
+    claims: any;
+    editable?: true | boolean;
     selectedOrder: SupplyOrder;
     setSelectedOrder: (i: SupplyOrder | undefined) => void;
     setReload: React.Dispatch<SetStateAction<boolean>>;
 }
 
-export function ViewFullOrder({ selectedOrder, setSelectedOrder, setReload }: Props) {
+export function ViewFullOrder({ claims, selectedOrder, setSelectedOrder, setReload, editable }: Props) {
     const [onProcess, setProcess] = useState(false);
     const [meatApproved, setMeatApproved] = useState(selectedOrder.meatCategory?.isApproved);
     const [snowApproved, setSnowApproved] = useState(selectedOrder.snowfrostCategory?.isApproved);
@@ -40,12 +43,12 @@ export function ViewFullOrder({ selectedOrder, setSelectedOrder, setReload }: Pr
             if (meatApproved && snowApproved) {      
                 toast.success(`Order ${selectedOrder.meatCategory!.meatOrderId} and ${selectedOrder.snowfrostCategory!.snowFrostOrderId} updated status to APPROVED`);
                 await SupplyOrderService.updateOrderStatus(selectedOrder.orderId!, "APPROVED", meatApproved, snowApproved);
-                // return await Inve.processOrder({
-                //     "branchId" : claims.branch.branchId,
-                //     "type" : "OUT",
-                //     "source" : "ORDER",
-                //     "orderId" : selectedOrder.orderId
-                // });
+                return await InventoryService.createInventoryOrder({
+                    "branchId" : claims.branch.branchId,
+                    "type" : "OUT",
+                    "source" : "ORDER",
+                    "orderId" : selectedOrder.orderId
+                });
             }
             if (!meatApproved && !snowApproved) {
                 toast.success(`Order ${selectedOrder.meatCategory!.meatOrderId} and ${selectedOrder.snowfrostCategory!.snowFrostOrderId} updated status to PENDING`);

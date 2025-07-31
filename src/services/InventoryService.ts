@@ -12,6 +12,8 @@ export class InventoryService {
 				'Authorization' : `Bearer ${getTokenFromLocalStorage()}`,
 			},
 		})
+		console.log(res);
+		
 
 		if (!res.ok) {
 			const err = await res.json();
@@ -22,7 +24,7 @@ export class InventoryService {
 	}
 
 	static async getInventoryAudits(id: number) {
-		const res = await fetch(`${URL}/get-audits`, {
+		const res = await fetch(`${URL}/get-audits?branchId=${id}`, {
 			method: 'GET',
 			headers: { 
 				'Content-Type': 'application/json', 
@@ -90,7 +92,6 @@ export class InventoryService {
 			},
 			body: JSON.stringify(payload),
 		})
-
 		console.log(res);
 		
 
@@ -111,6 +112,7 @@ export class InventoryService {
 			},
 			body: JSON.stringify(inventory),
 		})
+console.log(res);
 
 		if (!res.ok) {
 			const err = await res.json();

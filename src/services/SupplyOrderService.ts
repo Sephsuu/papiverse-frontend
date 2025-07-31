@@ -51,11 +51,14 @@ export class SupplyOrderService {
             throw new Error(err.message || 'Something went wrong.');
         }
 
+        console.log(res);
+        
+
         return res.json();
     }
 
     static async createSupplyOrder(order: object) {
-        const res = await fetch(`${BASE_URL}/create`, {
+        const res = await fetch(`${URL}/create`, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json', 
@@ -63,6 +66,8 @@ export class SupplyOrderService {
             },
             body: JSON.stringify(order),
         });
+        console.log(res);
+        
 
         if (!res.ok) {
             const err = await res.json();
@@ -82,8 +87,6 @@ export class SupplyOrderService {
                 'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
             },
         });
-        console.log(res);
-        
 
         if (!res.ok) {
             const err = await res.json();

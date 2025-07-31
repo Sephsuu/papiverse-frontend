@@ -19,6 +19,7 @@ export const adminRoute = [
         children: [
             { title: 'Supplies', href: '/admin/inventory/supplies' },
             { title: 'Inventories', href: '/admin/inventory/inventories' },
+            { title: 'Inventory Logs', href: '/admin/inventory/logs' },
             { title: 'Order Request', href: '/admin/inventory/order-request' },
         ]
     },
@@ -43,6 +44,7 @@ export const franchiseeRoute = [
         children: [
             { title: 'Inventories', href: '/franchisee/inventory/inventories' },
             { title: 'Supply Orders', href: '/franchisee/inventory/supply-orders/' },
+            { title: 'Inventory Logs', href: '/franchisee/inventory/inventory-logs' },
         ]
     },
 ]

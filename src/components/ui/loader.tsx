@@ -1,5 +1,6 @@
 import { LoaderCircle } from "lucide-react";
 import Image from "next/image";
+import { Sidebar, SidebarContent } from "./sidebar";
 
 interface LoaderProps {
     onProcess: boolean;
@@ -24,6 +25,26 @@ export function PapiverseLoading({ className }: { className?: string }) {
                 />
                 <div className="text-lg text-center">LOADING</div>
             </div>
+        </section>
+    );
+}
+
+export function SidebarLoading() {
+    return(
+        <section>
+            <Sidebar
+                variant="floating" 
+                collapsible="icon"
+            >
+                <SidebarContent 
+                    className="rounded-md flex justify-center items-center"
+                    style={{ backgroundImage: "url(/images/sidebar_bg.svg)" }}
+                >
+            
+                    <LoaderCircle className="w-15 h-15 animate-spin" strokeWidth={3} />
+                </SidebarContent>
+                
+            </Sidebar>
         </section>
     );
 }

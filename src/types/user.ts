@@ -12,6 +12,7 @@ export interface User {
     branchId: string | undefined;
     role: string;
 
+    imageUrl?: string;
     confirmPassword?: string;
     branch?: {
         branchId: number;

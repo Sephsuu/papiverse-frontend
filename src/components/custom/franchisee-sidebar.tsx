@@ -1,6 +1,6 @@
 "use client"
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarProvider } from "../ui/sidebar";
 import Link from "next/link";
 import Image from "next/image";
@@ -9,11 +9,25 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/colla
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { toast } from "sonner";
+import { useAuth } from "@/hooks/use-auth";
+import { PapiverseLoading } from "../ui/loader";
 
 export function FranchiseeSidebar() {
+    const { claims, loading } = useAuth();
+    const router = useRouter();
     const pathname = usePathname();
     const hideSidebar = pathname === "/auth" || pathname === "/";
 
+    const handleLogout = () => {
+        console.log('clicked');
+        
+        toast.success("Logging out. Please wait patiently.", { duration: Infinity });
+        localStorage.removeItem('token');
+        router.push("/auth");
+    }
+
+    if (loading) return <PapiverseLoading />
     return(
         <>
         {!hideSidebar &&
@@ -83,7 +97,7 @@ export function FranchiseeSidebar() {
                                         <AvatarImage src={""} alt="" />
                                         <AvatarFallback className="bg-amber-900 text-light">KP</AvatarFallback>
                                     </Avatar>
-                                    Username
+                                    { claims.sub }
                                     <ChevronUp className="ml-auto" />
                                 </SidebarMenuButton>
                                 </DropdownMenuTrigger>
@@ -97,7 +111,7 @@ export function FranchiseeSidebar() {
                                 <DropdownMenuItem>
                                     <span>Billing</span>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem onClick={ handleLogout }>
                                     <span>Sign out</span>
                                 </DropdownMenuItem>
                                 </DropdownMenuContent>

@@ -10,7 +10,7 @@ import { InventoryService } from "@/services/InventoryService";
 import { SupplyService } from "@/services/RawMaterialService";
 import { Inventory } from "@/types/inventory";
 import { SelectValue } from "@radix-ui/react-select";
-import { Download, Funnel, Info, Plus, SquarePen, Trash2 } from "lucide-react";
+import { Download, Funnel, Info, PackagePlus, Plus, SquarePen, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
@@ -19,9 +19,7 @@ import { toast } from "sonner";
 export default function InventoryTable() {
     const { claims, loading: authLoading } = useAuth();
     const [loading, setLoading] = useState(true);
-    const [reload, setReload] = useState(false);
     const [search, setSearch] = useState('');
-    const [toDelete, setDelete] = useState<Inventory | undefined>();
 
     const [inventories, setInventories] = useState<Inventory[]>([]);
     const [filteredInventories, setFilteredInventories] = useState<Inventory[]>([]);
@@ -35,7 +33,9 @@ export default function InventoryTable() {
             finally { setLoading(false) }
         }
         fetchData();
-    }, [reload]);
+    }, []);
+    console.log(inventories);
+    
 
     useEffect(() => {
         const find = search.toLowerCase().trim();
@@ -97,8 +97,8 @@ export default function InventoryTable() {
                         Export
                     </Button>
                     <Button className="!bg-darkorange text-light shadow-xs hover:opacity-90">
-                        <Plus />
-                        <Link href="/admin/inventory/inventories/add-inventory">Add an inventory</Link>
+                        <PackagePlus />
+                        <Link href="/franchisee/inventory/order-request">Order/Request Supply</Link>
                     </Button>
                 </div>
                 

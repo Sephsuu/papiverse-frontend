@@ -1,5 +1,6 @@
 export interface Inventory {
     id?: number;
+    orderId?: number;
     code?: string;
     name?: string;
     unitPrice?: number;

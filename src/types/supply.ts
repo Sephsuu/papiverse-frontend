@@ -6,6 +6,8 @@ export type Supply = {
     unitPriceInternal?: number;
     unitPriceExternal?: number;
     category?: string;
+
+    unitPrice?: number; 
 }
 
 export const supplyInit: Supply = {

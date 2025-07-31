@@ -6,6 +6,7 @@ import { FormLoader } from "@/components/ui/loader";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { formatDateToWords, formatToPeso } from "@/lib/formatter";
+import { InventoryService } from "@/services/InventoryService";
 import { SupplyOrderService } from "@/services/SupplyOrderService";
 import { SupplyOrder } from "@/types/supplyOrder";
 import { Ham, Snowflake } from "lucide-react";
@@ -13,12 +14,13 @@ import React, { SetStateAction, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 interface Props {
+    claims: any;
     toView: SupplyOrder;
     setToView: (i: SupplyOrder | undefined) => void;
     setReload: React.Dispatch<SetStateAction<boolean>>;
 }
 
-export function ViewOrderModal({ toView, setToView, setReload }: Props) {
+export function ViewOrderModal({ claims, toView, setToView, setReload }: Props) {
     const [onProcess, setProcess] = useState(false);
     const [reject, setReject] = useState(false);
     const [meatApproved, setMeatApproved] = useState<boolean>(toView.meatCategory!.isApproved);
@@ -41,12 +43,12 @@ export function ViewOrderModal({ toView, setToView, setReload }: Props) {
             if (meatApproved && snowApproved) {      
                 toast.success(`Order ${toView.meatCategory!.meatOrderId} and ${toView.snowfrostCategory!.snowFrostOrderId} updated status to APPROVED`);
                 await SupplyOrderService.updateOrderStatus(toView.orderId!, "APPROVED", meatApproved, snowApproved);
-                // return await Inve.processOrder({
-                //     "branchId" : claims.branch.branchId,
-                //     "type" : "OUT",
-                //     "source" : "ORDER",
-                //     "orderId" : selectedOrder.orderId
-                // });
+                return await InventoryService.createInventoryOrder({
+                    "branchId" : claims.branch.branchId,
+                    "type" : "OUT",
+                    "source" : "ORDER",
+                    "orderId" : toView.orderId
+                });
             }
             if (!meatApproved && !snowApproved) {
                 toast.success(`Order ${toView.meatCategory!.meatOrderId} and ${toView.snowfrostCategory!.snowFrostOrderId} updated status to PENDING`);

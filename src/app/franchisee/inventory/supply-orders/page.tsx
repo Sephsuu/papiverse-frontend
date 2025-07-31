@@ -1,24 +1,21 @@
-"use client";
+"use client"
 
-import { Select, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CircleFadingArrowUp, Download, Funnel, History } from "lucide-react";
-import Link from "next/link";
-import { useEffect, useState } from "react";
+import { ViewFullOrder } from "@/app/admin/inventory/order-request/_components/ViewFullOrder";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import { toast } from "sonner";
+import { PapiverseLoading } from "@/components/ui/loader";
+import { Select, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useAuth } from "@/hooks/use-auth";
 import { SupplyOrderService } from "@/services/SupplyOrderService";
 import { SupplyOrder } from "@/types/supplyOrder";
-import { PapiverseLoading } from "@/components/ui/loader";
-import { Toaster } from "@/components/ui/sonner";
-import { ViewFullOrder } from "./_components/ViewFullOrder";
-import { PendingOrders } from "./_components/PendingOrders";
+import { CircleFadingArrowUp, Download, Funnel, History } from "lucide-react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { OrderHistory } from "./_components/OrderHistory";
-import { useAuth } from "@/hooks/use-auth";
+import { PendingOrders } from "./_components/PendingOrders";
 
-
-export default function OrderSupplyTable() {
-    const { claims, loading: authLoading} = useAuth();
+export default function SupplyOrders() {
+    const { claims, loading: authLoading } = useAuth();
     const [loading, setLoading] = useState(true);
     const [reload, setReload] = useState(false); 
     const [search, setSearch] = useState('');
@@ -32,13 +29,16 @@ export default function OrderSupplyTable() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const data: SupplyOrder[] = await SupplyOrderService.getAllSupply();
+                const data: SupplyOrder[] = await SupplyOrderService.getSupplyOrderByBranch(claims.branch.branchId);
                 setOrders(data);
             } catch (error) { toast.error(`${error}`) }
             finally { setLoading(false) }
         }
         fetchData();
-    }, [reload]);
+    }, [claims, reload]);
+
+    console.log(orders);
+    
 
     useEffect(() => {
         const find = search.toLowerCase().trim();
@@ -53,14 +53,12 @@ export default function OrderSupplyTable() {
 
     if (loading || authLoading) return <PapiverseLoading />
     if (selectedOrder) return <ViewFullOrder 
-        claims={ claims }
         selectedOrder={ selectedOrder } 
         setSelectedOrder={ setSelectedOrder }
         setReload={ setReload }
     />
     return(
-        <section className="w-full px-2 py-4">
-            <Toaster closeButton position="top-center" />
+        <section className="w-full py-4 px-2">
             <div className="flex items-center gap-2">
                 <Image
                     src="/images/kp_logo.png"
@@ -68,8 +66,9 @@ export default function OrderSupplyTable() {
                     width={40}
                     height={40}
                 />
-                <div className="text-xl font-semibold">
-                    {activeTab ? "Pending Supply Orders" : "Supply Order History"}
+                <div>
+                    <div className="text-xl font-semibold">{activeTab ? "Pending Supply Orders" : "Supply Order History"}</div>
+                    <div className="text-sm -mt-1">Showing {activeTab ? "all pending supply orders" : "supply order history"} for branch { "[Branch Name]" }</div>
                 </div>
                 <Image
                     src="/images/papiverse_logo.png"
@@ -119,7 +118,6 @@ export default function OrderSupplyTable() {
             </div>
 
             {activeTab && <PendingOrders 
-                claims={ claims }
                 filteredOrders={ filteredOrders.filter(i => ["PENDING", "TO FOLLOW"].includes(i.status)) }
                 setReload={ setReload }
                 toView={ toView }
@@ -136,8 +134,6 @@ export default function OrderSupplyTable() {
                 selectedOrder={ selectedOrder }
                 setSelectedOrder={ setSelectedOrder }
             />}
-
         </section>
     );
-}
-
+} 

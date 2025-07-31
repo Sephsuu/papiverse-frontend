@@ -86,8 +86,8 @@ export function WeeklyExpenses({ branchId, search }: Props) {
                 const totalForDate = groupedExpenses[date].reduce((sum, expense) => sum + expense.expense, 0);
                 return(
                     <div key={ date }>
-                        <div className="grid bg-slate-200 py-2 px-4 rounded-sm shadow-sm">
-                            <div className="flex justify-between">
+                        <div className="grid bg-slate-200 p-2 rounded-sm shadow-sm">
+                            <div className="flex justify-between mx-2">
                                 <div className="flex gap-1 items-center">
                                     <div className="font-bold text-md">{formatDateToWords(date)}</div>
                                     <div className="bg-dark h-fit rounded-sm text-light px-2 font-semibold text-[10px]">{ getWeekday(date) }</div>
