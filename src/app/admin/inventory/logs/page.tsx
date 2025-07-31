@@ -61,11 +61,11 @@ export default function InventoryLogs() {
     
     function flattenGroupedLogsWithOrders(
         groupedLogsByDateOrder: Record<string, Record<string, InventoryLog[]>>
-        ): { date: string; orders: { orderId: string | null; logs: any[] }[] }[] {
-        const result: { date: string; orders: { orderId: string | null; logs: any[] }[] }[] = [];
+        ): { date: string; orders: { orderId: string | null; logs: InventoryLog[] }[] }[] {
+        const result: { date: string; orders: { orderId: string | null; logs: InventoryLog[] }[] }[] = [];
 
         Object.entries(groupedLogsByDateOrder).forEach(([date, orders]) => {
-            const ordersList: { orderId: string | null; logs: any[] }[] = [];
+            const ordersList: { orderId: string | null; logs: InventoryLog[] }[] = [];
 
             Object.entries(orders).forEach(([orderId, logs]) => {
             const parsedOrderId = orderId === "null" ? null : orderId;

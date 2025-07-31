@@ -1,4 +1,5 @@
 import { BASE_URL, getTokenFromLocalStorage } from "@/lib/utils";
+import { CompleteOrder, SupplyOrder } from "@/types/supplyOrder";
 
 const URL = `${BASE_URL}/supply-order`;
 
@@ -57,7 +58,8 @@ export class SupplyOrderService {
         return res.json();
     }
 
-    static async createSupplyOrder(order: object) {
+    static async createSupplyOrder(order: CompleteOrder) {
+        console.log(JSON.stringify(order));
         const res = await fetch(`${URL}/create`, {
             method: 'POST',
             headers: { 

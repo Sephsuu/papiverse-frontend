@@ -296,7 +296,7 @@ export default function AAddUser() {
                         <div className="text-sm font-semibold">{ user.contactNumber || (<span className="text-darkred font-normal">This field is required</span>) }</div>
                     </div>
                     <div className="flex justify-end gap-2">
-                        <Button type="button" variant="secondary"  className="border-1 border-dark bg-white text-xs px-4" onClick={ () => { handleSubmit(); setOpen(!open); }}>Yes, I'm sure.</Button>
+                        <Button type="button" variant="secondary"  className="border-1 border-dark bg-white text-xs px-4" onClick={ () => { handleSubmit(); setOpen(!open); }}>Yes, I&apos;m sure.</Button>
                         <Button type="button" className="text-xs px-4" onClick={ () => setOpen(!open) }>Cancel</Button>
                     </div>
                 </DialogContent>

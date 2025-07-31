@@ -54,9 +54,15 @@ export default function AddInventory() {
         }   
         fetchData();
     }, []);
+    console.log(supplies);
 
     useEffect(() => {
-        setMeasurement(supplies.find(i => i.code === inventory.rawMaterialCode)!.unitMeasurement!)
+        const matchedSupply = supplies.find(i => i.code === inventory.rawMaterialCode);
+        if (matchedSupply && matchedSupply.unitMeasurement) {
+            setMeasurement(matchedSupply.unitMeasurement);
+        } else {
+            setMeasurement('Unit Measurement'); 
+        }
     }, [inventory.rawMaterialCode])
 
     if (loading) return <PapiverseLoading />
@@ -100,14 +106,14 @@ export default function AddInventory() {
                 <div className="flex border-1 border-gray rounded-md">
                     <Input 
                         className="border-0"
-                        name="quantity"
-                        value={ inventory.quantity }
+                        name="changedQuantity"
+                        value={ inventory.changedQuantity }
                         onChange={ e => handleChange(e, setInventory) }
                     />
                     <Input 
-                        className="border-0"
-                        disabled
+                        className="border-0 placeholder:!text-dark"
                         placeholder={ measurement || 'Unit Measurement' }
+                        disabled
                     />
                 </div>
 
@@ -126,7 +132,7 @@ export default function AddInventory() {
                         <div className="text-sm">SKU ID: </div>
                         <div className="text-sm font-semibold">{ inventory.rawMaterialCode || (<span className="font-normal text-sxm text-darkred">This field is required</span>) }</div>
                         <div className="text-sm">Unit Quantity and Measurement: </div>
-                        <div className="text-sm font-semibold">{ `${inventory.quantity} ${measurement}` || (<span className="font-normal text-sxm text-darkred">This field is required</span>) }</div>
+                        <div className="text-sm font-semibold">{ `${inventory.changedQuantity} ${measurement}` || (<span className="font-normal text-sxm text-darkred">This field is required</span>) }</div>
                     </div>
                     <div className="flex justify-end gap-2">
                         <Button type="button" variant="secondary"  className="border-1 border-dark bg-white text-xs px-4" onClick={ () => { handleSubmit(); setOpen(!open); }}>

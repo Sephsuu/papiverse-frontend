@@ -53,7 +53,7 @@ export default function SuppliesTable() {
     async function handleDelete() {
         try {
             setProcess(true);
-            await SupplyService.deleteSupply(toDelete?.code!);
+            await SupplyService.deleteSupply(toDelete!.code!);
             toast.success(`Supply ${toDelete?.name} deleted successfully.`);
         } catch (error) { toast.error(`${error}`) }
         finally { 

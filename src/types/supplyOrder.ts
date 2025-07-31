@@ -30,3 +30,20 @@ export interface SupplyOrder {
         } []
     }
 }
+
+export interface SupplyItem {
+    category?: string;        // e.g. "MEAT", "SNOWFROST"
+    code?: string;            // e.g. "MT-022", "SF-102"
+    name?: string;            // e.g. "Pork Belly", "Frozen Tocino"
+    quantity?: number;        // e.g. 1
+    unitMeasurement?: string; // e.g. "kg", "packs"
+    unitPrice?: number;
+    unitQuantity?: number;       // e.g. 260, 125
+}
+
+export interface CompleteOrder {
+    branchId: number;
+    remarks: string;
+    meatCategoryItemId: string;
+    snowfrostCategoryItemId: string;
+}

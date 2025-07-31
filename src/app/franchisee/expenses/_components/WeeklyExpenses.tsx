@@ -67,7 +67,7 @@ export function WeeklyExpenses({ branchId, search }: Props) {
     async function handleDelete() {
         try {
             setProcess(true);
-            await ExpenseService.deleteExpense(toDelete?.id!);
+            await ExpenseService.deleteExpense(toDelete!.id!);
             toast.success(`Expense ${toDelete?.purpose} deleted successfully.`)
         } catch (error) { toast.error(`${error}`) }
         finally { 

@@ -11,6 +11,7 @@ import { MeatOrderForm } from "./_components/MeatOrderForm";
 import { SnowOrderForm } from "./_components/SnowOrderForm";
 import { Toaster } from "@/components/ui/sonner";
 import { OrderReceipt } from "./_components/OrderReceipt";
+import { SupplyItem } from "@/types/supplyOrder";
 
 export default function OrderRequest() {
     const { claims, loading: authLoading } = useAuth();
@@ -18,7 +19,12 @@ export default function OrderRequest() {
     const [activerForm, setActiveForm] = useState('meat');
 
     const [supplies, setSupplies] = useState<Supply[]>([]);
-    const [selectedItems, setSelectedItems] = useState<any>([]);
+    const [selectedItems, setSelectedItems] = useState<SupplyItem[]>([]);
+
+    useEffect(() => {
+        console.log(selectedItems);
+        
+    }, [selectedItems])
 
     useEffect(() => {
         async function fetchData() {

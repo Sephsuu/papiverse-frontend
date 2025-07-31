@@ -78,7 +78,7 @@ export class InventoryService {
 	static async createInventoryInput(inventory: Inventory) {
 		const payload = {
 			...inventory,
-			quantity: Number(inventory.quantity),
+			changedQuantity: Number(inventory.changedQuantity),
 			type: "IN",
 			source: "INPUT"
 		}

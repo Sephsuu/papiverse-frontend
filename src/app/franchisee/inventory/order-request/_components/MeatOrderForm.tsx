@@ -5,13 +5,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { formatToPeso } from "@/lib/formatter";
 import { Supply } from "@/types/supply";
+import { SupplyItem } from "@/types/supplyOrder";
 import { Ham, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { Fragment } from "react";
 
 interface Props {
     supplies: Supply[];
-    selectedItems: any[];
+    selectedItems: SupplyItem[];
     setActiveForm: (i: string) => void;
     onSelect: (i: string) => void;
     onQuantityChange: (code: string, quantity: number) => void;
@@ -49,20 +50,20 @@ export function MeatOrderForm({ supplies, selectedItems, setActiveForm, onSelect
                                 min="1"
                                 type="number"
                                 value={item.quantity}
-                                onChange={(e) => onQuantityChange(item.code, Number(e.target.value))}
+                                onChange={(e) => onQuantityChange(item.code!, Number(e.target.value))}
                                 className="text-sm w-18 border-0 pl-2"
                             />
                         </div>
                         <div className="text-sm pl-2 py-1.5 border-b-1 truncate col-span-2">{ item.name }</div>
                         <div className="text-sm pl-2 py-1.5 border-b-1 truncate">{item.unitQuantity} { item.unitMeasurement }</div>
-                        <div className="text-sm pl-2 py-1.5 border-b-1 truncate">{ formatToPeso(item.unitPrice) }</div>
-                        <div className="text-sm pl-2 py-1.5 border-b-1 truncate">{ formatToPeso(item.unitPrice * item.quantity) }</div>
+                        <div className="text-sm pl-2 py-1.5 border-b-1 truncate">{ formatToPeso(item.unitPrice!) }</div>
+                        <div className="text-sm pl-2 py-1.5 border-b-1 truncate">{ formatToPeso(item.unitPrice! * item.quantity!) }</div>
                         <div className="flex pl-2 border-b-1">
                             <Button 
                                 type="button"
                                 variant="secondary" 
                                 size="sm"
-                                onClick={() => onRemove(item.code)}
+                                onClick={() => onRemove(item.code!)}
                                 className="!h-fit py-1 my-auto"
                             >
                                 <Trash2 className="text-darkred" />

@@ -9,31 +9,45 @@ import { formatToPeso } from "@/lib/formatter";
 import MeatOrderService from "@/services/MeatOrderService";
 import SnowOrderService from "@/services/SnowOrderService";
 import { SupplyOrderService } from "@/services/SupplyOrderService";
+import { Claim } from "@/types/claims";
+import { SupplyItem } from "@/types/supplyOrder";
 import { Ham, Snowflake } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
 
 interface Props {
-    claims: any;
+    claims: Claim;
     setActiveForm: (i: string) => void;
-    selectedItems: any[];
+    selectedItems: SupplyItem[];
+}
+
+interface MeatOrder {
+    id: string,
+    branchId: number;
+    categoryItems: SupplyItem[];
+}
+
+interface SnowOrder {
+    id: string,
+    branchId: number;
+    categoryItems: SupplyItem[];
 }
 
 export function OrderReceipt({ claims, setActiveForm, selectedItems }: Props) {
     const [open, setOpen] = useState(false);
     const [onProcess, setProcess] = useState(false);
-    const [meatOrder, setMeatOrder] = useState<any>();
-    const [snowOrder, setSnowOrder] = useState<any>();
+    const [meatOrder, setMeatOrder] = useState<MeatOrder[]>([]);
+    const [snowOrder, setSnowOrder] = useState<SnowOrder[]>([]);
     const meatReceipt = selectedItems.filter((s) => s.category === "MEAT");
     const snowFrostReceipt = selectedItems.filter((s) => s.category === "SNOWFROST");
 
     const totalMeatAmount = meatReceipt.reduce(
-        (acc, supply) => acc + supply.unitPrice * supply.quantity,
+        (acc, supply) => acc + supply.unitPrice! * supply.quantity!,
         0
     );
     const totalSnowFrostAmount = snowFrostReceipt.reduce(
-        (acc, supply) => acc + supply.unitPrice * supply.quantity,
+        (acc, supply) => acc + supply.unitPrice! * supply.quantity!,
         0
     );
 
@@ -41,11 +55,15 @@ export function OrderReceipt({ claims, setActiveForm, selectedItems }: Props) {
         try {
             setProcess(true);
 
-            const updatedMeatOrder = {...meatOrder, id: "MEAT-053", branchId: claims.branch.branchId, categoryItems: meatReceipt, totalAmount: null};
-            const updatedSnowOrder = {...snowOrder, id: "SNOW-053", branchId: claims.branch.branchId, categoryItems: snowFrostReceipt, totalAmount: null};
+            const updatedMeatOrder = {...meatOrder, id: "MEAT-058", branchId: claims.branch.branchId, categoryItems: meatReceipt, totalAmount: null};
+            const updatedSnowOrder = {...snowOrder, id: "SNOW-058", branchId: claims.branch.branchId, categoryItems: snowFrostReceipt, totalAmount: null};
             
             setMeatOrder(updatedMeatOrder);
             setSnowOrder(updatedSnowOrder);
+            console.log(meatOrder);
+            console.log(snowOrder);
+            
+            
 
             await MeatOrderService.createMeatOrder(updatedMeatOrder);
             await SnowOrderService.createSnowOrder(updatedSnowOrder);
@@ -56,6 +74,7 @@ export function OrderReceipt({ claims, setActiveForm, selectedItems }: Props) {
                 meatCategoryItemId: updatedMeatOrder.id,
                 snowfrostCategoryItemId: updatedSnowOrder.id
             }
+
             const data = await SupplyOrderService.createSupplyOrder(orderSupply);
             if (data) {
                 toast.success("Supply Order Created")
@@ -100,8 +119,8 @@ export function OrderReceipt({ claims, setActiveForm, selectedItems }: Props) {
                                 <div className="text-sm">{ supply.name }</div>
                                 <div className="text-sm">{ supply.quantity }</div>
                                 <div className="text-sm">{ supply.unitMeasurement }</div>
-                                <div className="text-sm">{ formatToPeso(supply.unitPrice) }</div>
-                                <div className="text-sm">{ formatToPeso(supply.unitPrice * supply.quantity) }</div>
+                                <div className="text-sm">{ formatToPeso(supply.unitPrice!) }</div>
+                                <div className="text-sm">{ formatToPeso(supply.unitPrice! * supply.quantity!) }</div>
                             </div>  
                         ))
                     : (
@@ -147,8 +166,8 @@ export function OrderReceipt({ claims, setActiveForm, selectedItems }: Props) {
                                 <div className="text-sm">{ supply.name }</div>
                                 <div className="text-sm">{ supply.quantity }</div>
                                 <div className="text-sm">{ supply.unitMeasurement }</div>
-                                <div className="text-sm">{ formatToPeso(supply.unitPrice) }</div>
-                                <div className="text-sm">{ formatToPeso(supply.unitPrice * supply.quantity) }</div>
+                                <div className="text-sm">{ formatToPeso(supply.unitPrice!) }</div>
+                                <div className="text-sm">{ formatToPeso(supply.unitPrice! * supply.quantity!) }</div>
                             </div>  
                         ))
                     : (

@@ -47,7 +47,7 @@ export default function UsersTable() {
     async function handleDelete() {
         try {
             setProcess(true);
-            const data = await UserService.deleteUser(toDelete?.id!);
+            const data = await UserService.deleteUser(toDelete!.id!);
             if (data) toast.success(`User ${toDelete?.firstName} ${toDelete?.lastName} deleted successfully.`)
         } catch (error) { toast.error(`${error}`) }
         finally { setProcess(false); }

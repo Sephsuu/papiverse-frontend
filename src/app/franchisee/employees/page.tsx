@@ -49,7 +49,7 @@ export default function EmployeesTable() {
     async function handleDelete() {
         try {
             setProcess(true);
-            await EmployeeService.deleteEmployee(toDelete?.id!);
+            await EmployeeService.deleteEmployee(toDelete!.id!);
             toast.success(`Employee ${toDelete?.firstName} ${toDelete?.lastName} deleted successfully.`)
         } catch (error) { toast.error(`${error}`) }
         finally { 

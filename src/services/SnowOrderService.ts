@@ -1,10 +1,15 @@
-const BASE_URL = 'http://localhost:8080/api/v1/snow-order'; 
+import { BASE_URL, getTokenFromLocalStorage } from "@/lib/utils";
+
+const URL = `${BASE_URL}/snow-order`; 
 
 const SnowOrderService = {
     createSnowOrder: async (snow: object) => {
-        const response = await fetch(`${BASE_URL}/create`, {
+        const response = await fetch(`${URL}/create`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getTokenFromLocalStorage()}` 
+            },
             body: JSON.stringify(snow),
         });
 
