@@ -11,7 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
-import { PapiverseLoading } from "../ui/loader";
+import { PapiverseLoading, SidebarLoading } from "../ui/loader";
 
 export function FranchiseeSidebar() {
     const { claims, loading } = useAuth();
@@ -27,7 +27,7 @@ export function FranchiseeSidebar() {
         router.push("/auth");
     }
 
-    if (loading) return <PapiverseLoading />
+    if (loading) return <SidebarLoading />
     return(
         <>
         {!hideSidebar &&
