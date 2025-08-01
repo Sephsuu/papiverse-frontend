@@ -132,7 +132,9 @@ export default function AddEmployee() {
                         <DialogClose className="text-sm">Close</DialogClose>
                         <Button 
                             onClick={ handleSubmit }
+                            disabled={ onProcess }
                             size="sm"
+                            className="!bg-darkgreen hover:opacity-90"
                         >
                             <FormLoader onProcess={ onProcess } label="Yes, I'm sure." loadingLabel="Adding Employee" />
                         </Button>

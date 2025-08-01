@@ -47,22 +47,20 @@ export class AuthService {
 	static async registerUser(user: User) {
 		delete user.branch
 		console.log(JSON.stringify(user));
-		
 		const res = await fetch(`${URL}/register`, {
 			method: 'POST',
 			headers: {
 				'Content-Type' : 'application/json',
-				'Authorization' : `Bearer ${"eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJGUkFOQ0hJU09SIl0sImJyYW5jaCI6eyJpc0ludGVybmFsIjp0cnVlLCJicmFuY2hJZCI6MX0sInVzZXJJZCI6Miwic3ViIjoic2VwaHN1dSIsImlhdCI6MTc1MzI1ODAxOCwiZXhwIjoxNzUzMjU5NDU4fQ.cqwAHtCDsi-4tvQXHcA1VM9ks3YBEK8dbkp5mfzriIY"}`
+				'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
 			},
 			body: JSON.stringify(user)
 		});
 		console.log(res);
-		
 
-		console.log();
-		
-
-		if (!res.ok) throw new Error('Bad Response');
+		if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.message || err.error || 'Something went wrong.')
+        }
 
 		return res.json();
 	}

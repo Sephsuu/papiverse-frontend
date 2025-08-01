@@ -39,12 +39,12 @@ export class ProductService {
         return res.json();
     }
 
-    static async createProduct(product: Product) {
+    static async addProduct(product: Product) {
         const payload = {
             ...product,
-            product: product.name?.toUpperCase(),
+            name: product.name.toUpperCase(),
+            category: product.category.toUpperCase()
         }
-
         const res = await fetch(`${URL}/create`, {
             method: 'POST',
             headers: { 

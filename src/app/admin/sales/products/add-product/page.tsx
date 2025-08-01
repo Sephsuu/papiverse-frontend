@@ -77,7 +77,7 @@ export default function AddProduct() {
                     return; 
                 }
             }
-            const data = await ProductService.createProduct(product);
+            const data = await ProductService.addProduct(product);
             if (data) toast.success(`Product ${product.name} created successfully.`)
         } catch(error) { toast.error(`${error}`) }
         finally { 
@@ -203,10 +203,10 @@ export default function AddProduct() {
                         </div>      
                     </ScrollArea>
                     <div className="flex justify-end gap-2">
+                        <Button type="button" className="text-xs px-4" onClick={ () => setOpen(!open) }>Cancel</Button>
                         <Button type="button" variant="secondary"  className="border-1 border-dark bg-white text-xs px-4" onClick={ () => { handleSubmit(); setOpen(!open); }}>
                             <FormLoader onProcess={ onProcess } label="Yes, I'm sure." loadingLabel="Loading"  />
                         </Button>
-                        <Button type="button" className="text-xs px-4" onClick={ () => setOpen(!open) }>Cancel</Button>
                     </div>
                 </DialogContent>
             </Dialog>

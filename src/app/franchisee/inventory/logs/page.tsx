@@ -167,8 +167,7 @@ export default function InventoryLogs() {
                                                 </div>
                                                 <Separator />
                                             </Fragment>
-                                        ))}
-                                    
+                                        ))}   
                                 </AccordionContent>
                             </AccordionItem>
         

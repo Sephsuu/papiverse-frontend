@@ -51,7 +51,7 @@ export const franchiseeRoute = [
         children: [
             { title: 'Inventories', href: '/franchisee/inventory/inventories' },
             { title: 'Supply Orders', href: '/franchisee/inventory/supply-orders/' },
-            { title: 'Inventory Logs', href: '/franchisee/inventory/inventory-logs' },
+            { title: 'Inventory Logs', href: '/franchisee/inventory/logs' },
         ]
     },
 ]

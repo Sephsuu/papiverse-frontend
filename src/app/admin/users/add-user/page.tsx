@@ -2,8 +2,8 @@
 
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { AddButton, Button } from "@/components/ui/button";
+import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Toaster } from "@/components/ui/sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
@@ -18,7 +18,7 @@ import { BranchService } from "@/services/BranchService";
 import { handleChange } from "@/lib/form-handle";
 import { Branch } from "@/types/branch";
 import { AuthService } from "@/services/AuthService";
-import { PapiverseLoading } from "@/components/ui/loader";
+import { FormLoader, PapiverseLoading } from "@/components/ui/loader";
 import { User, userFields, userInit } from "@/types/user";
 import Image from "next/image";
 
@@ -26,13 +26,13 @@ const genders = ["Male", "Female", "Gay", "Lesbian", "Others"];
 
 export default function AAddUser() {
     const [loading, setLoading] = useState(true);
+    const [onProcess, setProcess] = useState(false);
     const [branches, setBranches] = useState<Branch[]>([]);
     const [open, setOpen] = useState(false);
     const [user, setUser] = useState<User>(userInit);
     const [date, setDate] = useState<Date | undefined>();
     const [dateOpen, setDateOpen] = useState(false);
 
-    // Fetching all branches on component mount
     useEffect(() => {
         const fetchBranches = async () => {
             try {
@@ -46,7 +46,6 @@ export default function AAddUser() {
         fetchBranches();
     }, []);
 
-    // Changes the date of birth in the user object when the date is selected
     useEffect(() => {
         if (date) {
             setUser(prevUser => ({
@@ -57,7 +56,8 @@ export default function AAddUser() {
     }, [date]);
 
     async function handleSubmit() {
-       try{        
+       try{         
+            setProcess(true);
             for (const field of userFields) {
                 if (
                     user[field] === "" ||
@@ -74,13 +74,15 @@ export default function AAddUser() {
             }
 
         const data = await AuthService.registerUser(user);
-        if (data) {
-            toast.success("User registered successfully!");
-            setUser(userInit);  
-            setDate(undefined);          
-        }
+        if (data) toast.success("User registered successfully!");    
        }
        catch(error){ toast.error(`${error}`) }
+       finally {
+            setUser(userInit);  
+            setDate(undefined);
+            setProcess(false);
+            setOpen(!open);
+       }
     }
     
     if (loading) return <PapiverseLoading />
@@ -295,9 +297,13 @@ export default function AAddUser() {
                         <div className="text-sm">Contact Number: </div>
                         <div className="text-sm font-semibold">{ user.contactNumber || (<span className="text-darkred font-normal">This field is required</span>) }</div>
                     </div>
-                    <div className="flex justify-end gap-2">
-                        <Button type="button" variant="secondary"  className="border-1 border-dark bg-white text-xs px-4" onClick={ () => { handleSubmit(); setOpen(!open); }}>Yes, I&apos;m sure.</Button>
-                        <Button type="button" className="text-xs px-4" onClick={ () => setOpen(!open) }>Cancel</Button>
+                    <div className="flex justify-end gap-4">
+                        <DialogClose className="text-sm">Close</DialogClose>
+                        <AddButton 
+                            handleSubmit={ handleSubmit }
+                            onProcess={ onProcess }
+                            loadingLabel="Adding User"
+                        />
                     </div>
                 </DialogContent>
             </Dialog>

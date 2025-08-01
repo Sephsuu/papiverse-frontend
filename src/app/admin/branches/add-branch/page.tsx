@@ -1,6 +1,6 @@
 "use client"
 
-import { Button } from "@/components/ui/button";
+import { AddButton, Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +10,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { handleChange } from "@/lib/form-handle";
 import { BranchService } from "@/services/BranchService";
 import { Branch, branchFields, branchInit } from "@/types/branch";
+import { DialogClose } from "@radix-ui/react-dialog";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -18,10 +19,12 @@ const status = ['Open', 'Under Renovation']
 
 export default function AddBranch() {
     const [open, setOpen] = useState(false);
+    const [onProcess, setProcess] = useState(false);
     const [branch, setBranch] = useState<Branch>(branchInit);
 
     async function handleSubmit() {
         try{            
+            setProcess(true);
             for (const field of branchFields) {
                 if (branch[field] === "" || branch[field] === undefined) {
                     toast.info("Please fill up all fields!");
@@ -33,17 +36,15 @@ export default function AddBranch() {
                 toast.success("Branch successfully added!");
                 setBranch(branchInit);
             }
-            
         }
-        catch(error){
-            console.log(error)
+        catch (error) { toast.error(`${error}`) }
+        finally {
+            setProcess(false);
+            setBranch(branchInit);
+            setOpen(!open);
         }
     };
 
-    useEffect(() => {
-        console.log(branch);
-        
-    }, [branch])
     return(
         <section className="relative flex flex-col w-full h-screen align-center justify-center">
             <Toaster closeButton position="top-center" />
@@ -184,9 +185,13 @@ export default function AddBranch() {
                         <div className="text-sm">Branch Type: </div>
                         <div className="text-sm font-semibold">{branch.isInternal ? "Internal Branch" : "External Branch" }</div>
                     </div>
-                    <div className="flex justify-end gap-2">
-                        <Button type="button" variant="secondary"  className="border-1 border-dark bg-white text-xs px-4" onClick={ () => { handleSubmit(); setOpen(!open); }}>Yes&lsquo; I&apos;m sure.</Button>
-                        <Button type="button" className="text-xs px-4" onClick={ () => setOpen(!open) }>Cancel</Button>
+                    <div className="flex justify-end gap-4">
+                        <DialogClose>Close</DialogClose>
+                        <AddButton
+                            handleSubmit={ handleSubmit }
+                            onProcess={ onProcess }
+                            loadingLabel="Adding Branch"
+                        />
                     </div>
                 </DialogContent>
             </Dialog>

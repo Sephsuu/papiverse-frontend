@@ -1,6 +1,6 @@
 "use client"
 
-import { Button } from "@/components/ui/button";
+import { Button, DeleteButton } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { FormLoader, PapiverseLoading } from "@/components/ui/loader";
 import { Select, SelectTrigger } from "@/components/ui/select";
@@ -16,6 +16,7 @@ import { toast } from "sonner";
 
 export default function UsersTable() {
     const [loading, setLoading] = useState(true);
+    const [reload, setReload] =  useState(false);
     const [onProcess, setProcess] = useState(false);
     const [search, setSearch] = useState('');
     const [toDelete, setDelete] = useState<User | undefined>();
@@ -32,7 +33,7 @@ export default function UsersTable() {
             finally { setLoading(false) }
         }
         fetchData();
-    }, []);
+    }, [reload]);
 
     useEffect(() => {
         const find = search.toLowerCase().trim();
@@ -47,10 +48,14 @@ export default function UsersTable() {
     async function handleDelete() {
         try {
             setProcess(true);
-            const data = await UserService.deleteUser(toDelete!.id!);
-            if (data) toast.success(`User ${toDelete?.firstName} ${toDelete?.lastName} deleted successfully.`)
+            toast.success(`User ${toDelete?.firstName} ${toDelete?.lastName} deleted successfully.`)
+            await UserService.deleteUser(toDelete!.id!);
         } catch (error) { toast.error(`${error}`) }
-        finally { setProcess(false); }
+        finally { 
+            setReload(!reload);
+            setProcess(false); 
+            setDelete(undefined);
+        }
     }
 
     if (loading) return <PapiverseLoading />
@@ -145,7 +150,7 @@ export default function UsersTable() {
 
             <Dialog open={ !!toDelete } onOpenChange={ (open) => { if (!open) setDelete(undefined) }}>
                 <DialogContent>
-                    <DialogTitle className="text-sm">Are you sure you want to delete { `${toDelete?.firstName} ${toDelete?.lastName}` }</DialogTitle>
+                    <DialogTitle className="text-sm">Are you sure you want to delete <span className="text-darkred">{ `${toDelete?.firstName} ${toDelete?.lastName}` }</span></DialogTitle>
                     <div className="flex justify-end items-end gap-2">
                         <Button 
                             onClick={ () => setDelete(undefined) }
@@ -153,13 +158,12 @@ export default function UsersTable() {
                         >
                             Close
                         </Button>
-                        <Button
-                            className="!bg-darkred"
-                            onClick={ () => handleDelete() }
-                        >
-                            {!onProcess && <Trash2 className="w-4 h-4 text-light" />}
-                            <FormLoader onProcess={ onProcess } label="Delete User" loadingLabel="Deleting User" /> 
-                        </Button>
+                        <DeleteButton 
+                            handleDelete={ handleDelete } 
+                            onProcess={ onProcess }
+                            label="Delete User"
+                            loadingLabel="Delete User"
+                        />
                     </div>
                 </DialogContent>
             </Dialog>

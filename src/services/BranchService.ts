@@ -52,6 +52,8 @@ export class BranchService {
         	},
         	body: JSON.stringify(payload),
 		});	
+		console.log(res);
+		
 
 		if (!res.ok) {
 			const err = await res.json();
@@ -73,6 +75,23 @@ export class BranchService {
                 'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
         	},
         	body: JSON.stringify(payload),
+		});
+
+		if (!res.ok) {
+			const err = await res.json();
+			throw new Error(err.message || 'Something went wrong');
+		}
+
+		return res.json();
+	}
+
+	static async deleteBranch(id: Branch) {
+		const res = await fetch(`${URL}/delete-by-id?id=${id}`, {
+			method: 'POST',
+			headers: { 
+				'Content-Type': 'application/json', 
+                'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
+        	},
 		});
 
 		if (!res.ok) {

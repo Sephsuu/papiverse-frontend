@@ -13,7 +13,10 @@ export class UserService {
             }
         });
 
-        if (!res.ok) throw new Error('Bad Response');
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.message || err.error || 'Something went wrong.')
+        }
 
         return res.json();
     }
@@ -27,7 +30,10 @@ export class UserService {
             }
         });
 
-        if (!res.ok) throw new Error('Bad Response');
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.message || err.error || 'Something went wrong.')
+        }
 
         return res.json();
     }
@@ -42,7 +48,10 @@ export class UserService {
             body: JSON.stringify(user)
         });
 
-        if (!res.ok) throw new Error('Bad Response');
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.message || err.error || 'Something went wrong.')
+        }
 
         return res.json();
     }
@@ -50,59 +59,18 @@ export class UserService {
     static async deleteUser(id: number) {
         console.log(id);
         
-        const res = await fetch(`${BASE_URL}/delete-user?id=${id}`, {
+        const res = await fetch(`${URL}/delete-user?id=${id}`, {
             method: 'POST',
             headers: {
                 'Content-Type' : 'application/json', 
                 'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
             }
         });
-        console.log(res);
-        
 
-        if (!res.ok) throw new Error('Bad Response');
-
-        return res.json();
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.message || err.error || 'Something went wrong.')
+        }
     }
 
 }
-//     deleteUser: async (id: number) => {
-//         const response = await fetch(`${BASE_URL}/delete-user?id=${id}`, {
-//             method: 'POST',
-//             headers: {'Content-Type' : 'application/json' }
-//         });
-        
-//         if (response.ok) {
-//             const text = await response.text();
-//             return text ? JSON.parse(text) : null;
-//         }
-//     },
-
-//     updateUser: async (user: object) => {
-//         const response = await fetch(`${BASE_URL}/update`, {
-//             method: 'POST',
-//             headers: {'Content-Type' : 'application/json' },
-//             body: JSON.stringify(user)
-//         });
-        
-//         if(!response.ok){
-//             throw new Error('Failed to Update User');
-//         }
-//         return await response.json();
-//     }
-
-// const UserService = {
-//     getAllUser: async () => {
-//         const response = await fetch(`${BASE_URL}/get-users`, {
-//             method: 'GET',
-//             headers: {'Content-Type' : 'application/json' }
-//         });
-
-//         if (response.ok) {
-//             return await response.json();
-//         }
-//     },
-
-// };
-
-// export default UserService;
