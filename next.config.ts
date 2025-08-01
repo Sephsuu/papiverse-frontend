@@ -5,7 +5,12 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    domains: ['395z4m7f-8080.asse.devtunnels.ms'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '395z4m7f-8080.asse.devtunnels.ms',
+      },
+    ],
   },
 };
 

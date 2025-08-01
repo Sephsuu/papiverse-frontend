@@ -1,4 +1,4 @@
-import { Container, Store, UserRound, UsersRound, Wallet } from "lucide-react";
+import { ChartNoAxesCombined, Container, Store, UserRound, UsersRound, Wallet } from "lucide-react";
 
 export const adminRoute = [
     { 
@@ -21,6 +21,13 @@ export const adminRoute = [
             { title: 'Inventories', href: '/admin/inventory/inventories' },
             { title: 'Inventory Logs', href: '/admin/inventory/logs' },
             { title: 'Order Request', href: '/admin/inventory/order-request' },
+        ]
+    },
+    { 
+        title: 'Sales', 
+        icon: ChartNoAxesCombined,
+        children: [
+            { title: 'Products', href: '/admin/sales/products' },
         ]
     },
 ]

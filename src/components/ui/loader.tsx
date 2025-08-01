@@ -1,6 +1,7 @@
 import { LoaderCircle } from "lucide-react";
 import Image from "next/image";
 import { Sidebar, SidebarContent } from "./sidebar";
+import { Skeleton } from "./skeleton";
 
 interface LoaderProps {
     onProcess: boolean;
@@ -37,11 +38,15 @@ export function SidebarLoading() {
                 collapsible="icon"
             >
                 <SidebarContent 
-                    className="rounded-md flex justify-center items-center"
+                    className="rounded-md p-4"
                     style={{ backgroundImage: "url(/images/sidebar_bg.svg)" }}
                 >
             
-                    <LoaderCircle className="w-15 h-15 animate-spin" strokeWidth={3} />
+                    <Skeleton className="w-40 mx-auto h-12 bg-orange-100" />
+                    <Skeleton className="w-full mt-2 h-8 bg-orange-100" />
+                    <Skeleton className="w-full h-8 bg-orange-100" />
+                    <Skeleton className="w-full h-8 bg-orange-100" />
+                    <Skeleton className="w-full h-8 bg-orange-100" />
                 </SidebarContent>
                 
             </Sidebar>

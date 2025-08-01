@@ -1,0 +1,30 @@
+button, a {
+    cursor: pointer;
+}
+
+.data-table-thead {
+    font-weight: 600;
+    background: #e2e8f0;
+    border-radius: 0.25rem;
+}
+
+.data-table-th {
+    font-size: 14px;
+    padding: 4px 0 4px 8px;
+    border-right: 1px solid oklch(98.7% 0.022 95.277);
+    margin-block: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.data-table-td {
+    font-size: 14px;
+    padding: 6px 0 6px 8px;
+    border-bottom-width: 1px gray;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* FIGTREE */

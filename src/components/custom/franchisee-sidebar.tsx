@@ -39,7 +39,7 @@ export function FranchiseeSidebar() {
                     className="rounded-md"
                     style={{ backgroundImage: "url(/images/sidebar_bg.svg)" }}
                 >
-                    <Link href="/auth/login">
+                    <Link href="/franchisee">
                         <Image
                             src="/images/papiverse_logo.png"
                             alt="Papiverse Logo"
@@ -64,7 +64,7 @@ export function FranchiseeSidebar() {
                                         <SidebarMenuSub>
                                             {item.children.map((sub, index) => (
                                                 <SidebarMenuButton key={ index }>
-                                                    <Link href={ sub.href }>
+                                                    <Link href={ sub.href } className="w-full h-full">
                                                         { sub.title }
                                                     </Link>
                                                 </SidebarMenuButton>
@@ -77,7 +77,7 @@ export function FranchiseeSidebar() {
                             <SidebarMenuButton className="flex gap-2" key={ index }>
                                 <Link 
                                     href={ item.href! }
-                                    className="flex items-center gap-2"
+                                    className="flex items-center gap-2 w-full h-full"
                                 >
                                     <item.icon className="w-4 h-4" />
                                     { item.title }
@@ -120,7 +120,6 @@ export function FranchiseeSidebar() {
                         </SidebarMenu>
                     </SidebarFooter>
                 </SidebarContent>
-                
             </Sidebar>
         }
         </>

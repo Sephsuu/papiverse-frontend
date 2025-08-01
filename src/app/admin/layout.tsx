@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "../globals.css";
+import "../style.css";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/custom/franchisor-sidebar";
 import { AuthProvider } from "@/hooks/use-auth";
