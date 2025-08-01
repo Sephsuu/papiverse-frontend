@@ -47,3 +47,35 @@ export interface CompleteOrder {
     meatCategoryItemId: string;
     snowfrostCategoryItemId: string;
 }
+
+interface MeatItem {
+    rawMaterialCode?: string;
+    rawMaterialName?: string;
+    quantity?: number;
+    unitPrice?: number;
+    totalPrice?: number;
+}
+
+export interface MeatOrder {
+    id: string;
+    branchId: number;
+    isApproved: boolean;
+    totalAmount: number;
+    meatItems: MeatItem[];
+}
+
+interface SnowItem {
+    rawMaterialCode?: string;
+    rawMaterialName?: string;
+    quantity?: number;
+    unitPrice?: number;
+    totalPrice?: number;
+}
+
+export interface SnowOrder {
+    id: string;
+    branchId: number;
+    isApproved: boolean;
+    totalAmount: number;
+    snowItems: SnowItem[];
+}
