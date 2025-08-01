@@ -34,7 +34,7 @@ export default function AddInventory() {
             }
             const data = await InventoryService.createInventoryInput(inventory);
             if (data) {
-                toast.success("Branch successfully added!");
+                toast.success("Ineventory successfully added!");
                 setInventory(inventoryInit);
             }
             

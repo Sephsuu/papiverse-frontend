@@ -10,7 +10,7 @@ import MeatOrderService from "@/services/MeatOrderService";
 import SnowOrderService from "@/services/SnowOrderService";
 import { SupplyOrderService } from "@/services/SupplyOrderService";
 import { Claim } from "@/types/claims";
-import { MeatOrder, SnowOrder, SupplyItem } from "@/types/supplyOrder";
+import { SupplyItem } from "@/types/supplyOrder";
 import { Ham, Snowflake } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
@@ -41,22 +41,20 @@ export function OrderReceipt({ claims, setActiveForm, selectedItems }: Props) {
         try {
             setProcess(true);
 
-            const meatOrder = {id: "", branchId: claims.branch.branchId, meatItems: meatReceipt, totalAmount: 0, isApproved: false};
-            const snowOrder = {id: "", branchId: claims.branch.branchId, snowItems: snowFrostReceipt, totalAmount: 0, isApproved: false};
+            const meatOrder = {id: "", branchId: claims.branch.branchId, categoryItems: meatReceipt};
+            const snowOrder = {id: "", branchId: claims.branch.branchId, categoryItems: snowFrostReceipt};
             
-            await MeatOrderService.createMeatOrder(meatOrder);
-            await SnowOrderService.createSnowOrder(snowOrder);
+            const meatFinal = await MeatOrderService.createMeatOrder(meatOrder);
+            const snowFinal = await SnowOrderService.createSnowOrder(snowOrder);
 
-            console.log(meatOrder.id);
-            console.log(snowOrder.id);
-            
-            
+            console.log(meatFinal.id);
+            console.log(snowFinal.id);
 
             const orderSupply = {
                 branchId: claims.branch.branchId,
                 remarks: "",
-                meatCategoryItemId: meatOrder.id,
-                snowfrostCategoryItemId: snowOrder!.id
+                meatCategoryItemId: meatFinal.id,
+                snowfrostCategoryItemId: snowFinal.id
             }
 
             const data = await SupplyOrderService.createSupplyOrder(orderSupply);

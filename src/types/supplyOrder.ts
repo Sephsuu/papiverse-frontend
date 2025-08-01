@@ -32,13 +32,13 @@ export interface SupplyOrder {
 }
 
 export interface SupplyItem {
-    category?: string;        // e.g. "MEAT", "SNOWFROST"
-    code?: string;            // e.g. "MT-022", "SF-102"
-    name?: string;            // e.g. "Pork Belly", "Frozen Tocino"
-    quantity?: number;        // e.g. 1
-    unitMeasurement?: string; // e.g. "kg", "packs"
+    category?: string;        
+    code?: string;          
+    name?: string;           
+    quantity?: number;        
+    unitMeasurement?: string; 
     unitPrice?: number;
-    unitQuantity?: number;       // e.g. 260, 125
+    unitQuantity?: number;
 }
 
 export interface CompleteOrder {
@@ -48,34 +48,13 @@ export interface CompleteOrder {
     snowfrostCategoryItemId: string;
 }
 
-interface MeatItem {
-    rawMaterialCode?: string;
-    rawMaterialName?: string;
+interface OrderItem {
+    code?: string;
     quantity?: number;
-    unitPrice?: number;
-    totalPrice?: number;
-}
+}   
 
-export interface MeatOrder {
+export interface CategoryOrder {
     id: string;
     branchId: number;
-    isApproved: boolean;
-    totalAmount: number;
-    meatItems: MeatItem[];
-}
-
-interface SnowItem {
-    rawMaterialCode?: string;
-    rawMaterialName?: string;
-    quantity?: number;
-    unitPrice?: number;
-    totalPrice?: number;
-}
-
-export interface SnowOrder {
-    id: string;
-    branchId: number;
-    isApproved: boolean;
-    totalAmount: number;
-    snowItems: SnowItem[];
+    categoryitems: OrderItem[];
 }

@@ -1,10 +1,12 @@
 import { BASE_URL, getTokenFromLocalStorage } from "@/lib/utils";
+import { SnowOrder } from "@/types/supplyOrder";
 
 const URL = `${BASE_URL}/snow-order`; 
 
 const SnowOrderService = {
-    createSnowOrder: async (snow: object) => {
-        const response = await fetch(`${URL}/create`, {
+    createSnowOrder: async (snow: SnowOrder) => {
+        console.log(JSON.stringify(snow));
+        const res = await fetch(`${URL}/create`, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
@@ -13,11 +15,12 @@ const SnowOrderService = {
             body: JSON.stringify(snow),
         });
 
-        if (!response.ok) {
-            throw new Error('Error adding snow order');
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.message || err.error || 'Something went wrong.')
         }
 
-        const data = await response.json();
+        const data = await res.json();
         return data;
     }
 }

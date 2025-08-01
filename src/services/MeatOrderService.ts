@@ -1,10 +1,13 @@
 import { BASE_URL, getTokenFromLocalStorage } from "@/lib/utils";
+import { MeatOrder } from "@/types/supplyOrder";
 
 const URL = `${BASE_URL}/meat-order`; 
 
 const MeatOrderService = {
-    createMeatOrder: async (meat: object) => {
-        const response = await fetch(`${URL}/create`, {
+    createMeatOrder: async (meat: MeatOrder) => {
+        console.log(JSON.stringify(meat));
+        
+        const res = await fetch(`${URL}/create`, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
@@ -13,11 +16,12 @@ const MeatOrderService = {
             body: JSON.stringify(meat),
         });
 
-        if (!response.ok) {
-            throw new Error('Error adding meat order');
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.message || err.error || 'Something went wrong.')
         }
 
-        const data = await response.json();
+        const data = await res.json();
         return data;
     }
 }
