@@ -1,4 +1,5 @@
 import { BASE_URL, getTokenFromLocalStorage } from "@/lib/utils";
+import { Product } from "@/types/products";
 import { Supply } from "@/types/supply";
 
 const URL = `${BASE_URL}/products`; 
@@ -38,13 +39,10 @@ export class ProductService {
         return res.json();
     }
 
-    static async addProduct(supply: Supply) {
+    static async createProduct(product: Product) {
         const payload = {
-            ...supply,
-            name: supply.name?.toUpperCase(),
-            unitQuantity: Number(supply.unitQuantity),
-            unitPriceInternal: Number(supply.unitPriceInternal),
-            unitPriceExternal: Number(supply.unitPriceExternal)
+            ...product,
+            product: product.name?.toUpperCase(),
         }
 
         const res = await fetch(`${URL}/create`, {

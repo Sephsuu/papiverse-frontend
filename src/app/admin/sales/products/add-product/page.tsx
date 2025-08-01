@@ -1,13 +1,17 @@
 "use client"
 
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { FormLoader } from "@/components/ui/loader";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Toaster } from "@/components/ui/sonner";
 import { handleChange } from "@/lib/form-handle";
+import { ProductService } from "@/services/ProductService";
 import { SupplyService } from "@/services/RawMaterialService";
-import { Product, productInit } from "@/types/products";
+import { Product, productFields, productInit } from "@/types/products";
 import { Supply } from "@/types/supply";
 import { SupplyItem } from "@/types/supplyOrder";
 import { Plus, X } from "lucide-react";
@@ -17,6 +21,8 @@ import { toast } from "sonner";
 
 export default function AddProduct() {
     const [loading, setLoading] = useState(true);
+    const [onProcess, setProcess] = useState(false);
+    const [open, setOpen] = useState(false);
     const [product, setProduct] = useState<Product>(productInit);
     const [supplies, setSupplies] = useState<Supply[]>([]);
     const [selectedItems, setSelectedItems] = useState<SupplyItem[]>([]);
@@ -58,6 +64,28 @@ export default function AddProduct() {
         setSelectedItems(selectedItems.filter((item: SupplyItem) => item.code !== code));
     };
 
+    async function handleSubmit() {
+        try {
+            setProcess(true);
+            setProduct(prev => ({
+                ...prev,
+                itemsNeeded: selectedItems
+            }))
+            for (const field of productFields) {
+                if (product[field] === "" || product[field] === undefined) {
+                    toast.info("Please fill up all fields!");
+                    return; 
+                }
+            }
+            const data = await ProductService.createProduct(product);
+            if (data) toast.success(`Product ${product.name} created successfully.`)
+        } catch(error) { toast.error(`${error}`) }
+        finally { 
+            setProcess(false)
+            setProduct(productInit);
+        }
+    }
+
     return(
         <section className="relative flex flex-col w-full h-screen align-center justify-center">
             <Toaster closeButton position="top-center" />
@@ -81,7 +109,7 @@ export default function AddProduct() {
 
                 <div className="grid grid-cols-2 gap-4 mt-4">
                     <div className="flex flex-col gap-1">
-                        <div>Branch Name</div>
+                        <div>Product Name</div>
                         <Input 
                             className="w-full border-1 border-gray max-md:w-full" 
                             name ="name"  
@@ -103,11 +131,11 @@ export default function AddProduct() {
                                 onChange={ e => handleChange(e, setProduct)}
                             />
                         </div>
-                        <div>Branch Name</div>
+                        <div>Category</div>
                         <Input 
                             className="w-full border-1 border-gray max-md:w-full" 
-                            name ="name"  
-                            value={product.name}
+                            name ="category"  
+                            value={product.category}
                             onChange={ e => handleChange(e, setProduct)}
                         />
                     </div>
@@ -143,8 +171,45 @@ export default function AddProduct() {
                             </div>
                         </ScrollArea>
                     </div>
+                    <Button 
+                        className="w-fit mt-2"
+                        onClick={ () => setOpen(!open) }
+                    >
+                        Register
+                    </Button>
                 </div>
             </div>
+
+            <Dialog open={ open } onOpenChange={ setOpen }>
+                <DialogContent className="sm:max-w-md">
+                    <DialogTitle className="text-sm">Are you sure to add branch.</DialogTitle>
+                    <ScrollArea>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="text-sm">Product Name: </div>
+                            <div className="text-sm font-semibold">{ product.name || (<span className="font-normal text-sxm text-darkred">This field is required</span>) }</div>
+                            <div className="text-sm">Price: </div>
+                            <div className="text-sm font-semibold">{ product.price || (<span className="font-normal text-sxm text-darkred">This field is required</span>) }</div>
+                            <div className="text-sm">Category: </div>
+                            <div className="text-sm font-semibold">{ product.category || (<span className="font-normal text-sxm text-darkred">This field is required</span>) }</div>
+                            <div className="text-sm">Items Needed </div>
+                            <div className="grid grid-cols-2 col-span-2">
+                            {selectedItems.map((item, index) => (
+                                <Fragment key={ index }>
+                                    <div className="text-sm pl-4 truncate py-1">{ item.name }</div>
+                                    <div className="text-sm">{ item.quantity }</div>
+                                </Fragment>
+                            ))}
+                            </div>
+                        </div>      
+                    </ScrollArea>
+                    <div className="flex justify-end gap-2">
+                        <Button type="button" variant="secondary"  className="border-1 border-dark bg-white text-xs px-4" onClick={ () => { handleSubmit(); setOpen(!open); }}>
+                            <FormLoader onProcess={ onProcess } label="Yes, I'm sure." loadingLabel="Loading"  />
+                        </Button>
+                        <Button type="button" className="text-xs px-4" onClick={ () => setOpen(!open) }>Cancel</Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </section>
     );
 }

@@ -7,10 +7,10 @@ export interface Product {
 }
 
 interface MaterialItem {
-    code: string;
-    name: string,
-    quantity: number;
-    unitMeasurement: string;
+    code?: string;
+    name?: string,
+    quantity?: number;
+    unitMeasurement?: string;
 }
 
 export const productInit: Product = {
