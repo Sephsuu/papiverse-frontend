@@ -47,6 +47,11 @@ export function OrderReceipt({ claims, setActiveForm, selectedItems }: Props) {
             await MeatOrderService.createMeatOrder(meatOrder);
             await SnowOrderService.createSnowOrder(snowOrder);
 
+            console.log(meatOrder.id);
+            console.log(snowOrder.id);
+            
+            
+
             const orderSupply = {
                 branchId: claims.branch.branchId,
                 remarks: "",
