@@ -4,6 +4,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { FranchiseeSidebar } from "@/components/custom/franchisee-sidebar";
 import { AuthProvider } from "@/hooks/use-auth";
 import { requireRole } from "@/lib/auth";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: {
@@ -21,7 +22,7 @@ export default async function RootLayout({
   await requireRole(['FRANCHISEE']);
   return (
     <AuthProvider>
-      <SidebarProvider className="bg-slate-100">
+      <SidebarProvider className="bg-slate-100 max-w-[2560px] mx-auto">
         <FranchiseeSidebar />
         {children}
 

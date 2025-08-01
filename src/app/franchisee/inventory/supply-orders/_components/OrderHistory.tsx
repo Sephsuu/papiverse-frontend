@@ -33,8 +33,6 @@ export function OrderHistory({ claims, filteredOrders, setReload, toView, setToV
                 source: "ORDER",
                 orderId: id,
             });
-            console.log('pass');
-            
         } catch (error) {
             console.log(error);
         } finally {

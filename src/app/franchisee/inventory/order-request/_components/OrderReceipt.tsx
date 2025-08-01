@@ -1,7 +1,7 @@
 "use client"
 
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { AddButton, Button } from "@/components/ui/button";
+import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { FormLoader, PapiverseLoading } from "@/components/ui/loader";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/use-auth";
@@ -13,6 +13,7 @@ import { Claim } from "@/types/claims";
 import { SupplyItem } from "@/types/supplyOrder";
 import { Ham, Snowflake } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -23,6 +24,7 @@ interface Props {
 }
 
 export function OrderReceipt({ claims, setActiveForm, selectedItems }: Props) {
+    const router = useRouter()
     const [open, setOpen] = useState(false);
     const [onProcess, setProcess] = useState(false);
     const meatReceipt = selectedItems.filter((s) => s.category === "MEAT");
@@ -47,9 +49,6 @@ export function OrderReceipt({ claims, setActiveForm, selectedItems }: Props) {
             const meatFinal = await MeatOrderService.createMeatOrder(meatOrder);
             const snowFinal = await SnowOrderService.createSnowOrder(snowOrder);
 
-            console.log(meatFinal.id);
-            console.log(snowFinal.id);
-
             const orderSupply = {
                 branchId: claims.branch.branchId,
                 remarks: "",
@@ -63,7 +62,10 @@ export function OrderReceipt({ claims, setActiveForm, selectedItems }: Props) {
             }
         
         } catch (error) { toast.error(`${error}`) }
-        finally { setProcess(false) }
+        finally { 
+            setProcess(false);
+            router.push('supply-orders')
+        }
     }
 
     return(
@@ -182,18 +184,14 @@ export function OrderReceipt({ claims, setActiveForm, selectedItems }: Props) {
             <Dialog open={ open } onOpenChange={ setOpen }>
                 <DialogContent>
                     <DialogTitle className="text-sm">Are you sure to order the following supplies?</DialogTitle>
-                    <div className="flex justify-end gap-2">
-                        <Button
-                            variant="secondary"
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            onClick={ handleSubmit }
-                            className="!bg-darkgreen hover:opacity-90"
-                        >
-                            <FormLoader onProcess={ onProcess } label="Yes, I'm sure." loadingLabel="Ordering Supplies" />
-                        </Button>
+                    <div className="flex justify-end gap-4">
+                        <DialogClose>Cancel</DialogClose>
+                        <AddButton 
+                            handleSubmit={ handleSubmit }
+                            onProcess={ onProcess }
+                            label="Order Supplies"
+                            loadingLabel="Ordering Supplies"
+                        />
                     </div>
                 </DialogContent>
             </Dialog>

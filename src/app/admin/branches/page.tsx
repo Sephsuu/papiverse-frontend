@@ -17,6 +17,7 @@ import { toast } from "sonner";
 
 export default function BranchesTable() {
     const [loading, setLoading] = useState(true);
+    const [reload, setReload] = useState(false);
     const [onProcess, setProcess] = useState(false);
     const [search, setSearch] = useState('');
     const [toDelete, setDelete] = useState<Branch | undefined>();
@@ -33,7 +34,7 @@ export default function BranchesTable() {
             finally { setLoading(false) }
         }
         fetchData();
-    }, []);
+    }, [reload]);
 
     useEffect(() => {
         const find = search.toLowerCase().trim();
@@ -47,10 +48,14 @@ export default function BranchesTable() {
     async function handleDelete() {
         try {
             setProcess(true);
-            const data = await UserService.deleteUser(toDelete!.branchId!);
-            if (data) toast.success(`Branch ${toDelete?.branchName} deleted successfully.`)
+            await BranchService.deleteBranch(toDelete!.branchId!);
+            toast.success(`Branch ${toDelete!.branchName} deleted successfully.`)
         } catch (error) { toast.error(`${error}`) }
-        finally { setProcess(false); }
+        finally { 
+            setProcess(false); 
+            setReload(!reload)
+            setDelete(undefined);
+        }
     }
 
     if (loading) return <PapiverseLoading />
@@ -146,7 +151,7 @@ export default function BranchesTable() {
 
             <Dialog open={ !!toDelete } onOpenChange={ (open) => { if (!open) setDelete(undefined) }}>
                 <DialogContent>
-                    <DialogTitle className="text-sm">Are you sure you want to delete branch { `${toDelete?.branchName}` }</DialogTitle>
+                    <DialogTitle className="text-sm">Are you sure you want to delete branch <span className="text-darkred">{ `${toDelete?.branchName}` }</span></DialogTitle>
                     <div className="flex justify-end items-end gap-2">
                         <Button 
                             onClick={ () => setDelete(undefined) }

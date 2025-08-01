@@ -90,8 +90,8 @@ export class ProductService {
         return res.json();
     }
 
-    static async deleteProduct(code: string) {
-        const res = await fetch(`${URL}/delete-by-code?code=${code}`, {
+    static async deleteProduct(id: number) {
+        const res = await fetch(`${URL}/delete?id=${id}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json'},
         });

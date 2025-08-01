@@ -1,3 +1,9 @@
+@property --tw-border-style {
+    syntax: "*";
+    inherits: false;
+    initial-value: solid;
+}
+
 button, a {
     cursor: pointer;
 }
@@ -21,7 +27,7 @@ button, a {
 .data-table-td {
     font-size: 14px;
     padding: 6px 0 6px 8px;
-    border-bottom-width: 1px gray;
+    border-bottom-width: 1px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

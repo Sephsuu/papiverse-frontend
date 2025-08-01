@@ -1,8 +1,9 @@
 "use client"
 
-import { Button } from "@/components/ui/button";
+import { Button, DeleteButton } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { PapiverseLoading } from "@/components/ui/loader";
-import { Select, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Toaster } from "@/components/ui/sonner";
 import { formatToPeso } from "@/lib/formatter";
 import { ProductService } from "@/services/ProductService";
@@ -17,6 +18,7 @@ import { toast } from "sonner";
 export default function ProductsTable() {
     const [loading, setLoading] = useState(true);
     const [reload, setReload] = useState(false);
+    const [onProcess, setProcess] = useState(false);
     const [search, setSearch] = useState('');
     const [toDelete, setDelete] = useState<Product>();
 
@@ -42,6 +44,20 @@ export default function ProductsTable() {
             ))
         } else setFilteredProducts(products);
     }, [search, products]);
+
+    async function handleDelete() {
+            try {
+                setProcess(true);
+                toast.success(`Product ${toDelete?.name} deleted successfully.`)
+                await ProductService.deleteProduct(toDelete!.id!);
+            } catch (error) { toast.error(`${error}`) }
+            finally { 
+                setReload(!reload);
+                setProcess(false); 
+                setDelete(undefined);
+            }
+        }
+    
 
     if (loading) return <PapiverseLoading />
     return(
@@ -97,25 +113,41 @@ export default function ProductsTable() {
                         <Link href="/admin/sales/products/add-product">Add a product</Link>
                     </Button>
                 </div>
-            </div>
-
-            
-            <div className="grid grid-cols-[20%_12%_15%_auto_auto_auto_10%] data-table-thead mt-2">
+            </div>    
+            <div className="grid grid-cols-5 data-table-thead mt-2">
                 <div className="data-table-th">Product Name</div>
                 <div className="data-table-th">Price</div>
                 <div className="data-table-th">Category</div>
-                <div className="data-table-th col-span-3">Supplies Neede</div>
+                <div className="data-table-th">Supplies Neede</div>
                 <div className="data-table-th">Action</div>
             </div>
-
-            <div className="grid grid-cols-[20%_12%_15%_auto_auto_auto_10%] bg-light rounded-b-sm shadow-xs">
+            <div className="grid grid-cols-5 bg-light rounded-b-sm shadow-xs">
                 {products.length > 0 ?
                     filteredProducts.map((item, index) => (
                         <Fragment key={ index }>
                             <div className="data-table-td">{ item.name }</div>
                             <div className="data-table-td">{ formatToPeso(item.price) }</div>
                             <div className="data-table-td">{ item.category }</div>
-                            <div className="data-table-td col-span-3">{ "Supplies" }</div>
+                            <Select>
+                                <SelectTrigger className="w-full">
+                                    <div className="text-dark font-semibold underline">Supplies Needed</div>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>Supplies needed for { item.name }</SelectLabel>
+                                        {item.itemsNeeded.map((subItem, index) => (
+                                            <SelectItem 
+                                                key={ index } 
+                                                value={ subItem.code! }
+                                                className="w-full grid grid-cols-2"
+                                            >
+                                                <div className="text-sm">{ subItem.name }</div>
+                                                <div className="text-sm">{ subItem.quantity }</div>
+                                            </SelectItem>
+                                        ))}
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
                             <div className="flex items-center gap-3 data-table-td">
                                 <Link href={`/admin/inventory/supplies/edit-supply/${item.id}`}><SquarePen className="w-4 h-4 text-darkgreen" /></Link>
                                 <button><Info className="w-4 h-4" /></button>
@@ -127,11 +159,30 @@ export default function ProductsTable() {
                             </div>
                         </Fragment>
                     ))
-                    : (<div className="my-2 text-sm text-center col-span-6">There are no existing users yet.</div>)
+                    : (<div className="my-2 text-sm text-center col-span-6">There are no existing products yet.</div>)
                 }
             </div>
             <div className="text-gray text-sm">Showing { filteredProducts.length.toString() } of { filteredProducts.length.toString() } results.</div>
 
+            <Dialog open={ !!toDelete } onOpenChange={ (open) => { if (!open) setDelete(undefined) }}>
+                <DialogContent>
+                    <DialogTitle className="text-sm">Are you sure you want to delete <span className="text-darkred">{ `${toDelete?.name}` }</span></DialogTitle>
+                    <div className="flex justify-end items-end gap-2">
+                        <Button 
+                            onClick={ () => setDelete(undefined) }
+                            variant="secondary"
+                        >
+                            Close
+                        </Button>
+                        <DeleteButton 
+                            handleDelete={ handleDelete } 
+                            onProcess={ onProcess }
+                            label="Delete Product"
+                            loadingLabel="Delete Product"
+                        />
+                    </div>
+                </DialogContent>
+            </Dialog>
         </section>
     );
 }

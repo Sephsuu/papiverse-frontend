@@ -19,7 +19,7 @@ export class EmployeeService {
 
 		if (!res.ok) {
 			const err = await res.json();
-			throw new Error(err.message || 'Something went wrong.');
+			throw new Error(err.message || err.error || 'Something went wrong.');
 		}
 
 		return res.json();
@@ -58,7 +58,7 @@ export class EmployeeService {
 
 		if (!res.ok) {
 			const err = await res.json();
-			throw new Error(err.message || 'Something went wrong.');
+			throw new Error(err.message || err.error || 'Something went wrong.');
 		}
 
 		return res.json();
@@ -93,7 +93,7 @@ export class EmployeeService {
 
 		if (!res.ok) {
 			const err = await res.json();
-			throw new Error(err.message || 'Something went wrong.');
+			throw new Error(err.message || err.error || 'Something went wrong.');
 		}
 	}
 }

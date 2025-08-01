@@ -1,7 +1,7 @@
 "use client"
 
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { AddButton, Button } from "@/components/ui/button";
+import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { FormLoader } from "@/components/ui/loader";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -72,17 +72,24 @@ export default function AddProduct() {
                 itemsNeeded: selectedItems
             }))
             for (const field of productFields) {
-                if (product[field] === "" || product[field] === undefined) {
+                if (product[field] === "" || product[field] === undefined || product[field] === 0) {
                     toast.info("Please fill up all fields!");
                     return; 
                 }
             }
-            const data = await ProductService.addProduct(product);
+            if (selectedItems.length <= 0) toast.info("Please fill up all fields!");
+            const updatedData = {
+                ...product,
+                itemsNeeded: selectedItems
+            }
+            const data = await ProductService.addProduct(updatedData);
             if (data) toast.success(`Product ${product.name} created successfully.`)
         } catch(error) { toast.error(`${error}`) }
         finally { 
             setProcess(false)
             setProduct(productInit);
+            setSelectedItems([]);
+            setOpen(!open);
         }
     }
 
@@ -202,11 +209,13 @@ export default function AddProduct() {
                             </div>
                         </div>      
                     </ScrollArea>
-                    <div className="flex justify-end gap-2">
-                        <Button type="button" className="text-xs px-4" onClick={ () => setOpen(!open) }>Cancel</Button>
-                        <Button type="button" variant="secondary"  className="border-1 border-dark bg-white text-xs px-4" onClick={ () => { handleSubmit(); setOpen(!open); }}>
-                            <FormLoader onProcess={ onProcess } label="Yes, I'm sure." loadingLabel="Loading"  />
-                        </Button>
+                    <div className="flex justify-end gap-5">
+                        <DialogClose>Close</DialogClose>
+                        <AddButton  
+                            handleSubmit={ handleSubmit }
+                            onProcess={ onProcess }
+                            loadingLabel="Adding Product"
+                        />
                     </div>
                 </DialogContent>
             </Dialog>

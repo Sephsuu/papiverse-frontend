@@ -14,6 +14,14 @@ import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
 import { toast } from "sonner";
 
+const columns = [
+    { title: "Full Name", style: "" },
+    { title: "E-mail Address", style: "" },
+    { title: "Username", style: "" },
+    { title: "Branch", style: "" },
+    { title: "Actions", style: "" },
+]
+
 export default function UsersTable() {
     const [loading, setLoading] = useState(true);
     const [reload, setReload] =  useState(false);
@@ -116,22 +124,20 @@ export default function UsersTable() {
                 
             </div>
 
-            <div className="grid grid-cols-6 bg-slate-200 font-semibold rounded-sm mt-2">
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50 col-span-2">Full Name</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">E-mail Address</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Username</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Branch Name</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Action</div>
+            <div className="grid grid-cols-5 data-table-thead mt-2">
+                {columns.map((item, _) => (
+                    <div key={_} className={`data-table-th ${item.style}`}>{ item.title }</div>
+                ))}
             </div>
 
-            <div className="grid grid-cols-6 bg-light rounded-b-sm shadow-xs">
+            <div className="grid grid-cols-5 bg-light rounded-b-sm shadow-xs">
                 {users.length > 0 ?
                     filteredUsers.map((item, index) => (
                         <Fragment key={ index }>
-                            <div className="text-sm col-span-2 pl-2 py-1.5 border-b-1">{ `${item.lastName}, ${item.firstName} ${item.middleName}` }</div>
-                            <div className="text-sm pl-2 py-1.5 border-b-1 truncate">{ item.email }</div>
-                            <div className="text-sm pl-2 py-1.5 border-b-1">{ item.username }</div>
-                            <div className="text-sm pl-2 py-1.5 border-b-1 truncate">{ item.branch?.branchName }</div>
+                            <div className="data-table-td">{ `${item.lastName}, ${item.firstName} ${item.middleName}` }</div>
+                            <div className="data-table-td">{ item.email }</div>
+                            <div className="data-table-td">{ item.username }</div>
+                            <div className="data-table-td">{ item.branch?.branchName }</div>
                             <div className="flex items-center pl-2 gap-3 border-b-1">
                                 <Link href={`/admin/users/edit-user/${item.id}`}><SquarePen className="w-4 h-4 text-darkgreen" /></Link>
                                 <button><Info className="w-4 h-4" /></button>

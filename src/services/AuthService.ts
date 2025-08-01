@@ -65,39 +65,3 @@ export class AuthService {
 		return res.json();
 	}
 }
-
-
-
-// const AuthService = {
-// 	authenticateUser: async (credentials: object) => {
-// 		const response = await fetch(`${BASE_URL}/login`, {
-// 		method: 'POST',
-// 		headers: { 'Content-Type': 'application/json' },
-// 		body: JSON.stringify(credentials),
-// 		});
-
-// 		if (!response.ok) {
-// 		throw new Error('Login failed');
-// 		}
-
-// 		const data = await response.json();
-// 		return data.token;
-// 	},
-
-// updateCredentials : async (newCredentials : object ) => {
-// 	const response = await fetch(`${BASE_URL}/update-credentials`, {
-// 	method: 'POST',
-// 	headers : {'Content-Type' : 'application/json'},
-// 	body : JSON.stringify(newCredentials)
-// 	})
-
-// 	if(!response.ok){
-// 		throw new Error("Registration Failed");
-// 	}
-
-// 	const data = response.json;
-// 	return 'Update Successful' + data;
-// }
-
-
-// };

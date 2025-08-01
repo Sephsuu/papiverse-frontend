@@ -85,7 +85,7 @@ export class BranchService {
 		return res.json();
 	}
 
-	static async deleteBranch(id: Branch) {
+	static async deleteBranch(id: number) {
 		const res = await fetch(`${URL}/delete-by-id?id=${id}`, {
 			method: 'POST',
 			headers: { 
@@ -98,8 +98,6 @@ export class BranchService {
 			const err = await res.json();
 			throw new Error(err.message || 'Something went wrong');
 		}
-
-		return res.json();
 	}
 
 
