@@ -1,47 +1,45 @@
 "use client"
-import {useEffect, useState}  from "react"
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { Dialog, 
+import {
+    Dialog,
     DialogContent,
-    DialogTrigger,
     DialogDescription,
-    DialogTitle,
-    DialogHeader
+    DialogHeader,
+    DialogTitle
 } from "@/components/ui/dialog";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { useEffect, useState } from "react";
 
 import { toast } from "sonner";
 
 import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
+    Avatar,
+    AvatarFallback,
+    AvatarImage,
+} from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Calendar1Icon, House, Lock, MapPinned, Pencil, Save } from "lucide-react";
 
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
-import { format, set } from "date-fns";
-import { Calendar } from "@/components/ui/calendar"
-import { Label } from "@/components/ui/label"
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { format } from "date-fns";
 
 
-import { UserService } from "@/services/UserService";
-import { AuthService } from "@/services/AuthService";
-import { Input } from "@/components/ui/input";
-import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { editUser, User, userCredentials, userInit } from "@/types/user";
+import { Toaster } from "@/components/ui/sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { handleChange, handleChangeSolo } from "@/lib/form-handle";
-import { log } from "node:console";
+import { cn } from "@/lib/utils";
+import { AuthService } from "@/services/AuthService";
+import { UserService } from "@/services/UserService";
+import { User, userInit } from "@/types/user";
+import FieldSkeleton from "@/components/custom/FieldSkeleton";
 
 export function AvatarDemo() {
   return (
@@ -81,6 +79,7 @@ export function AvatarDemo() {
 
 const genders = ["Male", "Female", "Gay", "Lesbian", "Others"];
 
+
 export default function MyProfilePage(){
   const [editUser, setEditUser] = useState<User>({})
   const { claims, loading: authLoading } = useAuth();
@@ -97,23 +96,34 @@ export default function MyProfilePage(){
 
 
     useEffect(() => {
-        const fetchUser = async () => {
-            try {
-            const data = await UserService.getUserById(claims.userId);
-            if(data) {
-                setUser(data);
-            }
+    const fetchUser = async () => {
+        try {
+        const newClaims = await AuthService.getCookie();
 
-            } catch (err) {
-                console.error("Failed to fetch user:", err);
-            }
-        };
+        if (!newClaims || !newClaims.userId) {
+            console.warn('No valid userId in cookie.');
+            return;
+        }
 
+        const data = await UserService.getUserById(newClaims.userId);
+
+        if (data) {
+            setUser(data);
+        }
+
+        } catch (err) {
+        console.error("Failed to fetch user:", err);
+        }
+    };
+
+    if (!authLoading) {
         fetchUser();
-    }, [refresh, claims]);
+    }
+    }, [refresh, claims, authLoading]);
+
 
     useEffect(() => {
-    if (user) {
+    if (!authLoading && user) {
         setCredentials({
             id: user.id,
             username: user.username,
@@ -160,8 +170,6 @@ export default function MyProfilePage(){
             const data = await UserService.updateUser(finalUser);
             if(data){
                 toast.success(`User ${user.firstName} ${user.lastName} was updated successfully.`);;
-
-                setRefresh(prev => !prev)
             }
         } catch(e) {
             toast.error(`${e}`);
@@ -189,28 +197,33 @@ export default function MyProfilePage(){
         }
 
         const updatedCredentials = {
-            ...credentials,
+            id: credentials.id,
+            username: credentials.username,
             password: newPassword,
+            email: credentials.email
         };
-
         try {
+            console.log(updatedCredentials)
             const data = await AuthService.updateCredentials(updatedCredentials);
             if (data) {
-            toast.success("Account credentials updated successfully!");
+                toast.success("Account credentials updated successfully!");
+                
+                await AuthService.setCookie(data.token)
 
-            setUser(prev => ({
-                ...prev,
-                username: updatedCredentials.username,
-                email: updatedCredentials.email
-            }));
+                setUser(prev => ({
+                    ...prev,
+                    username: updatedCredentials.username,
+                    email: updatedCredentials.email
+                }));
 
-            setRefresh(prev => !prev);
-
+            
             }
+
         } catch (e) {
             toast.error(`${e}`);
         } finally {
             setOpen(!open);
+            setRefresh(!refresh)
         }
     };
 
@@ -226,7 +239,6 @@ export default function MyProfilePage(){
             toast.error(`${e}`)
         }
     };
-
     return (
         <SidebarProvider >
             <Toaster position="top-center"/>
@@ -242,7 +254,7 @@ export default function MyProfilePage(){
                  <div className="relative w-35 h-35">
                     <Avatar className="w-full h-full bg-amber-400">
                         <AvatarImage
-                        src={user?.imageUrl ? `http://localhost:8080${user.imageUrl}` : ""}
+                        src={user?.imageUrl ? `https://395z4m7f-8080.asse.devtunnels.ms${user.imageUrl}` : ""}
                         className="h-full w-full object-cover rounded-full"
                         />
                     </Avatar>
@@ -375,36 +387,37 @@ export default function MyProfilePage(){
                         <div className="sub-con1 w-full ">
                             <div className="m-5">
                                 <h1 className="text-md text-gray font-semilight">First name</h1>
-                                <h1 className="text-lg font-semilight">{user && user.firstName}</h1>
+                                <FieldSkeleton text={!authLoading ? user.firstName : ''} width="w-40" />
+
                             </div>
 
                             <div className="m-5">
                                 <h1 className="text-md text-gray font-semilight">Birthdate</h1>
-                                <h1 className="text-lg font-semilight">{user && user.dateOfBirth}</h1>
+                                <FieldSkeleton text={!authLoading ? user.dateOfBirth : ''} width="w-40" />
                             </div>
                         </div>
 
                         <div className="sub-con2  w-full ">
                             <div  className="m-5">
                                 <h1 className="text-md text-gray font-semilight">Last Name</h1>
-                                <h1 className="text-lg font-semilight">{user && user.lastName}</h1>
+                                <FieldSkeleton text={!authLoading ? user.lastName : ''} width="w-40" />
                             </div>
 
                             <div className="m-5">
                                 <h1 className="text-md text-gray font-semilight">Phone Number </h1>
-                                <h1 className="text-lg font-semilight">{user && user.contactNumber}</h1>
+                                <FieldSkeleton text={!authLoading ? user.contactNumber : ''} width="w-40" />
                             </div>
                         </div>
 
                         <div className="sub-con3  w-full">
                              <div  className="m-5">
                                 <h1 className="text-md text-gray font-semilight">Middle Name</h1>
-                                <h1 className="text-lg font-semilight">{user && user.middleName}</h1>
+                                <FieldSkeleton text={!authLoading ? user.middleName : ''} width="w-40" />
                             </div>
 
                             <div className="m-5">
                                 <h1 className="text-md text-gray font-semilight">Gender </h1>
-                                <h1 className="text-lg font-semilight">{user && user.gender}</h1>
+                                <FieldSkeleton text={!authLoading ? user.gender : ''} width="w-40" />
                             </div>
                         </div>
                     </div>
@@ -417,26 +430,26 @@ export default function MyProfilePage(){
                         </div>
                         <Separator className="mt-2" />
                         
-                        <div className="flex justify-between ">
-                            <div className="w-full flex flex-col mt-7">
+                        <div className="flex justify-between p-2">
+                            <div className="w-full flex flex-col mt-5">
                                 <div className="branchDetails flex gap-2 mb-5">
                                     <House />
-                                    <h1 className="text-lg px-2">{user && user.branch!.branchName}</h1>
+                                    <FieldSkeleton text={!authLoading ? user.branch?.branchName : ''} width="w-40" />
                                 </div>
                                 <div className="flex gap-2 ">
                                     <MapPinned />
-                                    <h1 className="text-lg px-2">{user && user.branch!.streetAddress + ", " + user.branch!.barangay + ", " +  user.branch!.city 
-                                        + ", " + user.branch!.province}</h1>
+                                    <FieldSkeleton text={!authLoading ? user.branch?.streetAddress + ", " + user.branch?.barangay + ", " + user.branch?.city + 
+                                        " , " + user.branch?.province : ''} width="w-40" />
                                 </div>
                             </div>
                              <div className="w-full  flex justify-evenly">  
                                 <div className="branchDetails  flex flex-col gap-2  ml-5 justify-center items-center">
                                     <h1 className="font-semibold">Internal Branch: </h1>
-                                    <h1>{user && user.branch!.isInternal ? "Yes" : "No"}</h1>
+                                    <FieldSkeleton text={!authLoading ? user.branch?.isInternal? 'Yes' : "No" : ''} width="w-40" />
                                 </div>
                                 <div className="flex gap-2 flex-col   mr-5 justify-center items-center">
                                     <h1 className="font-semibold">Status</h1>
-                                    <h1>{user && user.branch!.branchStatus}</h1>
+                                    <FieldSkeleton text={!authLoading ? user.branch?.branchStatus : ''} width="w-40" />
                                 </div>
                             </div>
                             
@@ -539,15 +552,15 @@ export default function MyProfilePage(){
                             <div className="acc_info flex gap-5 h-full justify-between w-full">
                                  <div className=" flex flex-col items-start">
                                     <h1 className="text-md text-gray font-semilight mb-1">Username:</h1>
-                                    <h1 className="text-lg font-semilight">{user && user.username}</h1>
+                                    <FieldSkeleton text={!authLoading ? user.username : ''} width="w-40" />
                                 </div>
                                 <div className=" flex flex-col items-start">
                                     <h1  className="text-md text-gray font-semilight mb-1">User Role:</h1>
-                                    <h1 className="text-lg font-semilight">{user && user.role}</h1>
+                                    <FieldSkeleton text={!authLoading ? user.role : ''} width="w-40" />
                                 </div>
                                 <div className="flex flex-col items-start">
                                     <h1  className="text-md text-gray font-semilight mb-1">Email</h1>
-                                    <h1 className="text-lg font-semilight">{user && user.email}</h1>
+                                    <FieldSkeleton text={!authLoading ? user.email : ''} width="w-40" />
                                 </div>
                             </div>
                            
