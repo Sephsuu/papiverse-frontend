@@ -30,7 +30,7 @@ export function DeleteExpense({ toDelete, setDelete, setReload }: Props) {
     return(
         <Dialog open={ !!toDelete } onOpenChange={ (open) => { if (!open) setDelete(undefined) } }>
             <DialogContent>
-                <DialogTitle className="text-sm">Are you sure you want to delete expense { toDelete?.purpose }</DialogTitle>
+                <DialogTitle className="text-sm">Are you sure you want to delete expense <span className="text-darkred">{ toDelete.purpose }</span></DialogTitle>
                     <div className="flex justify-end items-end gap-4">
                         <DialogClose>Close</DialogClose>
                         <DeleteButton

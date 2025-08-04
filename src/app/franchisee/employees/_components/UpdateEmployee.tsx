@@ -11,14 +11,13 @@ import { toast } from "sonner";
 
 interface Props {
     claims: Claim;
-    onProcess: boolean;
-    setProcess: React.Dispatch<React.SetStateAction<boolean>>;
     toUpdate: Employee;
     setUpdate: React.Dispatch<React.SetStateAction<Employee | undefined>>;
     setReload: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function UpdateEmployee({ claims, onProcess, setProcess, toUpdate, setUpdate, setReload }: Props) {
+export function UpdateEmployee({ claims, toUpdate, setUpdate, setReload }: Props) {
+    const [onProcess, setProcess] = useState(false);
     const [employee, setEmployee] = useState<Employee>(toUpdate);
 
     async function handleSubmit() {
@@ -77,7 +76,6 @@ export function UpdateEmployee({ claims, onProcess, setProcess, toUpdate, setUpd
                         <Input    
                             className="w-full border-1 border-gray max-md:w-full" 
                             name ="lastName"  
-                            placeholder="(optional)"
                             value={employee.lastName}
                             onChange={ e => handleChange(e, setEmployee)}
                         />

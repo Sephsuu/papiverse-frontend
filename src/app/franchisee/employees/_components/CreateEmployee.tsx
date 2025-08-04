@@ -11,13 +11,12 @@ import { toast } from "sonner";
 
 interface Props {
     claims: Claim;
-    onProcess: boolean;
-    setProcess: React.Dispatch<React.SetStateAction<boolean>>;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
     setReload: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function CreateEmployee({ claims, onProcess, setProcess, setOpen, setReload }: Props) {
+export function CreateEmployee({ claims, setOpen, setReload }: Props) {
+    const [onProcess, setProcess] = useState(false);
     const [employee, setEmployee] = useState<Employee>(employeeInit);
 
     async function handleSubmit() {

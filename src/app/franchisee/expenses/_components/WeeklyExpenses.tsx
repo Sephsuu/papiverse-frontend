@@ -100,7 +100,7 @@ export function WeeklyExpenses({ branchId, search, reload, setReload, setUpdate,
                                     <div className="flex justify-center gap-2">
                                         <button onClick={ () => setUpdate(expense) }><SquarePen className="w-4 h-4 text-darkgreen"/></button>
                                         <button><Info className="w-4 h-4"/></button>
-                                        <button><Trash2 className="w-4 h-4 text-darkred"/></button>
+                                        <button onClick={ () => setDelete(expense) }><Trash2 className="w-4 h-4 text-darkred"/></button>
                                     </div>
                                 </div>
                             ))}
