@@ -14,6 +14,7 @@ import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { WeeklyExpenses } from "./_components/WeeklyExpenses";
+import { CreateExpense } from "./_components/CreateExpense";
 
 const tabs = [ 'Weekly', 'Monthly', 'Yearly'];
 
@@ -23,8 +24,10 @@ export default function ExpensesTable() {
     const [reload, setReload] = useState(false);
     const [onProcess, setProcess] = useState(false);
     const [search, setSearch] = useState('');
-    const [toDelete, setDelete] = useState<Expense>();
     const [activeTab, setActiveTab] = useState('Weekly');
+
+    const [open, setOpen] = useState(false);
+    const [toDelete, setDelete] = useState<Expense>();
 
     const [expenses, setExpenses] = useState<Expense[]>([]);
 
@@ -104,9 +107,11 @@ export default function ExpensesTable() {
                         <Download />
                         Export
                     </Button>
-                    <Button className="!bg-darkorange text-light shadow-xs hover:opacity-90">
-                        <Plus />
-                        <Link href="/franchisee/expenses/add-expense">Add an expenditure</Link>
+                    <Button 
+                        onClick={ () => setOpen(!open) }
+                        className="!bg-darkorange text-light shadow-xs hover:opacity-90"
+                    >
+                        <Plus />Add an expenditure
                     </Button>
                 </div>
             </div>
@@ -127,7 +132,15 @@ export default function ExpensesTable() {
                     search={ search }
                 />
             )}
-        
+
+            {open && (
+                <CreateExpense
+                    claims={ claims }
+                    onProcess={ onProcess }
+                    setProcess={ setProcess }
+                    setOpen={ setOpen }
+                /> 
+            )}
         </section>
     );
 }

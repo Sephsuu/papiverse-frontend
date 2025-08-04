@@ -6,6 +6,9 @@
 
 * {
   font-family: "Figtree", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-stretch: ultra-expanded;
 }
 
 @theme inline {
