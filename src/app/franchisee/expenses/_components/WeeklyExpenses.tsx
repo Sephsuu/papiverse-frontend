@@ -8,21 +8,22 @@ import { formatDateToWords, formatToPeso, getWeekday } from "@/lib/formatter";
 import { ExpenseService } from "@/services/ExpenseService";
 import { Expense } from "@/types/expense";
 import { Info, SquarePen, Trash2 } from "lucide-react";
-import Link from "next/link";
-import React, { Fragment, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { UpdateExpense } from "./UpdateExpense";
 
 interface Props {
+    setUpdate: React.Dispatch<React.SetStateAction<Expense | undefined>>;
+    setDelete: React.Dispatch<React.SetStateAction<Expense | undefined>>;
     branchId: number;
     search: string;
     reload: boolean;
     setReload: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function WeeklyExpenses({ branchId, search, reload, setReload }: Props) {
+export function WeeklyExpenses({ branchId, search, reload, setReload, setUpdate, setDelete }: Props) {
     const [loading, setLoading] = useState(true);
     const [onProcess, setProcess] = useState(false);
-    const [toDelete, setDelete] = useState<Expense>();
 
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
@@ -65,19 +66,6 @@ export function WeeklyExpenses({ branchId, search, reload, setReload }: Props) {
         acc + curr.expense
     ), 0);
 
-    async function handleDelete() {
-        try {
-            setProcess(true);
-            await ExpenseService.deleteExpense(toDelete!.id!);
-            toast.success(`Expense ${toDelete?.purpose} deleted successfully.`)
-        } catch (error) { toast.error(`${error}`) }
-        finally { 
-            setProcess(false); 
-            setDelete(undefined);
-            setReload(!reload); 
-        }
-    }
-
     if (loading) return <PapiverseLoading className="!h-fit mt-36" />
     return(
         <section className="w-full">
@@ -110,9 +98,9 @@ export function WeeklyExpenses({ branchId, search, reload, setReload }: Props) {
                                         <div className="font-semibold">{ formatToPeso(expense.expense) }</div>
                                     </div>
                                     <div className="flex justify-center gap-2">
-                                        {/* <button onClick={ () => { setToUpdate(expense); setUpdate(!update) }}><SquarePen className="w-4 h-4 text-darkgreen"/></button>
-                                        <button onClick={ () => { setDelete(expense.id); setDestroy(!destroy) } }><Trash2 className="w-4 h-4 text-darkred"/></button>
-                                        <button><Info className="w-4 h-4"/></button> */}
+                                        <button onClick={ () => setUpdate(expense) }><SquarePen className="w-4 h-4 text-darkgreen"/></button>
+                                        <button><Info className="w-4 h-4"/></button>
+                                        <button><Trash2 className="w-4 h-4 text-darkred"/></button>
                                     </div>
                                 </div>
                             ))}
@@ -120,30 +108,8 @@ export function WeeklyExpenses({ branchId, search, reload, setReload }: Props) {
                     </div>
                 );
             })}
-
             <div className="text-gray text-sm">Showing { filteredExpenses.length.toString() } of { filteredExpenses.length.toString() } results.</div>
-
-            <Dialog open={ !!toDelete } onOpenChange={ (open) => { if (!open) setDelete(undefined) } }>
-                <DialogContent>
-                    <DialogTitle className="text-sm">Are you sure you want to delete expense { toDelete?.purpose }</DialogTitle>
-                        <div className="flex justify-end items-end gap-2">
-                            <Button 
-                                onClick={ () => setDelete(undefined) }
-                                variant="secondary"
-                            >
-                                Close
-                            </Button>
-                            <Button
-                                className="!bg-darkred"
-                                onClick={ () => handleDelete() }
-                            >
-                                {!onProcess && <Trash2 className="w-4 h-4 text-light" />}
-                                <FormLoader onProcess={ onProcess } label="Delete Expense" loadingLabel="Deleting Expense" /> 
-                            </Button>
-                        </div>
-                </DialogContent>
-            </Dialog>
-        
+  
         </section>
     );
 }

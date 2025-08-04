@@ -1,4 +1,4 @@
-import { AddButton, Button } from "@/components/ui/button";
+import { AddButton, Button, UpdateButton } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { FormLoader } from "@/components/ui/loader";
@@ -19,13 +19,15 @@ const paymentModes = ['Cash', 'Credit Card', 'Debit Card', 'Bank Transfer'];
 interface Props {
     claims: Claim;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    toUpdate: Expense;
+    setUpdate: React.Dispatch<React.SetStateAction<Expense | undefined>>;
     setReload: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function CreateExpense({ claims, setOpen, setReload }: Props) {
+export function UpdateExpense({ claims, toUpdate, setUpdate, setReload }: Props) {
     const [loading, setLoading] = useState(true);
     const [onProcess, setProcess] = useState(false);
-    const [expense, setExpense] = useState<Expense>(expenseInit);
+    const [expense, setExpense] = useState<Expense>(toUpdate);
     const [employees, setEmployees] = useState<Employee[]>([]);
 
     useEffect(() => {
@@ -48,18 +50,18 @@ export function CreateExpense({ claims, setOpen, setReload }: Props) {
                         return; 
                     }
                 }
-            const data = await ExpenseService.createExpense(expense);
-            if (data) toast.success(`Expenditure for ${expense.purpose} added successfully.`)
+            const data = await ExpenseService.updateExpense(expense);
+            if (data) toast.success(`Expenditure for ${expense.purpose} updated successfully.`)
         } catch (error) { toast.error(`${error}`) }
         finally { 
             setReload(prev => !prev);
             setProcess(false); 
-            setOpen(!open);
+            setUpdate(undefined);
             setExpense(expenseInit);
         }
     }
     return(
-        <Dialog open onOpenChange={ setOpen }>
+        <Dialog open onOpenChange={ (open) => { if (!open) setUpdate(undefined) } }>
             <DialogContent>
                 <DialogTitle className="flex items-center gap-2">  
                     <Image
@@ -145,11 +147,11 @@ export function CreateExpense({ claims, setOpen, setReload }: Props) {
                 </div>
                 <div className="flex justify-end gap-4">
                     <DialogClose className="text-sm">Close</DialogClose>
-                    <AddButton 
+                    <UpdateButton 
                         handleSubmit={ handleSubmit }
                         onProcess={ onProcess }
-                        label="Add Expenditure"
-                        loadingLabel="Adding Expenditure"
+                        label="Update Expenditure"
+                        loadingLabel="Updating Expenditure"
                     />
                 </div>
             </DialogContent>

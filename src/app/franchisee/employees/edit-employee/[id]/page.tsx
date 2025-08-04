@@ -35,7 +35,7 @@ export default function EditEmployee() {
             } finally { setLoading(false) }
         }
         fetchData();
-    }, [])
+    }, []);
 
     async function handleSubmit() {
         try {

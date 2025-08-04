@@ -65,13 +65,18 @@ export class ExpenseService {
     }
 
     static async updateExpense(expense: Expense) {
-        const res = await fetch(`${URL}/create`, {
+        const payload = {
+            ...expense,
+            expense: Number(expense.expense),
+            purpose: expense.purpose.toUpperCase(),
+        }
+        const res = await fetch(`${URL}/update`, {
             method: 'POST',
             headers: { 
 				'Content-Type': 'application/json',
 				'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
 			},
-            body: JSON.stringify(expense),
+            body: JSON.stringify(payload),
         });
 
         if(!res.ok){

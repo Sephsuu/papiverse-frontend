@@ -15,6 +15,8 @@ import { Fragment, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { WeeklyExpenses } from "./_components/WeeklyExpenses";
 import { CreateExpense } from "./_components/CreateExpense";
+import { UpdateExpense } from "./_components/UpdateExpense";
+import { DeleteExpense } from "./_components/DeleteExpense";
 
 const tabs = [ 'Weekly', 'Monthly', 'Yearly'];
 
@@ -22,11 +24,11 @@ export default function ExpensesTable() {
     const { claims, loading: authLoading } = useAuth();
     const [loading, setLoading] = useState(true);
     const [reload, setReload] = useState(false);
-    const [onProcess, setProcess] = useState(false);
     const [search, setSearch] = useState('');
     const [activeTab, setActiveTab] = useState('Weekly');
 
     const [open, setOpen] = useState(false);
+    const [toUpdate, setUpdate] = useState<Expense>();
     const [toDelete, setDelete] = useState<Expense>();
 
     const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -41,19 +43,6 @@ export default function ExpensesTable() {
         }
         fetchData();
     }, [claims, reload]);
-
-    async function handleDelete() {
-        try {
-            setProcess(true);
-            await ExpenseService.deleteExpense(toDelete!.id!);
-            toast.success(`Expense ${toDelete?.purpose} deleted successfully.`)
-        } catch (error) { toast.error(`${error}`) }
-        finally { 
-            setProcess(false); 
-            setDelete(undefined);
-            setReload(!reload); 
-        }
-    }
 
     if (loading || authLoading) return <PapiverseLoading />
     return(
@@ -129,6 +118,8 @@ export default function ExpensesTable() {
             
             {activeTab === 'Weekly' && (
                 <WeeklyExpenses
+                    setUpdate={ setUpdate }
+                    setDelete={ setDelete }
                     branchId={ claims.branch.branchId }
                     search={ search }
                     reload={ reload }
@@ -139,12 +130,29 @@ export default function ExpensesTable() {
             {open && (
                 <CreateExpense
                     claims={ claims }
-                    onProcess={ onProcess }
-                    setProcess={ setProcess }
                     setOpen={ setOpen }
                     setReload={ setReload }
                 /> 
             )}
+
+            {toUpdate && (
+                <UpdateExpense
+                    claims={ claims }
+                    toUpdate={ toUpdate }
+                    setUpdate={ setUpdate }
+                    setOpen={ setOpen }
+                    setReload={ setReload }
+                /> 
+            )}
+
+            {toDelete && (
+                <DeleteExpense
+                    toDelete={ toDelete }
+                    setDelete={ setDelete }
+                    setReload={ setReload }
+                />
+            )}
+
         </section>
     );
 }
