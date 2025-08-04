@@ -13,6 +13,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { CreateEmployee } from "./_components/CreateEmployee";
+import { UpdateEmployee } from "./_components/UpdateEmployee";
 
 export default function EmployeesTable() {
     const { claims, loading: authLoading } = useAuth();
@@ -20,6 +22,9 @@ export default function EmployeesTable() {
     const [reload, setReload] = useState(false);
     const [onProcess, setProcess] = useState(false);
     const [search, setSearch] = useState('');
+
+    const [open, setOpen] = useState(false);
+    const [toUpdate, setUpdate] = useState<Employee>();
     const [toDelete, setDelete] = useState<Employee>();
 
     const [employees, setEmployees] = useState<Employee[]>([]);
@@ -111,19 +116,19 @@ export default function EmployeesTable() {
                         <Download />
                         Export
                     </Button>
-                    <Button className="!bg-darkorange text-light shadow-xs hover:opacity-90">
-                        <Plus />
-                        <Link href="/franchisee/employees/add-employee">Add an employee</Link>
+                    <Button 
+                        onClick={ () => setOpen(!open) }
+                        className="!bg-darkorange text-light shadow-xs hover:opacity-90"
+                    >
+                        <Plus />Add an employee
                     </Button>
                 </div>
             </div>
-
             <div className="grid grid-cols-4 bg-slate-200 font-semibold rounded-sm mt-2">
                 <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50 col-span-2">Full Name and Position</div>
                 <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">E-mail Address</div>
                 <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Actions</div>
             </div>
-
             <div className="grid grid-cols-4 bg-light rounded-b-sm shadow-xs">
                 {employees.length > 0 ?
                     filteredEmployees.map((item, index) => (
@@ -140,13 +145,9 @@ export default function EmployeesTable() {
                                 <div className="truncate">{ item.email }</div>
                             </div>
                             <div className="flex items-center pl-2 gap-3 border-b-1">
-                                <Link href={`/franchisee/employees/edit-employee/${item.id}`}><SquarePen className="w-4 h-4 text-darkgreen" /></Link>
+                                <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
                                 <button><Info className="w-4 h-4" /></button>
-                                <button
-                                    onClick={ () => setDelete(item) }
-                                >
-                                    <Trash2 className="w-4 h-4 text-darkred" />
-                                </button>
+                                <button onClick={ () => setDelete(item) }><Trash2 className="w-4 h-4 text-darkred" /></button>
                             </div>
                         </Fragment>
                     ))
@@ -175,6 +176,27 @@ export default function EmployeesTable() {
                         </div>
                 </DialogContent>
             </Dialog>
+
+            {open && (
+                <CreateEmployee 
+                    claims={ claims }
+                    onProcess={ onProcess }
+                    setProcess={ setProcess }
+                    setOpen={ setOpen }
+                    setReload={ setReload }
+                />
+            )}
+
+            {toUpdate && (
+                <UpdateEmployee 
+                    claims={ claims }
+                    onProcess={ onProcess }
+                    setProcess={ setProcess }
+                    toUpdate={ toUpdate! }
+                    setUpdate={ setUpdate }
+                    setReload={ setReload }
+                />
+            )}
         
         </section>
     );

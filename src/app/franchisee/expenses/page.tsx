@@ -126,10 +126,13 @@ export default function ExpensesTable() {
                     </button>
                 ))}
             </div>
+            
             {activeTab === 'Weekly' && (
                 <WeeklyExpenses
                     branchId={ claims.branch.branchId }
                     search={ search }
+                    reload={ reload }
+                    setReload={ setReload }
                 />
             )}
 

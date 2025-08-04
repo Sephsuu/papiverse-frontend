@@ -9,17 +9,18 @@ import { ExpenseService } from "@/services/ExpenseService";
 import { Expense } from "@/types/expense";
 import { Info, SquarePen, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 interface Props {
     branchId: number;
     search: string;
+    reload: boolean;
+    setReload: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function WeeklyExpenses({ branchId, search }: Props) {
+export function WeeklyExpenses({ branchId, search, reload, setReload }: Props) {
     const [loading, setLoading] = useState(true);
-    const [reload, setReload] = useState(false);
     const [onProcess, setProcess] = useState(false);
     const [toDelete, setDelete] = useState<Expense>();
 
