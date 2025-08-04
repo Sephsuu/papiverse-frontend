@@ -73,4 +73,6 @@ export class UserService {
         }
     }
 
+    static async fileUpload () 
+
 }
