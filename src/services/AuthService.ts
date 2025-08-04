@@ -66,7 +66,7 @@ export class AuthService {
 	}
 
 	static async updateCredentials(newCredentials : object ) {
-		const response = await fetch(`${BASE_URL}/update-credentials`, {
+		const response = await fetch(`${URL}/update-credentials`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json', 
 					'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
@@ -75,11 +75,9 @@ export class AuthService {
 		})
 
 		if(!response.ok){
-			const error = await response.json()
-			return error
+		   	const err = await response.json();
+            throw new Error(err.message || err.error || 'Something went wrong.')
 		}
-
-		const data = response.json;
-		return 'Update Successful' + data;
+		return response.json();
  	}
 }

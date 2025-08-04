@@ -20,7 +20,7 @@ import { Separator } from "@/components/ui/separator";
 import { Calendar1Icon, House, Lock, MapPinned, Pencil, Save } from "lucide-react";
 
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
 import { Calendar } from "@/components/ui/calendar"
 import { Label } from "@/components/ui/label"
 import {
@@ -40,7 +40,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { editUser, User, userCredentials, userInit } from "@/types/user";
 import { useAuth } from "@/hooks/use-auth";
-import { handleChange } from "@/lib/form-handle";
+import { handleChange, handleChangeSolo } from "@/lib/form-handle";
+import { log } from "node:console";
 
 export function AvatarDemo() {
   return (
@@ -84,38 +85,41 @@ export default function MyProfilePage(){
   const [editUser, setEditUser] = useState<User>({})
   const { claims, loading: authLoading } = useAuth();
   const [user, setUser] = useState<User>(userInit);
-  const [date, setDate] = useState(editUser.dateOfBirth ? new Date(editUser.dateOfBirth) : null);
+  const [date, setDate] = useState(editUser.dateOfBirth ? new Date(editUser.dateOfBirth) : undefined);
   const [dateOpen, setDateOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [open, setOpen] = useState(false);
   const [refresh, setRefresh] = useState(false)
-  const [credentials, setCredentials] = useState<userCredentials>({});
+  const [credentials, setCredentials] = useState<User>({});
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
 
     useEffect(() => {
-        async function fetchData() {
+        const fetchUser = async () => {
             try {
-                const data = await UserService.getUserById(claims.userId);
-                setUser(data)
-
-            } catch (error) {
-                console.log(error);
+            const data = await UserService.getUserById(claims.userId);
+            if(data) {
+                setUser(data);
             }
-        }
-        fetchData();
-        
-    }, [claims, refresh]);
+
+            } catch (err) {
+                console.error("Failed to fetch user:", err);
+            }
+        };
+
+        fetchUser();
+    }, [refresh, claims]);
 
     useEffect(() => {
     if (user) {
         setCredentials({
             id: user.id,
-            username: user.username || "",
-            email: user.email || "",
+            username: user.username,
+            email: user.email,
             password: "",
+            role: user.role
         });
 
         setEditUser({
@@ -129,7 +133,7 @@ export default function MyProfilePage(){
                 dateOfBirth :  user.dateOfBirth
             })
     }
-  }, [user]);
+  }, [user, refresh]);
 
     useEffect(() => {
         if (editUser.dateOfBirth) {
@@ -146,8 +150,6 @@ export default function MyProfilePage(){
         }));
     }
 
-
-
     const handleSubmit = async () => {
         try {
             const finalUser = {
@@ -158,10 +160,11 @@ export default function MyProfilePage(){
             const data = await UserService.updateUser(finalUser);
             if(data){
                 toast.success(`User ${user.firstName} ${user.lastName} was updated successfully.`);;
+
+                setRefresh(prev => !prev)
             }
-        } catch(error) {
-            console.log(error);
-            toast.error('Something went wrong. Could not update user.');
+        } catch(e) {
+            toast.error(`${e}`);
         }
         finally {
             setOpenEdit(!openEdit)
@@ -176,70 +179,58 @@ export default function MyProfilePage(){
     }
      function returnInitial() {
         setOpen(!open)
-        setEditUser(user)
+        setCredentials(user)
     }
 
     const handleSubmitAccount = async () => {
         if (newPassword !== confirmPassword) {
-        setErrorMessage("Passwords do not match");
-        return;
+            setErrorMessage("Passwords do not match");
+            return;
         }
 
-        setErrorMessage("");
-
         const updatedCredentials = {
-        ...credentials,
-        password: newPassword,
+            ...credentials,
+            password: newPassword,
         };
 
         try {
-        const data = await AuthService.updateCredentials(updatedCredentials)
-        if(data){
-             toast.success("Account credentials updated successfully!");
-        }
-        } catch (error) {
-        console.error(error);
-        toast.error("Something went wrong!");
+            const data = await AuthService.updateCredentials(updatedCredentials);
+            if (data) {
+            toast.success("Account credentials updated successfully!");
+
+            setUser(prev => ({
+                ...prev,
+                username: updatedCredentials.username,
+                email: updatedCredentials.email
+            }));
+
+            setRefresh(prev => !prev);
+
+            }
+        } catch (e) {
+            toast.error(`${e}`);
+        } finally {
+            setOpen(!open);
         }
     };
 
-    const handleFileUpload = async (file : File) => {
-        try {
-            const formData = new FormData();
-            formData.append("file", file);
-            const token = localStorage.getItem('token')
-            const response = await fetch(`http://localhost:8080/api/v1/user/${user.id}/profile-picture`, {
-            method: "POST",
-            headers : {'Authorization' : `Bearer ${token}`},
-            body: formData,
-            });
 
-            if (!response.ok) {
-            const error = await response.json();
-            console.error("Upload failed:", error);
-            return;
+    const handleFileUpload = async (file : File, userId : number) => {
+        try {
+            const data = await UserService.fileUpload(file, userId)
+            if (data) {
+                  toast.success("Account Profile Picture updated successfully!");
             }
 
-            const updatedUser = await response.json();
-            setUser(updatedUser);
-
-        } catch (err) {
-            console.error("Upload failed:", err);
+        } catch (e) {
+            toast.error(`${e}`)
         }
     };
-
-    useEffect(() => {
-        console.log(editUser);
-        
-    }, [editUser])
-
-
-
 
     return (
         <SidebarProvider >
             <Toaster position="top-center"/>
-            <div className="w-full h-full my-5 mx-5">
+            <div className="w-full h-fit my-5 mx-5 ">
                 <div className="">
                     <div className="m-5 mb-0 text-2xl flex flex-col pl-3 ">
                         <h3 className="text-amber-500 font-bold items-center">My Account</h3>
@@ -247,7 +238,7 @@ export default function MyProfilePage(){
                     </div>
                 </div>
 
-                <div className="profile m-5 h-full bg-white border border-gray-200 p-7 rounded-3xl shadow-inner flex">
+                <div className="profile m-5 h-fit bg-white border border-gray-200 p-7 rounded-3xl shadow-inner flex">
                  <div className="relative w-35 h-35">
                     <Avatar className="w-full h-full bg-amber-400">
                         <AvatarImage
@@ -277,7 +268,7 @@ export default function MyProfilePage(){
                         className="hidden"
                         onChange={(e) => {
                             if (e.target.files && e.target.files[0]) {
-                            handleFileUpload(e.target.files[0]);
+                            handleFileUpload(e.target.files[0], claims.userId);
                             }
                         }}
                         />
@@ -286,12 +277,12 @@ export default function MyProfilePage(){
                     
                     <div className="basic-info  ml-5 w-100 p-5  mt-0">
                         <h1 className="name text-3xl font-semibold text-amber-500 mb-1">{user && user.firstName}</h1>
-                        <h1 className="position text-xl font-light mb-1">{user && user.position}</h1>
-                        <h1 className="branch text-xl font-light">{ user && user.branch.branchName }</h1>
+                        <h1 className="position text-lg font-extralight text-gray-500 mb-1">{user && user.position}</h1>
+                        <h1 className="branch text-lg font-extralight text-gray-500">{ user && user.branch!.branchName }</h1>
                         
                     </div>
                 </div>
-                <div className="profile-information m-5 h-full bg-white border border-gray-200 p-7 rounded-3xl shadow-inner">
+                <div className="profile-information m-5 h-fit bg-white border border-gray-200 p-7 rounded-3xl shadow-inner">
                     
                     <Dialog open={openEdit} onOpenChange={returnInitialEdit}>
                         <div className="header flex justify-between w-full ">
@@ -430,22 +421,22 @@ export default function MyProfilePage(){
                             <div className="w-full flex flex-col mt-7">
                                 <div className="branchDetails flex gap-2 mb-5">
                                     <House />
-                                    <h1 className="text-lg px-2">{user && user.branch.branchName}</h1>
+                                    <h1 className="text-lg px-2">{user && user.branch!.branchName}</h1>
                                 </div>
                                 <div className="flex gap-2 ">
                                     <MapPinned />
-                                    <h1 className="text-lg px-2">{user && user.branch.streetAddress + ", " + user.branch.barangay + ", " +  user.branch.city 
-                                        + ", " + user.branch.province}</h1>
+                                    <h1 className="text-lg px-2">{user && user.branch!.streetAddress + ", " + user.branch!.barangay + ", " +  user.branch!.city 
+                                        + ", " + user.branch!.province}</h1>
                                 </div>
                             </div>
                              <div className="w-full  flex justify-evenly">  
                                 <div className="branchDetails  flex flex-col gap-2  ml-5 justify-center items-center">
                                     <h1 className="font-semibold">Internal Branch: </h1>
-                                    <h1>{user && user.branch.isInternal ? "Yes" : "No"}</h1>
+                                    <h1>{user && user.branch!.isInternal ? "Yes" : "No"}</h1>
                                 </div>
                                 <div className="flex gap-2 flex-col   mr-5 justify-center items-center">
                                     <h1 className="font-semibold">Status</h1>
-                                    <h1>{user && user.branch.branchStatus}</h1>
+                                    <h1>{user && user.branch!.branchStatus}</h1>
                                 </div>
                             </div>
                             
@@ -481,10 +472,9 @@ export default function MyProfilePage(){
                                 <input
                                     type="text"
                                     className="border p-2 rounded w-full my-2"
+                                    name="username"
                                     value={credentials.username}
-                                    onChange={(e) =>
-                                    setCredentials({ ...credentials, username: e.target.value })
-                                    }
+                                    onChange={e => handleChange(e, setCredentials)}
                                 />
 
                                 <label>User Role:</label>
@@ -492,7 +482,7 @@ export default function MyProfilePage(){
                                     <input
                                     type="text"
                                     className="border p-2 rounded w-full pr-10 text-gray-600"
-                                    value={user?.role || ""}
+                                    value={credentials.role}
                                     disabled
                                     />
                                     <Lock className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -501,29 +491,30 @@ export default function MyProfilePage(){
                                 <label>Email:</label>
                                 <input
                                     type="text"
+                                    name="email"
                                     className="border p-2 rounded w-full my-2"
                                     value={credentials.email}
-                                    onChange={(e) =>
-                                    setCredentials({ ...credentials, email: e.target.value })
-                                    }
+                                    onChange={e => handleChange(e, setCredentials)}
                                 />
 
                                 <label>New Password:</label>
                                 <input
                                     type="password"
+                                    name = "newPassword"
                                     className="border p-2 rounded w-full my-2"
                                     placeholder="Enter new password"
                                     value={newPassword}
-                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    onChange={e => handleChangeSolo(e, setNewPassword)}
                                 />
 
                                 <label>Confirm New Password:</label>
                                 <input
                                     type="password"
+                                    name="confirmPassword"
                                     className="border p-2 rounded w-full my-2"
                                     placeholder="Confirm new password"
                                     value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    onChange={e => handleChangeSolo(e, setConfirmPassword)}
                                 />
 
                                 {errorMessage && (

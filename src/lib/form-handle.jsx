@@ -5,3 +5,7 @@ export function handleChange(e, setItem) {
         [name]: value
     }))
 }
+
+export function handleChangeSolo(e, setItem) {
+  setItem(e.target.value);
+}

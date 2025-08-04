@@ -18,6 +18,12 @@ export interface User {
     branch?: {
         branchId: number;
         branchName: string;
+        streetAddress: string;
+        barangay : string;
+        city : string;
+        province : string;
+        isInternal : boolean;
+        branchStatus : string;
     }
 }
 
@@ -36,7 +42,13 @@ export const userInit: User = {
     role: "",
     branch: {
         branchId: 0,
-        branchName: ""
+        branchName: "",
+        streetAddress: "",
+        barangay : "",
+        city : "",
+        province : "",
+        isInternal : false,
+        branchStatus : ""
     }
 };
 

@@ -73,6 +73,24 @@ export class UserService {
         }
     }
 
-    static async fileUpload () 
+    static async fileUpload(file : File, userId : number ){
+        const formdata = new FormData();
+        formdata.append("file", file);
+        const res = await fetch(`${URL}/${userId}/profile-picture`, {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json',
+                'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
+            }
+        })
+
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.message || err.error || 'Something went wrong.')
+        }
+
+        return res.json();
+
+    } 
 
 }
