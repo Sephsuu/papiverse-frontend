@@ -1,6 +1,10 @@
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { AddButton, Button } from "@/components/ui/button";
+import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { FormLoader } from "@/components/ui/loader";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { handleChange } from "@/lib/form-handle";
 import { EmployeeService } from "@/services/EmployeeService";
 import { ExpenseService } from "@/services/ExpenseService";
 import { Claim } from "@/types/claims";
@@ -10,14 +14,17 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+const paymentModes = ['Cash', 'Credit Card', 'Debit Card', 'Bank Transfer'];
+
 interface Props {
     claims: Claim;
     onProcess: boolean;
     setProcess: React.Dispatch<React.SetStateAction<boolean>>;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    setReload: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function CreateExpense({ claims, onProcess, setProcess, setOpen }: Props) {
+export function CreateExpense({ claims, onProcess, setProcess, setOpen, setReload }: Props) {
     const [loading, setLoading] = useState(true);
     const [expense, setExpense] = useState<Expense>(expenseInit);
     const [employees, setEmployees] = useState<Employee[]>([]);
@@ -46,6 +53,7 @@ export function CreateExpense({ claims, onProcess, setProcess, setOpen }: Props)
             if (data) toast.success(`Expenditure for ${expense.purpose} added successfully.`)
         } catch (error) { toast.error(`${error}`) }
         finally { 
+            setReload(prev => !prev);
             setProcess(false); 
             setOpen(!open);
             setExpense(expenseInit);
@@ -126,6 +134,24 @@ export function CreateExpense({ claims, onProcess, setProcess, setOpen }: Props)
                             </SelectContent>
                         </Select>
                     </div>
+                    <div className="flex flex-col gap-1 col-span-2">
+                        <div>Expenditure Purpose</div>
+                        <Textarea 
+                            className="border-1 border-gray"
+                            name="purpose"
+                            value={ expense.purpose }
+                            onChange={ e => handleChange(e, setExpense) }
+                        />
+                    </div>
+                </div>
+                <div className="flex justify-end gap-4">
+                    <DialogClose className="text-sm">Close</DialogClose>
+                    <AddButton 
+                        handleSubmit={ handleSubmit }
+                        onProcess={ onProcess }
+                        label="Add Expenditure"
+                        loadingLabel="Adding Expenditure"
+                    />
                 </div>
             </DialogContent>
         </Dialog>

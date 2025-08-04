@@ -139,6 +139,7 @@ export default function ExpensesTable() {
                     onProcess={ onProcess }
                     setProcess={ setProcess }
                     setOpen={ setOpen }
+                    setReload={ setReload }
                 /> 
             )}
         </section>
