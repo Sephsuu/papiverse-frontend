@@ -3,7 +3,7 @@ import { BASE_URL, getTokenFromLocalStorage } from "@/lib/utils";
 const URL = `${BASE_URL}/snow-order`; 
 
 const SnowOrderService = {
-    createSnowOrder: async (snow: SnowOrder) => {
+    createSnowOrder: async (snow: object) => {
         console.log(JSON.stringify(snow));
         const res = await fetch(`${URL}/create`, {
             method: 'POST',
