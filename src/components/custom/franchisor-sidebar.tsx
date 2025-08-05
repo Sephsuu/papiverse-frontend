@@ -106,7 +106,7 @@ export function AdminSidebar() {
                                 className="w-50"
                                 >
                                 <DropdownMenuItem>
-                                    <Link href='/account'>Account</Link>
+                                    <Link href='/admin/account'>Account</Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
                                     <span>Billing</span>

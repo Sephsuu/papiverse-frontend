@@ -106,7 +106,7 @@ export function FranchiseeSidebar() {
                                 className="w-50"
                                 >
                                 <DropdownMenuItem>
-                                    <Link href='/account'>Account</Link>
+                                    <Link href='/franchisee/account'>Account</Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
                                     <span>Billing</span>
