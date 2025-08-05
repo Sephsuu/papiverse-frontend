@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { FormLoader, PapiverseLoading } from "@/components/ui/loader";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Toaster } from "@/components/ui/sonner";
+import { useAuth } from "@/hooks/use-auth";
 import { handleChange } from "@/lib/form-handle";
 import { InventoryService } from "@/services/InventoryService";
 import { SupplyService } from "@/services/RawMaterialService";
@@ -16,6 +17,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function AddInventory() {
+    const { claims, loading: authLoading } = useAuth();
     const [loading, setLoading]  = useState(true);
     const [onProcess, setProcess] = useState(false);
     const [open, setOpen] = useState(false);
@@ -32,7 +34,7 @@ export default function AddInventory() {
                     return; 
                 }
             }
-            const data = await InventoryService.createInventoryInput(inventory);
+            const data = await InventoryService.createInventoryInput(inventory, claims.branch.branchId);
             if (data) {
                 toast.success("Ineventory successfully added!");
                 setInventory(inventoryInit);
@@ -54,7 +56,6 @@ export default function AddInventory() {
         }   
         fetchData();
     }, []);
-    console.log(supplies);
 
     useEffect(() => {
         const matchedSupply = supplies.find(i => i.code === inventory.rawMaterialCode);
@@ -65,7 +66,7 @@ export default function AddInventory() {
         }
     }, [inventory.rawMaterialCode])
 
-    if (loading) return <PapiverseLoading />
+    if (loading || authLoading) return <PapiverseLoading />
     return(
         <section className="relative flex flex-col w-full h-screen align-center justify-center">
             <Toaster closeButton position="top-center" />

@@ -75,4 +75,15 @@ function OrderStatusLabel({ status, textSize } : { status: string, textSize?: ""
   );
 }
 
-export { Badge, badgeVariants, OrderStatusBadge, OrderStatusLabel }
+function QuantityBadge({stock, className}: {stock: number, className: string}) {
+  return(
+    <Badge 
+      className={`text-light ${className} ${stock === 0 ? "bg-darkred" : stock < 15 ? "bg-darkyellow" : "bg-darkgreen"}`}
+    >
+      { stock }
+    </Badge>
+  )
+}
+
+
+export { Badge, badgeVariants, OrderStatusBadge, OrderStatusLabel, QuantityBadge }

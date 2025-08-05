@@ -1,14 +1,18 @@
-import { OrderStatusLabel } from "@/components/ui/badge";
+import { Badge, OrderStatusLabel, QuantityBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { FormLoader } from "@/components/ui/loader";
 import { Separator } from "@/components/ui/separator";
+import { OrderModalSkeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { formatDateToWords, formatToPeso } from "@/lib/formatter";
 import { InventoryService } from "@/services/InventoryService";
+import { SupplyService } from "@/services/RawMaterialService";
 import { SupplyOrderService } from "@/services/SupplyOrderService";
 import { Claim } from "@/types/claims";
+import { Inventory } from "@/types/inventory";
+import { Supply } from "@/types/supply";
 import { SupplyOrder } from "@/types/supplyOrder";
 import { Ham, Snowflake } from "lucide-react";
 import React, { SetStateAction, useEffect, useState } from "react";
@@ -22,10 +26,22 @@ interface Props {
 }
 
 export function ViewOrderModal({ claims, toView, setToView, setReload }: Props) {
+    const [loading, setLoading] = useState(true); 
     const [onProcess, setProcess] = useState(false);
     const [reject, setReject] = useState(false);
+    const [inventory, setInventory] = useState<Inventory[]>([]);
     const [meatApproved, setMeatApproved] = useState<boolean>(toView.meatCategory!.isApproved);
     const [snowApproved, setSnowApproved] = useState<boolean>(toView.snowfrostCategory!.isApproved);
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const data = await InventoryService.getInventoryByBranch(claims.branch.branchId);
+                setInventory(data);
+            } catch (error) { `${error}` }
+        }
+        fetchData();
+    }, []);
 
     function enableSave(meatApproved: boolean, snowApproved: boolean) {
         if (meatApproved !== toView.meatCategory!.isApproved || snowApproved !== toView.snowfrostCategory!.isApproved) {
@@ -67,7 +83,7 @@ export function ViewOrderModal({ claims, toView, setToView, setReload }: Props) 
             setReload(prev => !prev);
         }
     }
-
+    // if (loading) return <OrderModalSkeleton />
     return(
         <Dialog open onOpenChange={ open => { if (!open) setToView?.(undefined) } }>
             <DialogContent>
@@ -112,23 +128,25 @@ export function ViewOrderModal({ claims, toView, setToView, setReload }: Props) 
                     <div className="grid grid-cols-5 border-t-1 border-gray">
                         <div className="text-sm font-semibold pt-2">SKU ID</div>
                         <div className="text-sm font-semibold pt-2">Item Name</div>
-                        <div className="text-sm font-semibold pt-2 text-center">Qty</div>
+                        <div className="text-sm font-semibold pt-2 pl-2">Qty</div>
                         <div className="text-sm font-semibold pt-2">Unit Price</div>
                         <div className="text-sm font-semibold pt-2">Amount</div>
                     </div>
                     {toView.meatCategory!.meatItems.length > 0 ? 
-                        toView.meatCategory!.meatItems.map((order, index) => (
-                            <div className="grid grid-cols-5" key={ index }>
-                                <div className="text-sm font-semibold">{ order.rawMaterialCode }</div>
-                                <Tooltip>
-                                    <TooltipTrigger className="truncate text-sm text-start">{ order.rawMaterialName }</TooltipTrigger>
-                                    <TooltipContent>{ order.rawMaterialName }</TooltipContent>
-                                </Tooltip>
-                                <div className="text-sm text-center">{ order.quantity }</div>
-                                <div className="text-sm">{ formatToPeso(order.price) }</div>
-                                <div className="text-sm">{ formatToPeso(order.price * order.quantity) }</div>
-                            </div>
-                        )) : (<div className="text-sm font-semibold text-center text-gray">You have no orders for MEAT category</div>)
+                        toView.meatCategory!.meatItems.map((order, index) => {
+                            const currentStock = inventory.find(i => i.code === order.rawMaterialCode)?.quantity;
+                            return(
+                                <div className="grid grid-cols-5" key={ index }>
+                                    <div className="text-sm font-semibold">{ order.rawMaterialCode }</div>
+                                    <Tooltip>
+                                        <TooltipTrigger className="truncate text-sm text-start">{ order.rawMaterialName }</TooltipTrigger>
+                                        <TooltipContent>{ order.rawMaterialName }</TooltipContent>
+                                    </Tooltip>
+                                    <div className="text-sm font-semibold pl-2">{ order.quantity } <QuantityBadge stock={ currentStock! } className="scale-80" /></div>
+                                    <div className="text-sm">{ formatToPeso(order.price) }</div>
+                                    <div className="text-sm">{ formatToPeso(order.price * order.quantity) }</div>
+                                </div>
+                        )}) : (<div className="text-sm font-semibold text-center text-gray">You have no orders for MEAT category</div>)
                     }
                     <div className="grid grid-cols-5 border-t-1 border-gray py-1">
                         <div className="col-span-4 text-sm font-semibold text-center">Total</div>

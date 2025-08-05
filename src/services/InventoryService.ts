@@ -75,12 +75,15 @@ export class InventoryService {
 		return res.json();
 	}
 
-	static async createInventoryInput(inventory: Inventory) {
+	static async createInventoryInput(inventory: Inventory, branchId: number) {
+		console.log(branchId);
+		
 		const payload = {
 			...inventory,
 			changedQuantity: Number(inventory.changedQuantity),
 			type: "IN",
-			source: "INPUT"
+			source: "INPUT",
+			branchId: branchId
 		}
 		console.log(JSON.stringify(payload));
 		
