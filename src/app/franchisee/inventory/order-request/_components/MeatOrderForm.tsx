@@ -31,34 +31,34 @@ export function MeatOrderForm({ supplies, selectedItems, setActiveForm, onSelect
                 <div className="font-semibold text-lg">Meat Order Form</div>
             </div>
 
-            <div className="grid grid-cols-8 bg-slate-200 font-semibold rounded-sm mt-2">
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">SKU ID</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Qty</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50 col-span-2">Supply Name</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Unit</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Unit Price</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Total</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50"></div>
+            <div className="grid grid-cols-8 data-table-thead mt-2">
+                <div className="data-table-th">SKU ID</div>
+                <div className="data-table-th">Qty</div>
+                <div className="data-table-th col-span-2">Supply Name</div>
+                <div className="data-table-th">Unit</div>
+                <div className="data-table-th">Unit Price</div>
+                <div className="data-table-th">Total</div>
+                <div className="data-table-th">Remove</div>
             </div>
 
             <div className="grid grid-cols-8 bg-light rounded-b-sm shadow-xs rounded-sm">
                 {selectedItems.filter(i => i.category === 'MEAT').map((item, index) => (
                     <Fragment key={ index }>
-                        <div className="text-sm pl-2 py-1.5 border-b-1 truncate">{ item.code }</div>
-                        <div className="pl-2 py-1 border-b-1">
+                        <div className="data-table-td">{ item.code }</div>
+                        <div className="data-table-td">
                             <input 
                                 min="1"
                                 type="number"
                                 value={item.quantity}
                                 onChange={(e) => onQuantityChange(item.code!, Number(e.target.value))}
-                                className="text-md w-18 border-0 pl-2"
+                                className="text-[16px] font-semibold w-18 border-0 pl-2"
                             />
                         </div>
-                        <div className="text-sm pl-2 py-1.5 border-b-1 truncate col-span-2">{ item.name }</div>
-                        <div className="text-sm pl-2 py-1.5 border-b-1 truncate">{item.unitQuantity} { item.unitMeasurement }</div>
-                        <div className="text-sm pl-2 py-1.5 border-b-1 truncate">{ formatToPeso(item.unitPrice!) }</div>
-                        <div className="text-sm pl-2 py-1.5 border-b-1 truncate">{ formatToPeso(item.unitPrice! * item.quantity!) }</div>
-                        <div className="flex pl-2 border-b-1">
+                        <div className="data-table-td col-span-2">{ item.name }</div>
+                        <div className="data-table-td">{item.unitQuantity} { item.unitMeasurement }</div>
+                        <div className="data-table-td">{ formatToPeso(item.unitPrice!) }</div>
+                        <div className="data-table-td">{ formatToPeso(item.unitPrice! * item.quantity!) }</div>
+                        <div className="flex data-table-td">
                             <Button 
                                 type="button"
                                 variant="secondary" 
