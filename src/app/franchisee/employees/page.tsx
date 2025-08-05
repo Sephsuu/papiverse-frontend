@@ -130,7 +130,7 @@ export default function EmployeesTable() {
                         </div>
                         <div className="flex items-center gap-1 data-table-td">
                             <div><Mail className="w-4 h-4" /></div>
-                            <div className="truncate">{ item.email }</div>
+                            <div className="text-sm">{ item.email }</div>
                         </div>
                         <div className="flex items-center pl-2 gap-3 border-b-1">
                             <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>

@@ -51,7 +51,7 @@ export function MeatOrderForm({ supplies, selectedItems, setActiveForm, onSelect
                                 type="number"
                                 value={item.quantity}
                                 onChange={(e) => onQuantityChange(item.code!, Number(e.target.value))}
-                                className="text-sm w-18 border-0 pl-2"
+                                className="text-md w-18 border-0 pl-2"
                             />
                         </div>
                         <div className="text-sm pl-2 py-1.5 border-b-1 truncate col-span-2">{ item.name }</div>

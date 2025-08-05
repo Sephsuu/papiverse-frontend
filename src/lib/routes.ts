@@ -49,6 +49,7 @@ export const franchiseeRoute = [
         title: 'Inventory', 
         icon: Container,
         children: [
+            { title: 'Overview', href: '/franchisee/inventory' },
             { title: 'Inventories', href: '/franchisee/inventory/inventories' },
             { title: 'Supply Orders', href: '/franchisee/inventory/supply-orders/' },
             { title: 'Inventory Logs', href: '/franchisee/inventory/logs' },
