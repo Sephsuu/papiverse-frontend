@@ -15,6 +15,7 @@ import { Fragment, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { CreateEmployee } from "./_components/CreateEmployee";
 import { UpdateEmployee } from "./_components/UpdateEmployee";
+import { DeleteEmployee } from "./_components/DeleteEmployee";
 
 export default function EmployeesTable() {
     const { claims, loading: authLoading } = useAuth();
@@ -50,19 +51,6 @@ export default function EmployeesTable() {
             ))
         } else setFilteredEmployees(employees);
     }, [search, employees]);
-
-    async function handleDelete() {
-        try {
-            setProcess(true);
-            await EmployeeService.deleteEmployee(toDelete!.id!);
-            toast.success(`Employee ${toDelete?.firstName} ${toDelete?.lastName} deleted successfully.`)
-        } catch (error) { toast.error(`${error}`) }
-        finally { 
-            setProcess(false); 
-            setDelete(undefined);
-            setReload(!reload); 
-        }
-    }
 
     if (loading || authLoading) return <PapiverseLoading />
     return(
@@ -124,64 +112,40 @@ export default function EmployeesTable() {
                     </Button>
                 </div>
             </div>
-            <div className="grid grid-cols-4 bg-slate-200 font-semibold rounded-sm mt-2">
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50 col-span-2">Full Name and Position</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">E-mail Address</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Actions</div>
+            <div className="grid grid-cols-4 data-table-thead mt-2">
+                <div className="data-table-th col-span-2">Full Name and Position</div>
+                <div className="data-table-th">E-mail Address</div>
+                <div className="data-table-th">Actions</div>
             </div>
-            <div className="grid grid-cols-4 bg-light rounded-b-sm shadow-xs">
-                {employees.length > 0 ?
-                    filteredEmployees.map((item, index) => (
-                        <Fragment key={ index }>
-                            <div className="flex items-center gap-2 text-sm col-span-2 pl-2 py-2 border-b-1">
-                                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-brown text-lg text-light font-semibold">{ `${item.firstName[0]}${item.lastName[0]}` }</div>
-                                <div>
-                                    <div className="font-semibold">{ `${item.lastName}, ${item.firstName} ${item.middleName}` }</div>
-                                    <div className="text-gray">{ item.position }</div>
-                                </div>
+            
+            {employees.length > 0 ?
+                filteredEmployees.map((item, index) => (
+                    <div className="grid grid-cols-4 bg-light rounded-b-sm shadow-xs" key={ index }>
+                        <div className="flex items-center gap-2 data-table-td col-span-2">
+                            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-brown text-lg text-light font-semibold">{ `${item.firstName[0]}${item.lastName[0]}` }</div>
+                            <div>
+                                <div className="font-semibold">{ `${item.lastName}, ${item.firstName} ${item.middleName}` }</div>
+                                <div className="text-gray">{ item.position }</div>
                             </div>
-                            <div className="flex items-center gap-1 text-sm pl-2 py-1.5 border-b-1 !truncate">
-                                <div><Mail className="w-4 h-4" /></div>
-                                <div className="truncate">{ item.email }</div>
-                            </div>
-                            <div className="flex items-center pl-2 gap-3 border-b-1">
-                                <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
-                                <button><Info className="w-4 h-4" /></button>
-                                <button onClick={ () => setDelete(item) }><Trash2 className="w-4 h-4 text-darkred" /></button>
-                            </div>
-                        </Fragment>
-                    ))
-                    : (<div className="my-2 text-sm text-center col-span-6">There are no existing employees yet.</div>)
-                }
-            </div>
-            <div className="text-gray text-sm">Showing { filteredEmployees.length.toString() } of { filteredEmployees.length.toString() } results.</div>
-
-            <Dialog open={ !!toDelete } onOpenChange={ (open) => { if (!open) setDelete(undefined) } }>
-                <DialogContent>
-                    <DialogTitle className="text-sm">Are you sure you want to delete employee { `${toDelete?.firstName} ${toDelete?.lastName}` }</DialogTitle>
-                        <div className="flex justify-end items-end gap-2">
-                            <Button 
-                                onClick={ () => setDelete(undefined) }
-                                variant="secondary"
-                            >
-                                Close
-                            </Button>
-                            <Button
-                                className="!bg-darkred"
-                                onClick={ () => handleDelete() }
-                            >
-                                {!onProcess && <Trash2 className="w-4 h-4 text-light" />}
-                                <FormLoader onProcess={ onProcess } label="Delete Employee" loadingLabel="Deleting Employee" /> 
-                            </Button>
                         </div>
-                </DialogContent>
-            </Dialog>
+                        <div className="flex items-center gap-1 data-table-td">
+                            <div><Mail className="w-4 h-4" /></div>
+                            <div className="truncate">{ item.email }</div>
+                        </div>
+                        <div className="flex items-center pl-2 gap-3 border-b-1">
+                            <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
+                            <button><Info className="w-4 h-4" /></button>
+                            <button onClick={ () => setDelete(item) }><Trash2 className="w-4 h-4 text-darkred" /></button>
+                        </div>
+                    </div>
+                ))
+                : (<div className="my-2 text-sm text-center col-span-6">There are no existing employees yet.</div>)
+            }
+            <div className="text-gray text-sm mx-2">Showing { filteredEmployees.length.toString() } of { filteredEmployees.length.toString() } results.</div>
 
             {open && (
                 <CreateEmployee 
                     claims={ claims }
-                    onProcess={ onProcess }
-                    setProcess={ setProcess }
                     setOpen={ setOpen }
                     setReload={ setReload }
                 />
@@ -190,10 +154,16 @@ export default function EmployeesTable() {
             {toUpdate && (
                 <UpdateEmployee 
                     claims={ claims }
-                    onProcess={ onProcess }
-                    setProcess={ setProcess }
                     toUpdate={ toUpdate! }
                     setUpdate={ setUpdate }
+                    setReload={ setReload }
+                />
+            )}
+
+            {toDelete && (
+                <DeleteEmployee 
+                    toDelete={ toDelete }
+                    setDelete={ setDelete }
                     setReload={ setReload }
                 />
             )}

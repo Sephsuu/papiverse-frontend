@@ -14,12 +14,24 @@ import Image from "next/image";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { CreateBranch } from "./_components/CreateBranch";
+import { Toaster } from "@/components/ui/sonner";
+
+const columns = [
+    { title: "Branch Name", style: "" },
+    { title: "Full Address", style: "col-span-2" },
+    { title: "Branch Type", style: "" },
+    { title: "Actions", style: "" },
+]
 
 export default function BranchesTable() {
     const [loading, setLoading] = useState(true);
     const [reload, setReload] = useState(false);
     const [onProcess, setProcess] = useState(false);
     const [search, setSearch] = useState('');
+
+    const [open, setOpen] = useState(false);
+    const [toUpdate, setUpdate] = useState<Branch | undefined>();
     const [toDelete, setDelete] = useState<Branch | undefined>();
 
     const [branches, setBranches] = useState<Branch[]>([]);
@@ -61,6 +73,7 @@ export default function BranchesTable() {
     if (loading) return <PapiverseLoading />
     return(
         <section className="w-full py-4 px-2">
+            <Toaster closeButton position="top-center" />
             <div className="flex items-center gap-2">
                 <Image
                     src="/images/kp_logo.png"
@@ -77,7 +90,6 @@ export default function BranchesTable() {
                     className="ms-auto"
                 />
             </div>
-
             <div className="flex items-center mt-2">
                 <input
                     className="py-1 pl-3 rounded-md bg-light shadow-xs w-100"
@@ -107,48 +119,53 @@ export default function BranchesTable() {
                         <Download />
                         Export
                     </Button>
-                    <Button className="!bg-darkorange text-light shadow-xs hover:opacity-90">
-                        <Plus />
-                        <Link href="/admin/branches/add-branch">Add a branch</Link>
+                    <Button 
+                        onClick={ () => setOpen(!open) }
+                        className="!bg-darkorange text-light shadow-xs hover:opacity-90"
+                    >
+                        <Plus />Add a branch
                     </Button>
                 </div>
                 
             </div>
-
-            <div className="grid grid-cols-5 bg-slate-200 font-semibold rounded-sm mt-2">
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Branch Name</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50 col-span-2">Full Address</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Branch Type</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Action</div>
+            <div className="grid grid-cols-5 data-table-thead mt-2">
+                {columns.map((item, _) => (
+                    <div key={_} className={`data-table-th ${item.style}`}>{ item.title }</div>
+                ))}
             </div>
-
-            <div className="grid grid-cols-5 bg-light rounded-b-sm shadow-xs">
-                {branches.length > 0 ?
-                    filteredBranches.map((item, index) => (
-                        <Fragment key={ index }>
-                            <div className="text-sm pl-2 py-1.5 border-b-1">{ item.branchName }</div>
-                            <div className="text-sm pl-2 py-1.5 col-span-2 border-b-1 truncate">{ `${item.streetAddress}, ${item.barangay}, ${item.city}, ${item.province}` }</div>
-                            <div className="text-sm pl-2 py-1.5 border-b-1">
-                                {item.isInternal ? (
-                                    <Badge className="text-xs text-darkgreen font-semibold" variant="secondary"><BadgeCheck />Internal Branch</Badge>
-                                ): (<Badge className="text-xs text-darkred font-semibold" variant="secondary"><BadgeCheck />External Branch</Badge>)}
-                            </div>
-                            <div className="flex items-center pl-2 gap-3 border-b-1">
-                                <Link href={`/admin/branches/edit-branch/${item.branchId}`}><SquarePen className="w-4 h-4 text-darkgreen" /></Link>
-                                <button><Info className="w-4 h-4" /></button>
-                                <button
-                                    onClick={ () => setDelete(item) }
-                                >
-                                    <Trash2 className="w-4 h-4 text-darkred" />
-                                </button>
-                            </div>
-                        </Fragment>
-                    ))
-                    : (<div className="my-2 text-sm text-center col-span-6">There are no existing users yet.</div>)
-                }
-            </div>
+            {branches.length > 0 ?
+                filteredBranches.map((item, index) => (
+                    <div className="grid grid-cols-5 bg-light border-b-1" key={ index }>
+                        <div className="data-table-td">{ item.branchName }</div>
+                        <div className="data-table-td col-span-2">{ `${item.streetAddress}, ${item.barangay}, ${item.city}, ${item.province}` }</div>
+                        <div className="data-table-td">
+                            {item.isInternal ? (
+                                <Badge className="text-xs text-darkgreen font-semibold" variant="secondary"><BadgeCheck />Internal Branch</Badge>
+                            ): (<Badge className="text-xs text-darkred font-semibold" variant="secondary"><BadgeCheck />External Branch</Badge>)}
+                        </div>
+                        <div className="flex items-center gap-3 data-table-td">
+                            <Link href={`/admin/branches/edit-branch/${item.branchId}`}><SquarePen className="w-4 h-4 text-darkgreen" /></Link>
+                            <button><Info className="w-4 h-4" /></button>
+                            <button
+                                onClick={ () => setDelete(item) }
+                            >
+                                <Trash2 className="w-4 h-4 text-darkred" />
+                            </button>
+                        </div>
+                    </div>
+                ))
+                : (<div className="my-2 text-sm text-center col-span-6">There are no existing users yet.</div>)
+            }
             <div className="text-gray text-sm">Showing { filteredBranches.length.toString() } of { filteredBranches.length.toString() } results.</div>
 
+            {open && (
+                <CreateBranch 
+                    setOpen={ setOpen }
+                    setReload={ setReload }
+                />
+            )}
+
+           
             <Dialog open={ !!toDelete } onOpenChange={ (open) => { if (!open) setDelete(undefined) }}>
                 <DialogContent>
                     <DialogTitle className="text-sm">Are you sure you want to delete branch <span className="text-darkred">{ `${toDelete?.branchName}` }</span></DialogTitle>

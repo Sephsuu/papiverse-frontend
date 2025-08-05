@@ -46,7 +46,6 @@ export class SupplyService {
 			unitPriceInternal: Number(supply.unitPriceInternal),
 			unitPriceExternal: Number(supply.unitPriceExternal)
 		}
-
 		const res = await fetch(`${URL}/create`, {
 			method: 'POST',
 			headers: { 
@@ -55,8 +54,6 @@ export class SupplyService {
 			},
 			body: JSON.stringify(payload)
 		});
-		console.log(res);
-		
 
 		if (!res.ok) {
 			const err = await res.json();
@@ -67,6 +64,8 @@ export class SupplyService {
 	}
 
 	static async updateSupply(supply: Supply) {
+		console.log(JSON.stringify(supply));
+		
 		const payload = {
 			...supply,
 			name: supply.name?.toUpperCase(),
@@ -74,7 +73,6 @@ export class SupplyService {
 			unitPriceInternal: Number(supply.unitPriceInternal),
 			unitPriceExternal: Number(supply.unitPriceExternal)
 		}
-
 		const res = await fetch(`${URL}/update`, {
 			method: 'POST',
 			headers: { 
@@ -93,10 +91,14 @@ export class SupplyService {
 	}
 
 	static async deleteSupply(code: string) {
+		console.log(code);
+		
 		const res = await fetch(`${URL}/delete-by-code?code=${code}`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json'},
 		});
+		console.log(res);
+		
 
 		if (!res.ok) {
 			const err = await res.json();

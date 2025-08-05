@@ -70,3 +70,8 @@ export const userFields: (keyof User)[] = [
     "branchId",
     "role"
 ];
+
+export const updateUserFields: (keyof User)[] = [
+    "branchId",
+    "role",
+]

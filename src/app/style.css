@@ -27,10 +27,7 @@ button, a {
 .data-table-td {
     font-size: 14px;
     padding: 6px 0 6px 8px;
-    border-bottom-width: 1px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    margin-block: auto;
 }
 
 /* FIGTREE */

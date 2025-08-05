@@ -41,6 +41,7 @@ export class BranchService {
 	static async addBranch(branch: Branch) {
 		const payload = {
 			...branch,
+			branchName: `Krispy Papi ${branch.branchName}`,
 			zipCode: Number(branch.zipCode),
 		}
 		

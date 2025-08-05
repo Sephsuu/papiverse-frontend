@@ -1,7 +1,7 @@
 "use client"
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, UpdateButton } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { FormLoader, PapiverseLoading } from "@/components/ui/loader";
 import { Select, SelectTrigger } from "@/components/ui/select";
@@ -19,13 +19,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { CreateSupply } from "./_components/CreateSupply";
+import { UpdateSupply } from "./_components/UpdateSupply";
+import { DeleteSupply } from "./_components/DeleteSupply";
 
 export default function SuppliesTable() {
     const [loading, setLoading] = useState(true);
     const [reload, setReload] = useState(false);
     const [onProcess, setProcess] = useState(false);
     const [search, setSearch] = useState('');
-    const [toDelete, setDelete] = useState<Supply | undefined>();
+
+    const [open, setOpen] = useState(false);
+    const [toUpdate, setUpdate] = useState<Supply>()
+    const [toDelete, setDelete] = useState<Supply>();
 
     const [supplies, setSupplies] = useState<Supply[]>([]);
     const [filteredSupplies, setFilteredSupplies] = useState<Supply[]>([]);
@@ -83,7 +89,6 @@ export default function SuppliesTable() {
                     className="ms-auto"
                 />
             </div>
-
             <div className="flex items-center mt-2">
                 <input
                     className="py-1 pl-3 rounded-md bg-light shadow-xs w-100"
@@ -113,68 +118,70 @@ export default function SuppliesTable() {
                         <Download />
                         Export
                     </Button>
-                    <Button className="!bg-darkorange text-light shadow-xs hover:opacity-90">
-                        <Plus />
-                        <Link href="/admin/inventory/supplies/add-supply">Add a supply</Link>
+                    <Button 
+                        onClick={ () => setOpen(!open) }
+                        className="!bg-darkorange text-light shadow-xs hover:opacity-90"
+                    >
+                        <Plus />Add a supply
                     </Button>
                 </div>
                 
             </div>
-
-            <div className="grid grid-cols-6 bg-slate-200 font-semibold rounded-sm mt-2">
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">SKU ID</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Supply Name</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Unit</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Internal Price</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">External Price</div>
-                <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Action</div>
+            <div className="grid grid-cols-6 data-table-thead mt-2">
+                <div className="data-table-th">SKU ID</div>
+                <div className="data-table-th">Supply Name</div>
+                <div className="data-table-th">Unit</div>
+                <div className="data-table-th">Internal Price</div>
+                <div className="data-table-th">External Price</div>
+                <div className="data-table-th">Action</div>
             </div>
-
-            <div className="grid grid-cols-6 bg-light rounded-b-sm shadow-xs">
-                {supplies.length > 0 ?
-                    filteredSupplies.map((item, index) => (
-                        <Fragment key={ index }>
-                            <div className="text-sm pl-2 py-1.5 border-b-1">{ item.code }</div>
-                            <div className="text-sm pl-2 py-1.5 border-b-1">{ item.name }</div>
-                            <div className="text-sm pl-2 py-1.5 border-b-1">{ `${item.unitQuantity} ${item.unitMeasurement}` }</div>
-                            <div className="text-sm pl-2 py-1.5 border-b-1">{ formatToPeso(item.unitPriceInternal!) }</div>
-                            <div className="text-sm pl-2 py-1.5 border-b-1">{ formatToPeso(item.unitPriceExternal!) }</div>
-                            <div className="flex items-center pl-2 gap-3 border-b-1">
-                                <Link href={`/admin/inventory/supplies/edit-supply/${item.code}`}><SquarePen className="w-4 h-4 text-darkgreen" /></Link>
-                                <button><Info className="w-4 h-4" /></button>
-                                <button
-                                    onClick={ () => setDelete(item) }
-                                >
-                                    <Trash2 className="w-4 h-4 text-darkred" />
-                                </button>
-                            </div>
-                        </Fragment>
-                    ))
-                    : (<div className="my-2 text-sm text-center col-span-6">There are no existing users yet.</div>)
-                }
-            </div>
-            <div className="text-gray text-sm">Showing { filteredSupplies.length.toString() } of { filteredSupplies.length.toString() } results.</div>
-
-            <Dialog open={ !!toDelete } onOpenChange={ (open) => { if (!open) setDelete(undefined) }}>
-                <DialogContent>
-                    <DialogTitle className="text-sm">Are you sure you want to delete supply { `${toDelete?.name}` }</DialogTitle>
-                    <div className="flex justify-end items-end gap-2">
-                        <Button 
-                            onClick={ () => setDelete(undefined) }
-                            variant="secondary"
-                        >
-                            Close
-                        </Button>
-                        <Button
-                            className="!bg-darkred"
-                            onClick={ () => handleDelete() }
-                        >
-                            {!onProcess && <Trash2 className="w-4 h-4 text-light" />}
-                            <FormLoader onProcess={ onProcess } label="Delete Supply" loadingLabel="Deleting Supply" /> 
-                        </Button>
+            
+            {supplies.length > 0 ?
+                filteredSupplies.map((item, index) => (
+                    <div className="grid grid-cols-6 bg-light border-b-1 shadow-xs" key={ index }>
+                        <div className="data-table-td">{ item.code }</div>
+                        <div className="data-table-td">{ item.name }</div>
+                        <div className="data-table-td">{ `${item.unitQuantity} ${item.unitMeasurement}` }</div>
+                        <div className="data-table-td">{ formatToPeso(item.unitPriceInternal!) }</div>
+                        <div className="data-table-td">{ formatToPeso(item.unitPriceExternal!) }</div>
+                        <div className="flex items-center gap-2 data-table-td">
+                            <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
+                            <button><Info className="w-4 h-4" /></button>
+                            <button
+                                onClick={ () => setDelete(item) }
+                            >
+                                <Trash2 className="w-4 h-4 text-darkred" />
+                            </button>
+                        </div>
                     </div>
-                </DialogContent>
-            </Dialog>
+                ))
+                : (<div className="my-2 text-sm text-center col-span-6">There are no existing users yet.</div>)
+            }
+            <div className="text-gray text-sm mx-2">Showing { filteredSupplies.length.toString() } of { filteredSupplies.length.toString() } results.</div>
+
+            {open && (
+                <CreateSupply 
+                    setOpen={ setOpen }
+                    setReload={ setReload }
+                />
+            )}
+
+            {toUpdate && (
+                <UpdateSupply
+                    toUpdate={ toUpdate }
+                    setUpdate={ setUpdate }
+                    setReload={ setReload }
+                />
+            )}
+
+            {toDelete && (
+                <DeleteSupply
+                    toDelete={ toDelete }
+                    setDelete={ setDelete }
+                    setReload={ setReload }
+                />
+            )}
+
         </section>
     )
 }

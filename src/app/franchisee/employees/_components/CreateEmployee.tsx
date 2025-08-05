@@ -47,7 +47,7 @@ export function CreateEmployee({ claims, setOpen, setReload }: Props) {
                         width={40}
                         height={40}
                     />
-                    <div className="font-semibold text-xl">Add an Expenditure</div>      
+                    <div className="font-semibold text-xl">Add an Employee</div>      
                 </DialogTitle>
                 <div className="grid grid-cols-2 gap-2">
                     <div className="col-span-2 flex flex-col gap-1">
@@ -74,7 +74,6 @@ export function CreateEmployee({ claims, setOpen, setReload }: Props) {
                         <Input    
                             className="w-full border-1 border-gray max-md:w-full" 
                             name ="lastName"  
-                            placeholder="(optional)"
                             value={employee.lastName}
                             onChange={ e => handleChange(e, setEmployee)}
                         />

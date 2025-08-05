@@ -49,7 +49,7 @@ export function UpdateEmployee({ claims, toUpdate, setUpdate, setReload }: Props
                         width={40}
                         height={40}
                     />
-                    <div className="font-semibold text-xl">Add an Expenditure</div>      
+                    <div className="font-semibold text-xl">Edit <span className="text-darkorange">{ `${toUpdate.firstName} ${toUpdate.lastName}` }</span></div>      
                 </DialogTitle>
                 <div className="grid grid-cols-2 gap-2">
                     <div className="col-span-2 flex flex-col gap-1">
