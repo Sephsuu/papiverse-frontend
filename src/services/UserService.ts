@@ -96,9 +96,9 @@ export class UserService {
         const res = await fetch(`${URL}/${userId}/profile-picture`, {
             method: 'POST',
             headers : {
-                'Content-type' : 'application/json',
                 'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
-            }
+            },
+            body: formdata
         })
 
         if (!res.ok) {

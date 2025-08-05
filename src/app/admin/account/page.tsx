@@ -174,7 +174,6 @@ export default function MyProfilePage(){
             email: credentials.email
         };
         try {
-            console.log(updatedCredentials)
             const data = await AuthService.updateCredentials(updatedCredentials);
             if (data) {
                 toast.success("Account credentials updated successfully!");
@@ -207,6 +206,9 @@ export default function MyProfilePage(){
         } catch (e) {
             toast.error(`${e}`)
         }
+        finally{
+            setRefresh(!refresh)
+        }   
     };
     return (
         <SidebarProvider >
