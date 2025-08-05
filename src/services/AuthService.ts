@@ -44,6 +44,19 @@ export class AuthService {
 		return 'Something went wrong. Please try again.';
 	}
 
+	static async deleteCookie() {
+		const res = await fetch('/api/delete-token', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+		});
+
+		if (res.ok) {
+			return 'Logged out successfully! Please wait patiently.';
+		}
+
+		return 'Something went wrong. Please try again.';
+	}
+
 	static async registerUser(user: User) {
 		delete user.branch
 		console.log(JSON.stringify(user));

@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { PapiverseLoading, SidebarLoading } from "../ui/loader";
+import { AuthService } from "@/services/AuthService";
 
 export function FranchiseeSidebar() {
     const { claims, loading } = useAuth();
@@ -19,9 +20,8 @@ export function FranchiseeSidebar() {
     const pathname = usePathname();
     const hideSidebar = pathname === "/auth" || pathname === "/";
 
-    const handleLogout = () => {
-        console.log('clicked');
-        
+    async function handleLogout() {
+        await AuthService.deleteCookie();
         toast.success("Logging out. Please wait patiently.", { duration: Infinity });
         localStorage.removeItem('token');
         router.push("/auth");
