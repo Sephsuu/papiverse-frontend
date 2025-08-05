@@ -1,10 +1,9 @@
 import { BASE_URL, getTokenFromLocalStorage } from "@/lib/utils";
-import { MeatOrder } from "@/types/supplyOrder";
 
 const URL = `${BASE_URL}/meat-order`; 
 
 const MeatOrderService = {
-    createMeatOrder: async (meat: MeatOrder) => {
+    createMeatOrder: async (meat: object) => {
         console.log(JSON.stringify(meat));
         
         const res = await fetch(`${URL}/create`, {
