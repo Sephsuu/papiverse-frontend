@@ -57,7 +57,8 @@ export function UpdateUser({ toUpdate, setUpdate, setReload }: Props) {
             if (foundBranch) {
                 setUser(prev => ({
                     ...prev,
-                    branchId: String(foundBranch.branchId)
+                    branchId: String(foundBranch.branchId),
+                    role: user.role
                 }));
             }
         }
@@ -66,21 +67,13 @@ export function UpdateUser({ toUpdate, setUpdate, setReload }: Props) {
     async function handleSubmit() {
         try{         
             setProcess(true);
-            for (const field of updateUserFields) {
-                if (
-                    user[field] === "" ||
-                    user[field] === null ||
-                    user[field] === undefined
-                ) {
-                    toast.info("Please fill up all fields!");
-                return; 
-                }
+            const finalUser =  {
+                id : user.id,
+                branchId: Number(user.branchId),
+                role: user.role
             }
-            if (user.password !== user.confirmPassword) {
-                toast.info("Passwords do not match!");
-                return;
-            }
-            const data = await UserService.updateUser(user);
+
+            const data = await UserService.adminUpdate(finalUser);
             if (data) toast.success("User updated successfully!");    
         }
         catch(error){ toast.error(`${error}`) }
@@ -92,10 +85,8 @@ export function UpdateUser({ toUpdate, setUpdate, setReload }: Props) {
     }
 
     useEffect(() => {
-        console.log(user);
-        
+        console.log(user)
     }, [user])
-
     return(
         <Dialog open onOpenChange={ (open) => { if (!open) setUpdate(undefined) } }>
             <DialogContent className="overflow-y-auto">

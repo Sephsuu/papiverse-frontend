@@ -56,9 +56,26 @@ export class UserService {
         return res.json();
     }
 
-    static async deleteUser(id: number) {
-        console.log(id);
-        
+    static async adminUpdate(user : object) {
+        console.log(JSON.stringify(user))
+        const res = await fetch(`${URL}/update-admin`, {
+            method: 'POST',
+            headers: {
+                'Content-Type' : 'application/json',
+                'Authorization' : `Bearer ${getTokenFromLocalStorage()}` 
+            },
+            body: JSON.stringify(user)
+        });
+
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.message || err.error || 'Something went wrong.')
+        }
+
+        return res.json();
+    }
+
+    static async deleteUser(id: number) {        
         const res = await fetch(`${URL}/delete-user?id=${id}`, {
             method: 'POST',
             headers: {
