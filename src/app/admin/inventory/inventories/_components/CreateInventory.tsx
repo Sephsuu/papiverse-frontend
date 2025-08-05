@@ -54,7 +54,12 @@ export function CreateProduct({ setOpen, setReload }: Props) {
                 <div className="grid grid-cols-2 gap-2">
                     <div className="flex flex-col gap-1 col-span-2">
                         <div>Product Name</div>
-                        <Select
+                        <Input    
+                            className="w-full border-1 border-gray rounded-md max-md:w-full" 
+                            name ="name"  
+                            value={product.name}
+                            onChange={ e => handleChange(e, setProduct)}
+                        />  
                     </div>
                     <div className="flex flex-col gap-1">
                         <div>Category</div>
