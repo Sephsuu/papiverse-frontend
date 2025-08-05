@@ -1,5 +1,4 @@
 import { BASE_URL, getTokenFromLocalStorage } from "@/lib/utils";
-import { SnowOrder } from "@/types/supplyOrder";
 
 const URL = `${BASE_URL}/snow-order`; 
 
