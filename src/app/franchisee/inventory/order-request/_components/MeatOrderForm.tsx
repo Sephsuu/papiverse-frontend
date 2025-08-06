@@ -45,7 +45,7 @@ export function MeatOrderForm({ supplies, selectedItems, setActiveForm, onSelect
                 {selectedItems.filter(i => i.category === 'MEAT').map((item, index) => (
                     <Fragment key={ index }>
                         <div className="data-table-td">{ item.code }</div>
-                        <div className="data-table-td">
+                        <div className="data-table-td !p-0">
                             <input 
                                 min="1"
                                 type="number"
