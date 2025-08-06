@@ -12,7 +12,7 @@ export async function GET() {
         const res = await pool.query('SELECT * FROM "users" ORDER BY email');
         return NextResponse.json(res.rows);
     } catch (error) {
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        return NextResponse.json({ error: 'Internal Server Error ERROR' }, { status: 500 });
     }
 }
 
