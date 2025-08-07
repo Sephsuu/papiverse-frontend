@@ -16,14 +16,14 @@ import { Claim } from "@/types/claims";
 interface Props {
     claims: Claim;
     filteredOrders: SupplyOrder[];
+    setToEdit: (i: SupplyOrder | undefined) => void;
     setReload: React.Dispatch<SetStateAction<boolean>>;
-    toView: SupplyOrder | undefined;
-    setToView: (i: SupplyOrder | undefined) => void;
+    setActiveTab: (i: string) => void;
     selectedOrder: SupplyOrder | undefined;
     setSelectedOrder: (i: SupplyOrder | undefined) => void;
 }
 
-export function PendingOrders({ claims, filteredOrders, setReload, toView, setToView, selectedOrder, setSelectedOrder }: Props) {
+export function PendingOrders({ claims, filteredOrders, setToEdit, setReload, setActiveTab, selectedOrder, setSelectedOrder }: Props) {
     async function handleReceived(id: number, meatApproved: boolean, snowApproved: boolean) {
         try {
             await SupplyOrderService.updateOrderStatus(id, "DELIVERED", meatApproved, snowApproved);
@@ -51,8 +51,8 @@ export function PendingOrders({ claims, filteredOrders, setReload, toView, setTo
                 <div className="w-15 py-1 border-r-1 border-amber-50"><SquareMinus className="w-4 h-4 mx-auto" strokeWidth={ 3 }/></div>
                 <div className="w-15 py-1 border-r-1 border-amber-50"><FileSpreadsheet className="w-4 h-4 mx-auto" strokeWidth={ 3 }/></div>
                 <div className="w-35 text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Status</div>
-                <div className="grid grid-cols-4 w-full">
-                    <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50 col-span-2">Orders</div>
+                <div className="grid grid-cols-5 w-full">
+                    <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50 col-span-3">Orders</div>
                     <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Total Amount</div>
                     <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Order Date</div>
                 </div>
@@ -71,9 +71,13 @@ export function PendingOrders({ claims, filteredOrders, setReload, toView, setTo
                         <div className="w-35 flex text-sm pl-2 py-1.5 border-b-1">
                             <div className="my-auto"><OrderStatusBadge status={item.status} /></div>
                         </div>
-                        <div className="grid grid-cols-4 w-full">
-                            <div className="col-span-2">
-                                <OrdersAccordion order={ item }/>
+                        <div className="grid grid-cols-5 w-full">
+                            <div className="col-span-3">
+                                <OrdersAccordion 
+                                    order={ item } 
+                                    setActiveTab={ setActiveTab }
+                                    setSelectedOrder={ setToEdit }
+                                />
                             </div>
                             <div className="flex text-sm pl-2 py-1.5 border-b-1">
                                 <div className="my-auto">{ formatToPeso(item.completeOrderTotalAmount) }</div>

@@ -14,15 +14,19 @@ import { toast } from "sonner";
 import { OrderHistory } from "./_components/OrderHistory";
 import { PendingOrders } from "./_components/PendingOrders";
 import { ViewOrderModal } from "@/app/admin/inventory/order-request/_components/ViewOrderModal";
+import { EditMeatOrder } from "../order-request/_components/EditMeatOrder";
+import { EditSnowOrder } from "../order-request/_components/EditSnowOrder";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function SupplyOrders() {
     const { claims, loading: authLoading } = useAuth();
     const [loading, setLoading] = useState(true);
     const [reload, setReload] = useState(false); 
     const [search, setSearch] = useState('');
-    const [activeTab, setActiveTab] = useState(true);
+    const [activeTab, setActiveTab] = useState('pending');
 
     const [toView, setToView] = useState<SupplyOrder | undefined>();
+    const [toEdit, setToEdit] = useState<SupplyOrder | undefined>();
     const [selectedOrder, setSelectedOrder] = useState<SupplyOrder | undefined>();
     const [orders, setOrders] = useState<SupplyOrder[]>([]);
     const [filteredOrders, setFilteredOrders] = useState<SupplyOrder[]>([]);
@@ -37,9 +41,6 @@ export default function SupplyOrders() {
         }
         fetchData();
     }, [claims, reload]);
-
-    console.log(orders);
-    
 
     useEffect(() => {
         const find = search.toLowerCase().trim();
@@ -61,6 +62,7 @@ export default function SupplyOrders() {
     />
     return(
         <section className="w-full py-4 px-2">
+            <Toaster closeButton position="top-center" />
             <div className="flex items-center gap-2">
                 <Image
                     src="/images/kp_logo.png"
@@ -80,11 +82,10 @@ export default function SupplyOrders() {
                     className="ms-auto"
                 />
             </div>
-
             <div className="flex items-center mt-2">
                 <input
                     className="py-1 pl-3 rounded-md bg-light shadow-xs w-100"
-                    placeholder="Search for a user"
+                    placeholder="Search OrderID"
                     onChange={ e => setSearch(e.target.value) }
                 />
 
@@ -111,7 +112,7 @@ export default function SupplyOrders() {
                         Export
                     </Button>
                     <Button 
-                        onClick={ () => setActiveTab(prev => !prev) }
+                        onClick={ () => {activeTab === 'pending' ? setActiveTab('history') : setActiveTab('pending')} }
                         className="!bg-darkorange text-light shadow-xs hover:opacity-90"
                     >
                         {activeTab ? <><History />Order History</> : <><CircleFadingArrowUp />Pending Requests</>}
@@ -119,16 +120,16 @@ export default function SupplyOrders() {
                 </div>
             </div>
 
-            {activeTab && <PendingOrders 
+            {activeTab === 'pending' && <PendingOrders 
                 claims={ claims }
                 filteredOrders={ filteredOrders.filter(i => ["PENDING", "TO FOLLOW"].includes(i.status)) }
+                setToEdit={ setToEdit }
                 setReload={ setReload }
-                toView={ toView }
-                setToView={ setToView }
+                setActiveTab={ setActiveTab }
                 selectedOrder={ selectedOrder }
                 setSelectedOrder={ setSelectedOrder }
             />}
-            {!activeTab && <OrderHistory 
+            {activeTab === 'history' && <OrderHistory 
                 claims={ claims }
                 filteredOrders={ filteredOrders.filter(i => ["APPROVED", "REJECTED", "DELIVERED"].includes(i.status)) }
                 setReload={ setReload }
@@ -137,7 +138,22 @@ export default function SupplyOrders() {
                 selectedOrder={ selectedOrder }
                 setSelectedOrder={ setSelectedOrder }
             />}
-
+            {activeTab === 'meat' && (
+                <EditMeatOrder 
+                    claims={ claims }
+                    order={ toEdit! }
+                    setActiveTab={ setActiveTab }
+                    setReload={ setReload }
+                />
+            )}
+            {activeTab === 'snow' && (
+                <EditSnowOrder 
+                    claims={ claims }
+                    order={ toEdit! }
+                    setActiveTab={ setActiveTab }
+                    setReload={ setReload }
+                />
+            )}
             {toView && (
                 <ViewOrderModal
                     claims={ claims }

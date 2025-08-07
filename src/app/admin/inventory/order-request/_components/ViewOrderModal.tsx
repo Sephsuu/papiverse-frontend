@@ -205,7 +205,7 @@ export function ViewOrderModal({ claims, toView, setToView, setReload }: Props) 
                                                 <div className="text-sm">{ formatToPeso(order.price) }</div>
                                                 <div className="text-sm">{ formatToPeso(order.price * order.quantity) }</div>
                                             </div>
-                                        )}) : (<div className="text-sm font-semibold text-center text-gray">You have no orders for MEAT category</div>)
+                                        )}) : (<div className="text-sm font-semibold text-center text-gray">You have no orders for SNOW FROST category</div>)
                                 }
                                 <div className="grid grid-cols-5 border-t-1 border-gray py-1">
                                     <div className="col-span-4 text-sm font-semibold text-center">Total</div>

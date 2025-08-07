@@ -13,6 +13,7 @@ export interface SupplyOrder {
         meatItems: {
             rawMaterialCode: string;
             rawMaterialName: string;
+            unitMeasurement: string;
             quantity: number;
             price: number;
         } []
@@ -25,6 +26,7 @@ export interface SupplyOrder {
         snowFrostItems: {
             rawMaterialCode: string;
             rawMaterialName: string;
+            unitMeasurement: string;
             quantity: number;
             price: number;
         } []

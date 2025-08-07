@@ -22,11 +22,6 @@ export default function OrderRequest() {
     const [selectedItems, setSelectedItems] = useState<SupplyItem[]>([]);
 
     useEffect(() => {
-        console.log(selectedItems);
-        
-    }, [selectedItems])
-
-    useEffect(() => {
         async function fetchData() {
             try {
                 const data = await SupplyService.getAllSupplies();

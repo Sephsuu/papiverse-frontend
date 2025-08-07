@@ -1,5 +1,5 @@
 import { BASE_URL, getTokenFromLocalStorage } from "@/lib/utils";
-import { CompleteOrder, SupplyOrder } from "@/types/supplyOrder";
+import { CompleteOrder, SupplyItem, SupplyOrder } from "@/types/supplyOrder";
 
 const URL = `${BASE_URL}/supply-order`;
 
@@ -80,8 +80,6 @@ export class SupplyOrderService {
     }
 
     static async updateOrderStatus(id: number, newStatus: string, meatApproved: boolean, snowApproved: boolean) {
-        console.log(id, newStatus, meatApproved, snowApproved);
-        
         const res = await fetch(`${URL}/update-status?id=${id}&newStatus=${newStatus}&meatApproved=${meatApproved}&snowApproved=${snowApproved}`, {
             method: 'POST',
             headers: { 
@@ -98,5 +96,54 @@ export class SupplyOrderService {
         return res.json();
     }
 
-    
+    static async updateMeatOrder(meatOrder: SupplyItem[], id: number) {
+        const payload = {
+            id: id,
+            categoryItems: meatOrder
+        }
+        
+        const res = await fetch(`${BASE_URL}/meat-order/update`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json', 
+                'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
+            },
+            body: JSON.stringify(payload)
+        });
+        console.log(res);
+        
+
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.message || 'Something went wrong.');
+        }
+
+        return res.json();
+    }
+
+    static async updateSnowOrder(snowOrder: SupplyItem[], id: number) {
+        const payload = {
+            id: id,
+            categoryItems: snowOrder
+        }
+        console.log(payload);
+        
+        const res = await fetch(`${BASE_URL}/snow-order/update`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json', 
+                'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
+            },
+            body: JSON.stringify(payload)
+        });
+        console.log(res);
+        
+
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.message || 'Something went wrong.');
+        }
+
+        return res.json();
+    }
 }
