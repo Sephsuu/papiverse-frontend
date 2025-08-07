@@ -4,13 +4,14 @@ import { Button } from "@/components/ui/button";
 import { PapiverseLoading } from "@/components/ui/loader";
 import { Select, SelectTrigger } from "@/components/ui/select";
 import { Toaster } from "@/components/ui/sonner";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/use-auth";
 import { formatToPeso } from "@/lib/formatter";
 import { InventoryService } from "@/services/InventoryService";
 import { SupplyService } from "@/services/RawMaterialService";
 import { Inventory } from "@/types/inventory";
 import { SelectValue } from "@radix-ui/react-select";
-import { Download, Funnel, Info, PackagePlus, Plus, SquarePen, Trash2 } from "lucide-react";
+import { Download, Funnel, Ham, Info, PackagePlus, Plus, Snowflake, SquarePen, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
@@ -116,7 +117,15 @@ export default function InventoryTable() {
                     filteredInventories.map((item, index) => (
                         <Fragment key={ index }>
                             <div className="text-sm pl-2 py-1.5 border-b-1">{ item.code }</div>
-                            <div className="text-sm pl-2 py-1.5 border-b-1">{ item.name }</div>
+                            <div className="data-table-td flex items-center gap-1">
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        {item.category === 'MEAT' ? <Ham className="w-4 h-4 text-darkbrown"/> : <Snowflake className="w-4 h-4 text-blue" />}
+                                    </TooltipTrigger>
+                                    <TooltipContent>{ item.category === 'MEAT' ? "MEAT Category" : "SNOW FROST Category"}</TooltipContent>
+                                </Tooltip>
+                                <div>{ item.name }</div>
+                            </div>
                             <div className="flex items-center text-sm pl-2 py-1.5 border-b-1">
                                 <div className="w-15 text-end pr-3">{ item.quantity }</div>
                                 <div>{ item.unitMeasurement }</div>

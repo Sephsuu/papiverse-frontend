@@ -5,13 +5,14 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { FormLoader, PapiverseLoading } from "@/components/ui/loader";
 import { Select, SelectTrigger } from "@/components/ui/select";
 import { Toaster } from "@/components/ui/sonner";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/use-auth";
 import { formatToPeso } from "@/lib/formatter";
 import { InventoryService } from "@/services/InventoryService";
 import { SupplyService } from "@/services/RawMaterialService";
 import { Inventory } from "@/types/inventory";
 import { SelectValue } from "@radix-ui/react-select";
-import { Download, Funnel, Info, Plus, SquarePen, Trash2 } from "lucide-react";
+import { Download, Funnel, Ham, Info, Plus, Snowflake, SquarePen, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
@@ -131,14 +132,22 @@ export default function InventoryTable() {
                 {inventories.length > 0 ?
                     filteredInventories.map((item, index) => (
                         <Fragment key={ index }>
-                            <div className="text-sm pl-2 py-1.5 border-b-1">{ item.code }</div>
-                            <div className="text-sm pl-2 py-1.5 border-b-1">{ item.name }</div>
-                            <div className="flex items-center text-sm pl-2 py-1.5 border-b-1">
+                            <div className="data-table-td">{ item.code }</div>
+                            <div className="data-table-td flex items-center gap-1">
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        {item.category === 'MEAT' ? <Ham className="w-4 h-4 text-darkbrown"/> : <Snowflake className="w-4 h-4 text-blue" />}
+                                    </TooltipTrigger>
+                                    <TooltipContent>{ item.category === 'MEAT' ? "MEAT Category" : "SNOW FROST Category"}</TooltipContent>
+                                </Tooltip>
+                                <div>{ item.name }</div>
+                            </div>
+                            <div className="flex items-center data-table-td">
                                 <div className="w-15 text-end pr-3">{ item.quantity }</div>
                                 <div>{ item.unitMeasurement }</div>
                             </div>
-                            <div className="text-sm pl-2 py-1.5 border-b-1">{ formatToPeso(item.unitPrice!) }</div>
-                            <div className="flex items-center pl-2 gap-3 border-b-1">
+                            <div className="data-table-td">{ formatToPeso(item.unitPrice!) }</div>
+                            <div className="flex items-center gap-3 data-table-td">
                                 <Link href={`/admin/inventory/supplies/edit-supply/${item.code}`}><SquarePen className="w-4 h-4 text-darkgreen" /></Link>
                                 <button><Info className="w-4 h-4" /></button>
                                 <button
