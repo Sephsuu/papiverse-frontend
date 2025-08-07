@@ -16,6 +16,8 @@ import { toast } from "sonner";
 import { CreateEmployee } from "./_components/CreateEmployee";
 import { UpdateEmployee } from "./_components/UpdateEmployee";
 import { DeleteEmployee } from "./_components/DeleteEmployee";
+import { Branch } from "@/types/branch";
+import { BranchService } from "@/services/BranchService";
 
 export default function EmployeesTable() {
     const { claims, loading: authLoading } = useAuth();
@@ -23,11 +25,10 @@ export default function EmployeesTable() {
     const [reload, setReload] = useState(false);
     const [onProcess, setProcess] = useState(false);
     const [search, setSearch] = useState('');
-
+    const [branch, setBranch ] = useState<Branch>();
     const [open, setOpen] = useState(false);
     const [toUpdate, setUpdate] = useState<Employee>();
     const [toDelete, setDelete] = useState<Employee>();
-
     const [employees, setEmployees] = useState<Employee[]>([]);
     const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([]);
 
@@ -41,6 +42,21 @@ export default function EmployeesTable() {
         }
         fetchData();
     }, [claims, reload]);
+
+    useEffect(() => {
+        if (!claims?.branch?.branchId) return;
+
+        async function getBranch(branchId:number) {
+            try{
+                const data = await BranchService.getBranchById(branchId);
+                if(data) {
+                    setBranch(data)
+                }
+            } catch (error) { toast.error(`${error}`) }
+        }
+        getBranch(claims.branch.branchId)
+    }, [claims])
+
 
     useEffect(() => {
         const find = search.toLowerCase().trim();
@@ -65,7 +81,7 @@ export default function EmployeesTable() {
                 />
                 <div>
                     <div className="text-xl font-semibold">All Employees</div>
-                    <div className="text-sm -mt-1">Showing all employees for branch { "[Branch Name]" }</div>
+                    <div className="text-sm -mt-1">Showing all employees for branch { branch?.branchName }</div>
                 </div>
                 <Image
                     src="/images/papiverse_logo.png"
@@ -120,8 +136,8 @@ export default function EmployeesTable() {
             
             {employees.length > 0 ?
                 filteredEmployees.map((item, index) => (
-                    <div className="grid grid-cols-4 bg-light rounded-b-sm shadow-xs" key={ index }>
-                        <div className="flex items-center gap-2 data-table-td col-span-2">
+                    <div className="grid grid-cols-4 bg-light shadow-xs py-1 border-1 " key={ index }>
+                        <div className="flex items-center gap-2 data-table-td col-span-2 pl-2">
                             <div className="flex items-center justify-center w-10 h-10 rounded-full bg-brown text-lg text-light font-semibold">{ `${item.firstName[0]}${item.lastName[0]}` }</div>
                             <div>
                                 <div className="font-semibold">{ `${item.lastName}, ${item.firstName} ${item.middleName}` }</div>
@@ -132,7 +148,7 @@ export default function EmployeesTable() {
                             <div><Mail className="w-4 h-4" /></div>
                             <div className="truncate">{ item.email }</div>
                         </div>
-                        <div className="flex items-center pl-2 gap-3 border-b-1">
+                        <div className="flex items-center pl-2 gap-3">
                             <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
                             <button><Info className="w-4 h-4" /></button>
                             <button onClick={ () => setDelete(item) }><Trash2 className="w-4 h-4 text-darkred" /></button>

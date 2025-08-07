@@ -124,7 +124,7 @@ export default function ProductsTable() {
                 <div className="data-table-th">Product Name</div>
                 <div className="data-table-th">Price</div>
                 <div className="data-table-th">Category</div>
-                <div className="data-table-th">Supplies Neede</div>
+                <div className="data-table-th">Supplies Needed</div>
                 <div className="data-table-th">Action</div>
             </div>
             {products.length > 0 ?

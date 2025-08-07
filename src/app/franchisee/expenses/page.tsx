@@ -17,6 +17,9 @@ import { WeeklyExpenses } from "./_components/WeeklyExpenses";
 import { CreateExpense } from "./_components/CreateExpense";
 import { UpdateExpense } from "./_components/UpdateExpense";
 import { DeleteExpense } from "./_components/DeleteExpense";
+import { Branch } from "@/types/branch";
+import { BranchService } from "@/services/BranchService";
+import { error } from "console";
 
 const tabs = [ 'Weekly', 'Monthly', 'Yearly'];
 
@@ -26,11 +29,11 @@ export default function ExpensesTable() {
     const [reload, setReload] = useState(false);
     const [search, setSearch] = useState('');
     const [activeTab, setActiveTab] = useState('Weekly');
+    const [branch, setBranch] = useState<Branch>();
 
     const [open, setOpen] = useState(false);
     const [toUpdate, setUpdate] = useState<Expense>();
     const [toDelete, setDelete] = useState<Expense>();
-
     const [expenses, setExpenses] = useState<Expense[]>([]);
 
     useEffect(() => {
@@ -43,6 +46,20 @@ export default function ExpensesTable() {
         }
         fetchData();
     }, [claims, reload]);
+
+
+    useEffect(() => {
+        async function getBranch(branchId : number) {
+            try{
+                const data = await BranchService.getBranchById(branchId);
+                if(data) {
+                    setBranch(data)
+                }
+            }
+            catch (error) { toast.error(`${error}`) }
+        }
+        getBranch(claims.branch.branchId)
+    }, [claims]) 
 
     if (loading || authLoading) return <PapiverseLoading />
     return(
@@ -57,7 +74,7 @@ export default function ExpensesTable() {
                 />
                 <div>
                     <div className="text-xl font-semibold">All Expenses</div>
-                    <div className="text-sm -mt-1">Showing all expenses for branch { "[Branch Name]" }</div>
+                    <div className="text-sm -mt-1">Showing all expenses for branch {branch?.branchName }</div>
                 </div>
                 <Image
                     src="/images/papiverse_logo.png"

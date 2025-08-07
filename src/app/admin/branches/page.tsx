@@ -93,7 +93,7 @@ export default function BranchesTable() {
             <div className="flex items-center mt-2">
                 <input
                     className="py-1 pl-3 rounded-md bg-light shadow-xs w-100"
-                    placeholder="Search for a user"
+                    placeholder="Search for Branch"
                     onChange={ e => setSearch(e.target.value) }
                 />
 
