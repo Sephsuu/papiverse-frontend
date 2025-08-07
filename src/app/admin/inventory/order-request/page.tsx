@@ -16,6 +16,7 @@ import { PendingOrders } from "./_components/PendingOrders";
 import { OrderHistory } from "./_components/OrderHistory";
 import { useAuth } from "@/hooks/use-auth";
 import { ViewOrderModal } from "./_components/ViewOrderModal";
+import AddRemarks from "./_components/AddRemarks";
 
 
 export default function OrderSupplyTable() {
@@ -25,6 +26,7 @@ export default function OrderSupplyTable() {
     const [search, setSearch] = useState('');
     const [activeTab, setActiveTab] = useState(true);
 
+    const [open, setOpen] = useState(false);
     const [toView, setToView] = useState<SupplyOrder | undefined>();
     const [selectedOrder, setSelectedOrder] = useState<SupplyOrder | undefined>();
     const [orders, setOrders] = useState<SupplyOrder[]>([]);
@@ -122,9 +124,7 @@ export default function OrderSupplyTable() {
             {activeTab && <PendingOrders 
                 filteredOrders={ filteredOrders.filter(i => ["PENDING", "TO FOLLOW"].includes(i.status)) }
                 setReload={ setReload }
-                toView={ toView }
                 setToView={ setToView }
-                selectedOrder={ selectedOrder }
                 setSelectedOrder={ setSelectedOrder }
             />}
             {!activeTab && <OrderHistory 
@@ -144,6 +144,7 @@ export default function OrderSupplyTable() {
                     setReload={ setReload }
                 />
             )}
+            
 
         </section>
     );

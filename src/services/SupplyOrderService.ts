@@ -59,7 +59,6 @@ export class SupplyOrderService {
     }
 
     static async createSupplyOrder(order: CompleteOrder) {
-        console.log(JSON.stringify(order));
         const res = await fetch(`${URL}/create`, {
             method: 'POST',
             headers: { 
@@ -70,6 +69,23 @@ export class SupplyOrderService {
         });
         console.log(res);
         
+
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.message || 'Something went wrong.');
+        }
+
+        return res.json();
+    }
+
+    static async addRemarks(id: number, remarks: string) {
+        const res = await fetch(`${URL}/add-remarks?id=${id}&remarks=${remarks}`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json', 
+                'Authorization' : `Bearer ${getTokenFromLocalStorage()}`,
+            },
+        });
 
         if (!res.ok) {
             const err = await res.json();

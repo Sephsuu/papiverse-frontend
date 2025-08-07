@@ -1,28 +1,30 @@
 "use client";
 
-import { Download, FileSpreadsheet, SquareMinus } from "lucide-react";
+import { Download, FileSpreadsheet, MessageSquareMore, MessageSquareText, SquareMinus } from "lucide-react";
 import { SetStateAction, useState } from "react";
 import { OrderStatusBadge } from "@/components/ui/badge";
 import { SupplyOrder } from "@/types/supplyOrder";
 import { formatDateToWords, formatToPeso } from "@/lib/formatter";
 import { ViewOrderModal } from "./ViewOrderModal";
 import { ViewFullOrder } from "./ViewFullOrder";
+import AddRemarks from "./AddRemarks";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface Props {
     filteredOrders: SupplyOrder[];
     setReload: React.Dispatch<SetStateAction<boolean>>;
-    toView: SupplyOrder | undefined;
     setToView: (i: SupplyOrder | undefined) => void;
-    selectedOrder: SupplyOrder | undefined;
     setSelectedOrder: (i: SupplyOrder | undefined) => void;
 }
 
-export function PendingOrders({ filteredOrders, setReload, toView, setToView, selectedOrder, setSelectedOrder }: Props) {
+export function PendingOrders({ filteredOrders, setReload, setToView, setSelectedOrder }: Props) {
+    const [order, setOrder] = useState<SupplyOrder>();
     return(
         <section>
             <div className="flex items-center bg-slate-200 font-semibold rounded-sm mt-2">
                 <div className="w-[5%] py-1 border-r-1 border-amber-50"><SquareMinus className="w-4 h-4 mx-auto" strokeWidth={ 3 }/></div>
                 <div className="w-[5%] py-1 border-r-1 border-amber-50"><FileSpreadsheet className="w-4 h-4 mx-auto" strokeWidth={ 3 }/></div>
+                <div className="w-[5%] py-1 border-r-1 border-amber-50"><MessageSquareMore className="w-4 h-4 mx-auto" strokeWidth={ 3 }/></div>
                 <div className="grid grid-cols-5 w-full">
                     <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Branch Name</div>
                     <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Date Requested</div>
@@ -42,6 +44,16 @@ export function PendingOrders({ filteredOrders, setReload, toView, setToView, se
                             View Full
                         </button>
                         <div className="w-[5%] flex justify-center"><button><Download className="w-4 h-4 text-gray" strokeWidth={ 2 }/></button></div>
+                        <div className="w-[5%] flex justify-center">
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <button onClick={ () => setOrder(item) }>
+                                        <MessageSquareText className="w-4 h-4 text-gray" strokeWidth={ 2 }/>
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent className="bg-dark text-light text-xs p-1 rounded-md">{ item.remarks || 'No Remarks' }</TooltipContent>
+                            </Tooltip>
+                        </div>
                         <div className="grid grid-cols-5 w-full">
                                 <div className="flex text-sm pl-2 py-1.5 border-b-1">
                                     <button className="my-auto"
@@ -59,6 +71,14 @@ export function PendingOrders({ filteredOrders, setReload, toView, setToView, se
                 )) : (<div className="my-2 text-sm text-center col-span-6">There are no previous orders yet.</div>)
             }
             <div className="text-gray text-sm ms-2">Showing { filteredOrders.length.toString() } of { filteredOrders.length.toString() } results.</div>
+            
+            {order && (
+                <AddRemarks 
+                    order={ order }
+                    setOrder={ setOrder }
+                    setReload={ setReload }
+                />
+            )}
         </section>
     );
 }

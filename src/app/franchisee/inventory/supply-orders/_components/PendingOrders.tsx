@@ -1,7 +1,7 @@
 "use client";
 
-import { Download, FileSpreadsheet, SquareMinus, Truck } from "lucide-react";
-import { SetStateAction } from "react";
+import { Download, FileSpreadsheet, MessageSquareMore, MessageSquareText, SquareMinus, Truck } from "lucide-react";
+import { SetStateAction, useState } from "react";
 import { OrderStatusBadge } from "@/components/ui/badge";
 import { SupplyOrder } from "@/types/supplyOrder";
 import { formatDateToWords, formatToPeso } from "@/lib/formatter";
@@ -12,6 +12,9 @@ import { SupplyOrderService } from "@/services/SupplyOrderService";
 import { InventoryService } from "@/services/InventoryService";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Claim } from "@/types/claims";
+import ViewRemarks from "./ViewRemarks";
+import { Tooltip, TooltipTrigger } from "@/components/ui/tooltip";
+import { TooltipContent } from "@radix-ui/react-tooltip";
 
 interface Props {
     claims: Claim;
@@ -24,6 +27,8 @@ interface Props {
 }
 
 export function PendingOrders({ claims, filteredOrders, setToEdit, setReload, setActiveTab, selectedOrder, setSelectedOrder }: Props) {
+    const [remarks, setRemarks] = useState('');
+
     async function handleReceived(id: number, meatApproved: boolean, snowApproved: boolean) {
         try {
             await SupplyOrderService.updateOrderStatus(id, "DELIVERED", meatApproved, snowApproved);
@@ -50,6 +55,7 @@ export function PendingOrders({ claims, filteredOrders, setToEdit, setReload, se
             <div className="flex items-center bg-slate-200 font-semibold rounded-sm mt-2">
                 <div className="w-15 py-1 border-r-1 border-amber-50"><SquareMinus className="w-4 h-4 mx-auto" strokeWidth={ 3 }/></div>
                 <div className="w-15 py-1 border-r-1 border-amber-50"><FileSpreadsheet className="w-4 h-4 mx-auto" strokeWidth={ 3 }/></div>
+                <div className="w-15 py-1 border-r-1 border-amber-50"><MessageSquareMore className="w-4 h-4 mx-auto" strokeWidth={ 3 }/></div>
                 <div className="w-35 text-sm my-auto pl-2 py-1 border-r-1 border-amber-50">Status</div>
                 <div className="grid grid-cols-5 w-full">
                     <div className="text-sm my-auto pl-2 py-1 border-r-1 border-amber-50 col-span-3">Orders</div>
@@ -68,6 +74,16 @@ export function PendingOrders({ claims, filteredOrders, setToEdit, setReload, se
                             View Full
                         </button>
                         <div className="w-15 flex justify-center"><button><Download className="w-4 h-4 text-gray" strokeWidth={ 2 }/></button></div>
+                        <div className="w-15 flex justify-center">
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <button onClick={ () => setRemarks(item.remarks || 'No remarks') }>
+                                        <MessageSquareText className="w-4 h-4 text-gray" strokeWidth={ 2 }/>
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent className="bg-dark text-light text-xs p-1 rounded-md">{ item.remarks || 'No Remarks' }</TooltipContent>
+                            </Tooltip>
+                        </div>
                         <div className="w-35 flex text-sm pl-2 py-1.5 border-b-1">
                             <div className="my-auto"><OrderStatusBadge status={item.status} /></div>
                         </div>
@@ -91,6 +107,12 @@ export function PendingOrders({ claims, filteredOrders, setToEdit, setReload, se
             }
             <div className="text-gray text-sm ms-2">Showing { filteredOrders.length.toString() } of { filteredOrders.length.toString() } results.</div>
 
+            {remarks && (
+                <ViewRemarks 
+                    remarks={ remarks }
+                    setRemarks={ setRemarks }
+                />
+            )}
         </section>
     );
 }
