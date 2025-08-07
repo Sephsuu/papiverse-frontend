@@ -16,6 +16,7 @@ import { Fragment, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { CreateBranch } from "./_components/CreateBranch";
 import { Toaster } from "@/components/ui/sonner";
+import { UpdateBranch } from "./_components/UpdateBranch";
 
 const columns = [
     { title: "Branch Name", style: "" },
@@ -144,7 +145,7 @@ export default function BranchesTable() {
                             ): (<Badge className="text-xs text-darkred font-semibold" variant="secondary"><BadgeCheck />External Branch</Badge>)}
                         </div>
                         <div className="flex items-center gap-3 data-table-td">
-                            <Link href={`/admin/branches/edit-branch/${item.branchId}`}><SquarePen className="w-4 h-4 text-darkgreen" /></Link>
+                            <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
                             <button><Info className="w-4 h-4" /></button>
                             <button
                                 onClick={ () => setDelete(item) }
@@ -162,6 +163,14 @@ export default function BranchesTable() {
                 <CreateBranch 
                     setOpen={ setOpen }
                     setReload={ setReload }
+                />
+            )}
+            {toUpdate && (
+                <UpdateBranch 
+                    setOpen={ setOpen }
+                    setReload={ setReload }
+                    toUpdate={ toUpdate }
+                    setUpdate={ setUpdate }
                 />
             )}
 

@@ -1,20 +1,12 @@
-import { AddButton, Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+import { AddButton, Button, UpdateButton } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { handleChange } from "@/lib/form-handle";
-import { cn } from "@/lib/utils";
-import { AuthService } from "@/services/AuthService";
 import { BranchService } from "@/services/BranchService";
 import { Branch, branchFields, branchInit } from "@/types/branch";
-import { User, userFields, userInit } from "@/types/user";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -24,15 +16,15 @@ const status = ['Open', 'Under Renovation/Construction', 'Active', 'Inactive'];
 interface Props {
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
     setReload: React.Dispatch<React.SetStateAction<boolean>>;
+    toUpdate: Branch;
+    setUpdate: React.Dispatch<React.SetStateAction<Branch | undefined>>;
 }
 
-export function CreateBranch({ setOpen, setReload }: Props) {
+export function UpdateBranch({ setOpen, setReload, toUpdate, setUpdate }: Props) {
     const [loading, setLoading] = useState(true);
     const [onProcess, setProcess] = useState(false);
 
-    const [branch, setBranch] = useState<Branch>(branchInit);
-    const [date, setDate] = useState<Date | undefined>();
-    const [dateOpen, setDateOpen] = useState(false);
+    const [branch, setBranch] = useState<Branch>(toUpdate);
 
     async function handleSubmit() {
         try{         
@@ -48,19 +40,20 @@ export function CreateBranch({ setOpen, setReload }: Props) {
                 }
             }
 
-            const data = await BranchService.addBranch(branch);
-            if (data) toast.success(`Branch ${branch.branchName} registered successfully!`);    
+            const data = await BranchService.updateBranch(branch);
+            if (data) toast.success(`Branch ${branch.branchName} updated successfully!`);    
         }
         catch(error){ toast.error(`${error}`) }
         finally { 
             setReload(prev => !prev);
             setProcess(false);
             setOpen(!open);
+            setUpdate(undefined);
         }
     }
 
     return(
-        <Dialog open onOpenChange={ setOpen }>
+        <Dialog open onOpenChange={ (open) => { if (!open) setUpdate(undefined) } }>
             <DialogContent className="h-9/10 overflow-y-auto">
                 <DialogTitle className="flex items-center gap-2">  
                     <Image
@@ -69,7 +62,7 @@ export function CreateBranch({ setOpen, setReload }: Props) {
                         width={40}
                         height={40}
                     />
-                    <div className="font-semibold text-xl">Create Branch</div>      
+                    <div className="font-semibold text-xl">Edit <span className="text-darkorange">{ toUpdate.branchName }</span></div>      
                 </DialogTitle>
                 <div className="grid grid-cols-2 gap-2">
                     <div className="col-span-2 font-semibold">Branch Details</div>
@@ -178,11 +171,11 @@ export function CreateBranch({ setOpen, setReload }: Props) {
                 </div>
                 <div className="flex justify-end gap-4">
                     <DialogClose className="text-sm">Close</DialogClose>
-                    <AddButton 
+                    <UpdateButton 
                         handleSubmit={ handleSubmit }
                         onProcess={ onProcess }
-                        label="Add Branch"
-                        loadingLabel="Adding Branch"
+                        label="Update Branch"
+                        loadingLabel="Updating Branch"
                     />
                 </div>
             </DialogContent>
