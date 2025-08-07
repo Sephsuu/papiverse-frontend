@@ -7,8 +7,8 @@ import { Fragment } from "react";
 
 interface Props {
     order: SupplyOrder;
-    setActiveTab: (i: string) => void;
-    setSelectedOrder: (i: SupplyOrder | undefined) => void;
+    setActiveTab?: (i: string) => void;
+    setSelectedOrder?: (i: SupplyOrder | undefined) => void;
 }
 
 export function OrdersAccordion({ order, setActiveTab, setSelectedOrder }: Props) {
@@ -22,7 +22,7 @@ export function OrdersAccordion({ order, setActiveTab, setSelectedOrder }: Props
                 <AccordionContent className="flex flex-col">
                     {order.status === 'TO FOLLOW' && !order.meatCategory?.isApproved && (
                         <button 
-                            onClick={ () => { setActiveTab('meat'); setSelectedOrder(order) }}
+                            onClick={ () => { setActiveTab!('meat'); setSelectedOrder!(order) }}
                         >
                             <SquarePen className="w-4 h-4 text-gray ms-auto" />
                         </button>
@@ -56,7 +56,7 @@ export function OrdersAccordion({ order, setActiveTab, setSelectedOrder }: Props
                     <div className={`text-xs ms-auto ${order.snowfrostCategory!.isApproved ? "text-darkgreen" : "text-darkred"}`}>{order.snowfrostCategory!.isApproved ? "Approved" : "Not Approved"}</div>
                 </AccordionTrigger> 
                 <AccordionContent className="flex flex-col">
-                    {order.status === 'TO FOLLOW' && !order.snowfrostCategory?.isApproved && (
+                    {setActiveTab && setSelectedOrder && order.status === 'TO FOLLOW' && !order.snowfrostCategory?.isApproved && (
                         <button 
                             onClick={ () => { setActiveTab('snow'); setSelectedOrder(order) }}
                         >
