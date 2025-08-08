@@ -29,7 +29,6 @@ export default function ExpensesTable() {
     const [reload, setReload] = useState(false);
     const [search, setSearch] = useState('');
     const [activeTab, setActiveTab] = useState('Weekly');
-    const [branch, setBranch] = useState<Branch>();
 
     const [open, setOpen] = useState(false);
     const [toUpdate, setUpdate] = useState<Expense>();
@@ -47,20 +46,6 @@ export default function ExpensesTable() {
         fetchData();
     }, [claims, reload]);
 
-
-    useEffect(() => {
-        async function getBranch(branchId : number) {
-            try{
-                const data = await BranchService.getBranchById(branchId);
-                if(data) {
-                    setBranch(data)
-                }
-            }
-            catch (error) { toast.error(`${error}`) }
-        }
-        getBranch(claims.branch.branchId)
-    }, [claims]) 
-
     if (loading || authLoading) return <PapiverseLoading />
     return(
         <section className="w-full py-4 px-2">
@@ -74,7 +59,7 @@ export default function ExpensesTable() {
                 />
                 <div>
                     <div className="text-xl font-semibold">All Expenses</div>
-                    <div className="text-sm -mt-1">Showing all expenses for branch {branch?.branchName }</div>
+                    <div className="text-sm -mt-1">Showing all expenses for branch [Branch Name]</div>
                 </div>
                 <Image
                     src="/images/papiverse_logo.png"

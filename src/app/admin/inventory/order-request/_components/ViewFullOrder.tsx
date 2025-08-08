@@ -52,12 +52,12 @@ export function ViewFullOrder({ claims, selectedOrder, setSelectedOrder, setRelo
         try {
             setProcess(true);
             if (isRejected) {
-                toast.success(`Order ${selectedOrder.meatCategory!.meatOrderId} and ${selectedOrder.snowfrostCategory!.snowFrostOrderId} updated status to REJECTED`);
-                return await SupplyOrderService.updateOrderStatus(selectedOrder.orderId!, "REJECTED", meatApproved, snowApproved)
+                await SupplyOrderService.updateOrderStatus(selectedOrder.orderId!, "REJECTED", meatApproved, snowApproved)
+                return toast.success(`Order ${selectedOrder.meatCategory!.meatOrderId} and ${selectedOrder.snowfrostCategory!.snowFrostOrderId} updated status to REJECTED`);
             }
             if (meatApproved && snowApproved) {      
+                await SupplyOrderService.updateOrderStatus(selectedOrder.orderId!, "APPROVED", meatApproved, snowApproved)
                 toast.success(`Order ${selectedOrder.meatCategory!.meatOrderId} and ${selectedOrder.snowfrostCategory!.snowFrostOrderId} updated status to APPROVED`);
-                await SupplyOrderService.updateOrderStatus(selectedOrder.orderId!, "APPROVED", meatApproved, snowApproved);
                 return await InventoryService.createInventoryOrder({
                     "branchId" : claims.branch.branchId,
                     "type" : "OUT",
@@ -66,19 +66,18 @@ export function ViewFullOrder({ claims, selectedOrder, setSelectedOrder, setRelo
                 });
             }
             if (!meatApproved && !snowApproved) {
-                toast.success(`Order ${selectedOrder.meatCategory!.meatOrderId} and ${selectedOrder.snowfrostCategory!.snowFrostOrderId} updated status to PENDING`);
-                return await SupplyOrderService.updateOrderStatus(selectedOrder.orderId!, "PENDING", meatApproved, snowApproved);
+                await SupplyOrderService.updateOrderStatus(selectedOrder.orderId!, "PENDING", meatApproved, snowApproved)
+                return toast.success(`Order ${selectedOrder.meatCategory!.meatOrderId} and ${selectedOrder.snowfrostCategory!.snowFrostOrderId} updated status to PENDING`);
             }
             if (meatApproved || snowApproved) {
-                toast.success(`Order ${selectedOrder.meatCategory!.meatOrderId} and ${selectedOrder.snowfrostCategory!.snowFrostOrderId} updated status to TO FOLLOW`);
-                return await SupplyOrderService.updateOrderStatus(selectedOrder.orderId!, "TO_FOLLOW", meatApproved, snowApproved)
+                await SupplyOrderService.updateOrderStatus(selectedOrder.orderId!, "TO_FOLLOW", meatApproved, snowApproved)
+                return toast.success(`Order ${selectedOrder.meatCategory!.meatOrderId} and ${selectedOrder.snowfrostCategory!.snowFrostOrderId} updated status to TO FOLLOW`);
             }
-        } catch (error) {
-            console.log(error);    
-        } finally {
+        } catch (error) { toast.error(`${error}`) } 
+        finally {
             setProcess(false);
+            setSelectedOrder(undefined);
             setReload(prev => !prev);
-            
         }
     }
 

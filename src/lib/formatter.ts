@@ -13,3 +13,13 @@ export function getWeekday(dateString: string) {
     const options: Intl.DateTimeFormatOptions = { weekday: 'long' };
     return new Date(dateString).toLocaleDateString(undefined, options);
 }
+
+export function capitalizeWords(str: string): string {
+    if (!str) return '';
+    return str
+        .split(' ')               
+        .map(word =>                   
+        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() 
+        )
+        .join(' ');                   
+}

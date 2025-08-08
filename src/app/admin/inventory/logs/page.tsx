@@ -17,7 +17,7 @@ import { Separator } from "@/components/ui/separator";
 
 export default function InventoryLogs() {
     const { claims, loading: authLoading } = useAuth();
-    const [loading, setLoading] = useState();
+    const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [logs, setLogs] = useState<InventoryLog[]>([]);
     const [filteredLogs, setFilteredLogs] = useState<InventoryLog[]>([]);
@@ -26,8 +26,9 @@ export default function InventoryLogs() {
         async function fetchData() {
             try {
                 const data = await InventoryService.getInventoryAudits(claims.branch.branchId);
-                setLogs(data);
+                setLogs(data);                
             } catch (error) { toast.error(`${error}`) }
+            finally { setLoading(false) }
         }
         fetchData();
     }, [claims]);
@@ -77,9 +78,6 @@ export default function InventoryLogs() {
 
         return result;
     }
-    console.log(flattenGroupedLogsWithOrders(groupedByDateAndOrder));
-    
-
     if (loading || authLoading) return <PapiverseLoading />
     return(
         <section className="w-full py-4 px-2">

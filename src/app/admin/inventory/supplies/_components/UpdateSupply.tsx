@@ -43,7 +43,7 @@ export function UpdateSupply({ toUpdate, setUpdate, setReload }: Props) {
                 }
             }
             const data = await SupplyService.updateSupply(supply);
-            if (data) toast.success(`Supply ${supply.name} registered successfully!`);    
+            if (data) toast.success(`Supply ${supply.name} updated successfully!`);    
         }
         catch(error){ toast.error(`${error}`) }
         finally { 

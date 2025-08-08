@@ -14,7 +14,7 @@ import { Branch } from "@/types/branch";
 import { Supply } from "@/types/supply";
 import { User } from "@/types/user";
 import { SelectValue } from "@radix-ui/react-select";
-import { BadgeCheck, Download, Funnel, Info, Plus, SquarePen, Trash2 } from "lucide-react";
+import { BadgeCheck, Download, Funnel, Ham, Info, Plus, Snowflake, SquarePen, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import { CreateSupply } from "./_components/CreateSupply";
 import { UpdateSupply } from "./_components/UpdateSupply";
 import { DeleteSupply } from "./_components/DeleteSupply";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function SuppliesTable() {
     const [loading, setLoading] = useState(true);
@@ -140,7 +141,15 @@ export default function SuppliesTable() {
                 filteredSupplies.map((item, index) => (
                     <div className="grid grid-cols-6 bg-light border-b-1 shadow-xs" key={ index }>
                         <div className="data-table-td">{ item.code }</div>
-                        <div className="data-table-td">{ item.name }</div>
+                        <div className="data-table-td flex items-center gap-1">
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    {item.category === 'MEAT' ? <Ham className="w-4 h-4 text-darkbrown"/> : <Snowflake className="w-4 h-4 text-blue" />}
+                                </TooltipTrigger>
+                                <TooltipContent>{ item.category === 'MEAT' ? "MEAT Category" : "SNOW FROST Category"}</TooltipContent>
+                            </Tooltip>
+                            <div>{ item.name }</div>
+                        </div>
                         <div className="data-table-td">{ `${item.unitQuantity} ${item.unitMeasurement}` }</div>
                         <div className="data-table-td">{ formatToPeso(item.unitPriceInternal!) }</div>
                         <div className="data-table-td">{ formatToPeso(item.unitPriceExternal!) }</div>

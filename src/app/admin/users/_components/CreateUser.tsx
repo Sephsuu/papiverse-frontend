@@ -96,7 +96,7 @@ export function CreateUser({ setOpen, setReload }: Props) {
                         width={40}
                         height={40}
                     />
-                    <div className="font-semibold text-xl">Create user</div>      
+                    <div className="font-semibold text-xl">Create User</div>      
                 </DialogTitle>
                 <div className="grid grid-cols-2 gap-2">
                     <div className="col-span-2 font-semibold">Account Details</div>

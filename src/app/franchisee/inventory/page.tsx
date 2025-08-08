@@ -114,7 +114,7 @@ export default function InventoryOverview() {
                         </div>
                     </div>
                 </div>
-                <ScrollArea className="col-span-1 bg-white shadow-sm rounded-sm p-3">
+                <ScrollArea className="col-span-1 bg-white shadow-sm rounded-sm p-3 h-[300px]">
                     <div className="font-semibold">Low Stock Items</div>
                     {inventories.filter(i => i.quantity! < 15).length > 0 ? (
                         inventories.filter(i => i.quantity! < 15).map((item, index) => (
@@ -133,7 +133,7 @@ export default function InventoryOverview() {
                         </div>
                     )}  
                 </ScrollArea>
-                <ScrollArea className="col-span-1 bg-white shadow-sm rounded-sm p-3">
+                <ScrollArea className="col-span-1 bg-white shadow-sm rounded-sm p-3 h-[300px]">
                     <div className="flex justify-between font-semibold mb-2">
                         <div>Order Transactions</div>
                         <Link href="inventory/supply-orders" className="text-xs text-gray">View All</Link>

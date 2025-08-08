@@ -20,12 +20,13 @@ import { toast } from "sonner";
 
 interface Props {
     claims: Claim;
+    editable?: true | boolean;
     toView: SupplyOrder;
     setToView: (i: SupplyOrder | undefined) => void;
     setReload: React.Dispatch<SetStateAction<boolean>>;
 }
 
-export function ViewOrderModal({ claims, toView, setToView, setReload }: Props) {
+export function ViewOrderModal({ claims, editable = true, toView, setToView, setReload }: Props) {
     const [loading, setLoading] = useState(true); 
     const [onProcess, setProcess] = useState(false);
     const [reject, setReject] = useState(false);
@@ -55,12 +56,12 @@ export function ViewOrderModal({ claims, toView, setToView, setReload }: Props) 
         try {
             setProcess(true);
             if (isRejected) {
-                toast.success(`Order ${toView.meatCategory!.meatOrderId} and ${toView.snowfrostCategory!.snowFrostOrderId} updated status to REJECTED`);
-                return await SupplyOrderService.updateOrderStatus(toView.orderId!, "REJECTED", meatApproved, snowApproved)
+                await SupplyOrderService.updateOrderStatus(toView.orderId!, "REJECTED", meatApproved, snowApproved)
+                return toast.success(`Order ${toView.meatCategory!.meatOrderId} and ${toView.snowfrostCategory!.snowFrostOrderId} updated status to REJECTED`);
             }
             if (meatApproved && snowApproved) {      
+                await SupplyOrderService.updateOrderStatus(toView.orderId!, "APPROVED", meatApproved, snowApproved)
                 toast.success(`Order ${toView.meatCategory!.meatOrderId} and ${toView.snowfrostCategory!.snowFrostOrderId} updated status to APPROVED`);
-                await SupplyOrderService.updateOrderStatus(toView.orderId!, "APPROVED", meatApproved, snowApproved);
                 return await InventoryService.createInventoryOrder({
                     "branchId" : claims.branch.branchId,
                     "type" : "OUT",
@@ -69,21 +70,21 @@ export function ViewOrderModal({ claims, toView, setToView, setReload }: Props) 
                 });
             }
             if (!meatApproved && !snowApproved) {
-                toast.success(`Order ${toView.meatCategory!.meatOrderId} and ${toView.snowfrostCategory!.snowFrostOrderId} updated status to PENDING`);
-                return await SupplyOrderService.updateOrderStatus(toView.orderId!, "PENDING", meatApproved, snowApproved);
+                await SupplyOrderService.updateOrderStatus(toView.orderId!, "PENDING", meatApproved, snowApproved)
+                return toast.success(`Order ${toView.meatCategory!.meatOrderId} and ${toView.snowfrostCategory!.snowFrostOrderId} updated status to PENDING`);
             }
             if (meatApproved || snowApproved) {
-                toast.success(`Order ${toView.meatCategory!.meatOrderId} and ${toView.snowfrostCategory!.snowFrostOrderId} updated status to TO FOLLOW`);
-                return await SupplyOrderService.updateOrderStatus(toView.orderId!, "TO_FOLLOW", meatApproved, snowApproved)
+                await SupplyOrderService.updateOrderStatus(toView.orderId!, "TO_FOLLOW", meatApproved, snowApproved)
+                return toast.success(`Order ${toView.meatCategory!.meatOrderId} and ${toView.snowfrostCategory!.snowFrostOrderId} updated status to TO FOLLOW`);
             }
-        } catch (error) {
-            console.log(error);    
-        } finally {
+        } catch (error) { toast.error(`${error}`) } 
+        finally {
             setProcess(false);
             setToView(undefined);
             setReload(prev => !prev);
         }
     }
+    
     return(
         <Dialog open onOpenChange={ open => { if (!open) setToView?.(undefined) } }>
             <DialogContent>
@@ -95,12 +96,14 @@ export function ViewOrderModal({ claims, toView, setToView, setReload }: Props) 
                             <div className="h-[80vh] flex flex-col gap-5 overflow-y-auto">
                                 <div className="flex justify-between items-center">
                                     <OrderStatusLabel status={ toView.status } />
-                                    <Button className="h-fit bg-darkgreen w-fit px-4 py-1 ms-auto" 
-                                        disabled={ enableSave(meatApproved, snowApproved) }
-                                        onClick={ () => handleSubmit(meatApproved, snowApproved) }
-                                    >
-                                        <FormLoader onProcess={ onProcess } label="Save Order" loadingLabel="Saving Order" />
-                                    </Button>
+                                    {editable && (
+                                        <Button className="h-fit bg-darkgreen w-fit px-4 py-1 ms-auto" 
+                                            disabled={ enableSave(meatApproved, snowApproved) }
+                                            onClick={ () => handleSubmit(meatApproved, snowApproved) }
+                                        >
+                                            <FormLoader onProcess={ onProcess } label="Save Order" loadingLabel="Saving Order" />
+                                        </Button>
+                                    )}
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <div className="flex justify-center items-center gap-1 mt-[-15px]">

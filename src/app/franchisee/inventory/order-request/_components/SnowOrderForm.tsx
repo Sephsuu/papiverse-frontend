@@ -1,12 +1,13 @@
 "use client"
 
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatToPeso } from "@/lib/formatter";
 import { Supply } from "@/types/supply";
 import { SupplyItem } from "@/types/supplyOrder";
 import { Snowflake, Trash2 } from "lucide-react";
-import { Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 interface Props {
@@ -19,6 +20,19 @@ interface Props {
 }
 
 export function SnowOrderForm({ supplies, selectedItems, setActiveForm, onSelect, onQuantityChange, onRemove }: Props) {
+    const [filteredSupplies, setFilteredSupplies] = useState<Supply[]>(supplies);
+    const [search, setSearch] = useState("");
+
+    useEffect(() => {
+        const find = search.toLowerCase().trim();
+        if (find !== '') {
+            setFilteredSupplies(supplies.filter(
+                (i) => i.name?.toLowerCase().includes(find) ||
+                i.code?.toLowerCase().includes(find)
+            ))
+        } else setFilteredSupplies(supplies);
+    }, [search, supplies]);
+
     const handleSubmit = async () => {
         if (selectedItems.length > 0) {
             setActiveForm("receipt");
@@ -78,13 +92,21 @@ export function SnowOrderForm({ supplies, selectedItems, setActiveForm, onSelect
 
             <div className="grid grid-cols-8 bg-light shadow-sm">
                 <Select onValueChange={ onSelect }>
-                    <SelectTrigger className="p-0 m-0 border-0 shadow-none mx-auto w-fit">
+                    <SelectTrigger className="p-0 pl-2 m-0 border-0 shadow-none mx-auto w-fit">
                         <SelectValue placeholder="Select Item">Select Item</SelectValue>
                     </SelectTrigger>
                     <SelectContent>
-                        {supplies.map((item) => (
-                            <SelectItem key={item.code} value={item.code!}>{item.code} - {item.name}</SelectItem>
-                        ))}
+                        <SelectGroup>
+                            <Input
+                                placeholder="Search for a supply"
+                                className="border-1 border-slate-300 h-fit"
+                                onChange={ e => setSearch(e.target.value) }
+                            />
+                            <SelectLabel>Snow Frost Supplies</SelectLabel>
+                            {filteredSupplies.map((item) => (
+                                <SelectItem key={item.code} value={item.code!}>{item.code} - {item.name}</SelectItem>
+                            ))}
+                        </SelectGroup>
                     </SelectContent>
                 </Select>
             </div>

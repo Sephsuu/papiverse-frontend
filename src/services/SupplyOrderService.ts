@@ -96,6 +96,8 @@ export class SupplyOrderService {
     }
 
     static async updateOrderStatus(id: number, newStatus: string, meatApproved: boolean, snowApproved: boolean) {
+        console.log(id, newStatus, meatApproved, snowApproved);
+        
         const res = await fetch(`${URL}/update-status?id=${id}&newStatus=${newStatus}&meatApproved=${meatApproved}&snowApproved=${snowApproved}`, {
             method: 'POST',
             headers: { 
@@ -103,10 +105,12 @@ export class SupplyOrderService {
                 'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
             },
         });
+        console.log(res);
+        
 
         if (!res.ok) {
             const err = await res.json();
-            throw new Error(err.message || 'Something went wrong.');
+            throw new Error(err.error || 'Something went wrong.');
         }
 
         return res.json();

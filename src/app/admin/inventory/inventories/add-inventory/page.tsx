@@ -114,7 +114,7 @@ export default function AddInventory() {
                     <Input 
                         className="border-0 placeholder:!text-dark"
                         placeholder={ measurement || 'Unit Measurement' }
-                        disabled
+                        readOnly
                     />
                 </div>
 

@@ -33,12 +33,6 @@ export default function ViewRemarks({ remarks, setRemarks }: Props) {
                 </div>
                 <div className="flex justify-end gap-4">
                     <DialogClose className="text-sm">Close</DialogClose>
-                    <AddButton 
-                        handleSubmit={ handleSubmit }
-                        onProcess={ onProcess }
-                        label="Add Remark"
-                        loadingLabel="Adding Remark"
-                    />
                 </div>
             </DialogContent>
         </Dialog>

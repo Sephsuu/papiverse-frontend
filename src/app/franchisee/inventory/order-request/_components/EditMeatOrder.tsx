@@ -1,8 +1,9 @@
 "use client"
 
-import { Button } from "@/components/ui/button";
+import { Button, UpdateButton } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { FormLoader, PapiverseLoading } from "@/components/ui/loader";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatToPeso } from "@/lib/formatter";
 import { SupplyService } from "@/services/RawMaterialService";
 import { SupplyOrderService } from "@/services/SupplyOrderService";
@@ -29,12 +30,23 @@ export function EditMeatOrder({ order, claims, setActiveTab, setReload }: Props)
     const [loading, setLoading] = useState(true);
     const [onProcess, setProcess] = useState(false);    
     const [selectedItems, setSelectedItems] = useState<SupplyItem[]>([]);
+    const [search, setSearch] = useState("");
     const [supplies, setSupplies] = useState<Supply[]>([])
+    const [filteredSupplies, setFilteredSupplies] = useState<Supply[]>([]);
+
+    useEffect(() => {
+        const find = search.toLowerCase().trim();
+        if (find !== '') {
+            setFilteredSupplies(supplies.filter(
+                (i) => i.name?.toLowerCase().includes(find) ||
+                i.code?.toLowerCase().includes(find)
+            ))
+        } else setFilteredSupplies(supplies);
+    }, [search, supplies]);
 
     useEffect(() => {
         async function fetchData() {
             try {
-                setProcess(true);
                 const supplyItems: SupplyItem[] = order.meatCategory?.meatItems.map(item => ({
                     category: "MEAT",               
                     code: item.rawMaterialCode,
@@ -45,7 +57,7 @@ export function EditMeatOrder({ order, claims, setActiveTab, setReload }: Props)
                     unitQuantity: item.quantity  
                 })) ?? [];
                 const data = await SupplyService.getAllSupplies();
-                const fixedPrice = data.map((supply: Supply) => ({
+                const fixedPrice = data.filter((i: Supply) => i.category === 'MEAT').map((supply: Supply) => ({
                     ...supply, unitPrice: claims.branch.isInternal ? supply.unitPriceInternal : supply.unitPriceExternal
                 }));
 
@@ -151,13 +163,21 @@ export function EditMeatOrder({ order, claims, setActiveTab, setReload }: Props)
 
             <div className="grid grid-cols-8 bg-light shadow-sm">
                 <Select onValueChange={ handleSelect }>
-                    <SelectTrigger className="p-0 m-0 border-0 shadow-none mx-auto w-fit">
+                    <SelectTrigger className="p-0 pl-2 m-0 border-0 shadow-none mx-auto w-fit">
                         <SelectValue placeholder="Select Item">Select Item</SelectValue>
                     </SelectTrigger>
                     <SelectContent>
-                        {supplies.map((item) => (
-                            <SelectItem key={item.code} value={item.code!}>{item.code} - {item.name}</SelectItem>
-                        ))}
+                        <SelectGroup>
+                            <Input
+                                placeholder="Search for a supply"
+                                className="border-1 border-slate-300 h-fit"
+                                onChange={ e => setSearch(e.target.value) }
+                            />
+                            <SelectLabel>Meat Supplies</SelectLabel>
+                            {filteredSupplies.map((item) => (
+                                <SelectItem key={item.code} value={item.code!}>{item.code} - {item.name}</SelectItem>
+                            ))}
+                        </SelectGroup>
                     </SelectContent>
                 </Select>
             </div>
@@ -169,13 +189,12 @@ export function EditMeatOrder({ order, claims, setActiveTab, setReload }: Props)
                 >
                     Back to Orders
                 </Button>
-                <Button 
-                    onClick={ () => handleSubmit() } 
-                    className="!bg-darkbrown text-light hover:opacity-90"
-                    disabled={onProcess}
-                >
-                    <FormLoader onProcess={ onProcess } label="Update Order" loadingLabel="Updating Order" />
-                </Button>
+                <UpdateButton
+                    handleSubmit={ handleSubmit }
+                    onProcess={ onProcess }
+                    label="Update Order"
+                    loadingLabel="Update Order"
+                />
             </div>
         </section>
     );

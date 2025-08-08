@@ -1,3 +1,4 @@
+import { capitalizeWords } from "@/lib/formatter";
 import { BASE_URL, getTokenFromLocalStorage } from "@/lib/utils";
 import { Supply } from "@/types/supply";
 
@@ -41,7 +42,7 @@ export class SupplyService {
 	static async addSupply(supply: Supply) {
 		const payload = {
 			...supply,
-			name: supply.name?.toUpperCase(),
+			name: capitalizeWords(supply.name!),
 			unitQuantity: Number(supply.unitQuantity),
 			unitPriceInternal: Number(supply.unitPriceInternal),
 			unitPriceExternal: Number(supply.unitPriceExternal)
@@ -63,12 +64,10 @@ export class SupplyService {
 		return res.json();
 	}
 
-	static async updateSupply(supply: Supply) {
-		console.log(JSON.stringify(supply));
-		
+	static async updateSupply(supply: Supply) {		
 		const payload = {
 			...supply,
-			name: supply.name?.toUpperCase(),
+			name: capitalizeWords(supply.name!),
 			unitQuantity: Number(supply.unitQuantity),
 			unitPriceInternal: Number(supply.unitPriceInternal),
 			unitPriceExternal: Number(supply.unitPriceExternal)

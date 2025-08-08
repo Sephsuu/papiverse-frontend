@@ -71,8 +71,8 @@ export default function SupplyOrders() {
                     height={40}
                 />
                 <div>
-                    <div className="text-xl font-semibold">{activeTab ? "Pending Supply Orders" : "Supply Order History"}</div>
-                    <div className="text-sm -mt-1">Showing {activeTab ? "all pending supply orders" : "supply order history"} for branch { "[Branch Name]" }</div>
+                    <div className="text-xl font-semibold">{activeTab === 'pending' ? "Pending Supply  Orders" : "Supply Order History"}</div>
+                    <div className="text-sm -mt-1">Showing {activeTab === 'history' ? "all pending supply orders" : "supply order history"} for branch { "[Branch Name]" }</div>
                 </div>
                 <Image
                     src="/images/papiverse_logo.png"
@@ -115,7 +115,7 @@ export default function SupplyOrders() {
                         onClick={ () => {activeTab === 'pending' ? setActiveTab('history') : setActiveTab('pending')} }
                         className="!bg-darkorange text-light shadow-xs hover:opacity-90"
                     >
-                        {activeTab ? <><History />Order History</> : <><CircleFadingArrowUp />Pending Requests</>}
+                        {activeTab === 'pending' ? <><History />Order History</> : <><CircleFadingArrowUp />Pending Requests</>}
                     </Button>
                 </div>
             </div>
@@ -133,8 +133,6 @@ export default function SupplyOrders() {
                 claims={ claims }
                 filteredOrders={ filteredOrders.filter(i => ["APPROVED", "REJECTED", "DELIVERED"].includes(i.status)) }
                 setReload={ setReload }
-                toView={ toView }
-                setToView={ setToView }
                 selectedOrder={ selectedOrder }
                 setSelectedOrder={ setSelectedOrder }
             />}

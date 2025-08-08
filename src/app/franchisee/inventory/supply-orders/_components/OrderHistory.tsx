@@ -1,7 +1,7 @@
 "use client";
 
 import { Download, FileSpreadsheet, SquareMinus, Truck } from "lucide-react";
-import { SetStateAction } from "react";
+import { SetStateAction, useState } from "react";
 import { OrderStatusBadge } from "@/components/ui/badge";
 import { SupplyOrder } from "@/types/supplyOrder";
 import { formatDateToWords, formatToPeso } from "@/lib/formatter";
@@ -12,20 +12,26 @@ import { SupplyOrderService } from "@/services/SupplyOrderService";
 import { InventoryService } from "@/services/InventoryService";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Claim } from "@/types/claims";
+import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { AddButton, Button } from "@/components/ui/button";
+import { FormLoader } from "@/components/ui/loader";
+import { toast } from "sonner";
 
 interface Props {
     claims: Claim;
     filteredOrders: SupplyOrder[];
     setReload: React.Dispatch<SetStateAction<boolean>>;
-    toView: SupplyOrder | undefined;
-    setToView: (i: SupplyOrder | undefined) => void;
     selectedOrder: SupplyOrder | undefined;
     setSelectedOrder: (i: SupplyOrder | undefined) => void;
 }
 
-export function OrderHistory({ claims, filteredOrders, setReload, toView, setToView, selectedOrder, setSelectedOrder }: Props) {
+export function OrderHistory({ claims, filteredOrders, setReload, selectedOrder, setSelectedOrder }: Props) {
+    const [onProcess, setProcess] = useState(false);
+    const [delivered, setDelivered] = useState<number>();
+    
     async function handleReceived(id: number, meatApproved: boolean, snowApproved: boolean) {
         try {
+            setProcess(true);
             await SupplyOrderService.updateOrderStatus(id, "DELIVERED", meatApproved, snowApproved);
             await InventoryService.createInventoryOrder({
                 branchId: claims.branch.branchId,
@@ -33,10 +39,13 @@ export function OrderHistory({ claims, filteredOrders, setReload, toView, setToV
                 source: "ORDER",
                 orderId: id,
             });
+            toast.success('Order successfully marked as DELIVERED and supplies are added to inventory.')
         } catch (error) {
             console.log(error);
         } finally {
             setReload(prev => !prev);
+            setProcess(false);
+            setDelivered(undefined);
         }
     }
     if (selectedOrder) return <ViewFullOrder 
@@ -73,7 +82,7 @@ export function OrderHistory({ claims, filteredOrders, setReload, toView, setToV
                             <Checkbox
                                 id={ String(item.orderId!) } 
                                 checked={ item.status === "DELIVERED" }
-                                onCheckedChange={ () => handleReceived(item.orderId!, true, true) } 
+                                onCheckedChange={ () => setDelivered(item.orderId) } 
                                 className="border-dark data-[state=checked]:bg-blue data-[state=checked]:border-blue" 
                                 disabled={item.status === "REJECTED" || item.status === "DELIVERED"} 
                             />
@@ -96,6 +105,24 @@ export function OrderHistory({ claims, filteredOrders, setReload, toView, setToV
                 )) : (<div className="my-2 text-sm text-center col-span-6">There are no previous orders yet.</div>)
             }
             <div className="text-gray text-sm ms-2">Showing { filteredOrders.length.toString() } of { filteredOrders.length.toString() } results.</div>
+        
+            <Dialog open={ Boolean(delivered) } onOpenChange={ (open) => { if (!open) setDelivered(undefined) } }>
+                <DialogContent>
+                    <DialogTitle className="text-sm">Are you sure that this order is <span className="text-blue">DELIVERED</span>?</DialogTitle>
+                    <div className="flex justify-end gap-4">
+                        <DialogClose className="text-sm">Close</DialogClose>
+                        <Button 
+                            onClick={ () => handleReceived(delivered!, true, true) }
+                            disabled={ onProcess }
+                            size="sm"
+                            className="!bg-darkgreen hover:opacity-90"
+                        >
+                            {!onProcess && <Truck className="w-4 h-4 text-light" />}
+                            <FormLoader onProcess={ onProcess } label="Yes, Order is Delivered" loadingLabel="Processing Order" />
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </section>
     );
 }
