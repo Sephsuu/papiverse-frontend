@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { FormLoader } from "@/components/ui/loader";
 import { Separator } from "@/components/ui/separator";
 import { OrderModalSkeleton } from "@/components/ui/skeleton";
+import { ToastError } from "@/components/ui/sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { formatDateToWords, formatToPeso } from "@/lib/formatter";
 import { InventoryService } from "@/services/InventoryService";
@@ -77,14 +78,14 @@ export function ViewOrderModal({ claims, editable = true, toView, setToView, set
                 await SupplyOrderService.updateOrderStatus(toView.orderId!, "TO_FOLLOW", meatApproved, snowApproved)
                 return toast.success(`Order ${toView.meatCategory!.meatOrderId} and ${toView.snowfrostCategory!.snowFrostOrderId} updated status to TO FOLLOW`);
             }
-        } catch (error) { toast.error(`${error}`) } 
+        } catch (error) { toast(<ToastError message={ String(error) } />) } 
         finally {
             setProcess(false);
             setToView(undefined);
             setReload(prev => !prev);
         }
     }
-    
+
     return(
         <Dialog open onOpenChange={ open => { if (!open) setToView?.(undefined) } }>
             <DialogContent>

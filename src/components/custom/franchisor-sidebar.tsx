@@ -1,7 +1,7 @@
 "use client"
 
 import { usePathname, useRouter } from "next/navigation";
-import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarProvider } from "../ui/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarProvider, SidebarTrigger } from "../ui/sidebar";
 import Link from "next/link";
 import Image from "next/image";
 import { adminRoute, franchiseeRoute } from "@/lib/routes";
@@ -11,14 +11,16 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
-import { PapiverseLoading, SidebarLoading } from "../ui/loader";
+import { SidebarLoading } from "../ui/loader";
 import { AuthService } from "@/services/AuthService";
+import { useState } from "react";
 
 export function AdminSidebar() {
     const router = useRouter();
     const pathname = usePathname();
     const hideSidebar = pathname === "/auth" || pathname === "/";
     const { claims, loading } = useAuth();
+    const [isCollapsed, setIsCollapsed] = useState(false);
 
     async function handleLogout() {
         await AuthService.deleteCookie();
@@ -35,8 +37,12 @@ export function AdminSidebar() {
                 variant="floating" 
                 collapsible="icon"
             >
+                <SidebarTrigger 
+                    className="rounded-full shadow-6xl bg-white absolute z-50 right-[-20px] top-[47%] -translate-x-1/2 -translate-y-1/2"
+                    onClick={() => setIsCollapsed(!isCollapsed)}
+                />
                 <SidebarContent 
-                    className="rounded-md"
+                    className={ `rounded-md ${isCollapsed && "px-1"}` }
                     style={{ backgroundImage: "url(/images/sidebar_bg.svg)" }}
                 >
                     <Link href="/auth/login">
@@ -48,7 +54,7 @@ export function AdminSidebar() {
                             className="mx-auto mt-4"
                         />
                     </Link>
-                    <SidebarMenu className="mt-3">
+                    <SidebarMenu className={ `mt-3 ${isCollapsed && "flex flex-col justify-center items-center"}` }>
                         {adminRoute.map((item, index) => (
                             item.children.length !== 0 ?
                             <Collapsible className="group/collapsible" key={ index }>

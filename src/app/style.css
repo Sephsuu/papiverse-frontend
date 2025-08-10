@@ -4,6 +4,21 @@
     initial-value: solid;
 }
 
+/* Example for react-toastify */
+
+.Toastify__toast--error {
+  font-weight: 600; /* emibold */
+  color: #8B0000;   /* dark red color */
+}
+
+/* If color doesn't affect text inside, try this */
+
+.Toastify__toast--error > * {
+  font-weight: 600;
+  color: #8B0000 !important;
+}
+
+
 button, a {
     cursor: pointer;
 }

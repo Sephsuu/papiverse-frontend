@@ -5,15 +5,16 @@ import { PapiverseLoading } from "@/components/ui/loader";
 import { Select, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Toaster } from "@/components/ui/sonner";
 import { useAuth } from "@/hooks/use-auth";
-import { formatDateToWords, getWeekday } from "@/lib/formatter";
 import { InventoryService } from "@/services/InventoryService";
 import { InventoryLog } from "@/types/inventory-log";
 import { Download, Funnel } from "lucide-react";
 import Image from "next/image";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Separator } from "@/components/ui/separator";
+import { OrderLogs } from "./_components/OrderLogs";
+import { InputLogs } from "./_components/InputLogs";
+
+const tabs = ['Order Logs', 'Input Logs'];
 
 export default function InventoryLogs() {
     const { claims, loading: authLoading } = useAuth();
@@ -21,6 +22,7 @@ export default function InventoryLogs() {
     const [search, setSearch] = useState('');
     const [logs, setLogs] = useState<InventoryLog[]>([]);
     const [filteredLogs, setFilteredLogs] = useState<InventoryLog[]>([]);
+    const [activeTab, setActiveTab] = useState('Input Logs');
 
     useEffect(() => {
         async function fetchData() {
@@ -38,46 +40,13 @@ export default function InventoryLogs() {
         if (find !== '') {
             setFilteredLogs(logs.filter(
                 (i) => i.source.toLowerCase().includes(find) ||
-                i.orderId!.toString().includes(find)
+                (i.orderId !== null && i.orderId !== undefined && i.orderId.toString().includes(find)) ||
+                i.rawMaterialCode.toLowerCase().includes(find) ||
+                i.rawMaterialName.toLowerCase().includes(find)
             ))
         } else setFilteredLogs(logs);
     }, [search, logs]);
-
-    const groupedByDateAndOrder = filteredLogs.reduce<Record<string, Record<string, InventoryLog[]>>>((acc, log) => {
-        if (!log.dateTime) {
-            return acc; 
-        }
-        const dateOnly = log.dateTime.slice(0, 10);
-        if (!acc[dateOnly]) {
-            acc[dateOnly] = {};
-        }
-        const orderKey = String(log.orderId);
-        if (!acc[dateOnly][orderKey]) {
-            acc[dateOnly][orderKey] = [];
-        }
-        acc[dateOnly][orderKey].push(log);
-        return acc;
-    }, {});
-    console.log(groupedByDateAndOrder);
     
-    function flattenGroupedLogsWithOrders(
-        groupedLogsByDateOrder: Record<string, Record<string, InventoryLog[]>>
-        ): { date: string; orders: { orderId: string | null; logs: InventoryLog[] }[] }[] {
-        const result: { date: string; orders: { orderId: string | null; logs: InventoryLog[] }[] }[] = [];
-
-        Object.entries(groupedLogsByDateOrder).forEach(([date, orders]) => {
-            const ordersList: { orderId: string | null; logs: InventoryLog[] }[] = [];
-
-            Object.entries(orders).forEach(([orderId, logs]) => {
-            const parsedOrderId = orderId === "null" ? null : orderId;
-            ordersList.push({ orderId: parsedOrderId, logs });
-            });
-
-            result.push({ date, orders: ordersList });
-        });
-
-        return result;
-    }
     if (loading || authLoading) return <PapiverseLoading />
     return(
         <section className="w-full py-4 px-2">
@@ -135,46 +104,26 @@ export default function InventoryLogs() {
                     </Button> */}
                 </div>
             </div>
+            <div className="flex w-fit rounded-full bg-light shadow-xs my-2">
+                {tabs.map((item, index) => (
+                    <button 
+                        onClick={ () => setActiveTab(item) }
+                        key={ index }
+                        className={ `w-30 py-0.5 rounded-full text-sm ${activeTab === item && "bg-darkorange text-light"}` }
+                    >
+                        { item }
+                    </button>
+                ))}
+            </div>
 
-            {flattenGroupedLogsWithOrders(groupedByDateAndOrder).map((item, index) => (
-                <div className="my-1" key={ item.date }>
-                    <Accordion type="multiple">
-                        <div className="flex gap-2 items-center w-fit font-semibold py-2 px-4 border-1 border-gray-300 shadow-xs bg-light rounded-t-xl z-50">
-                            <div>{formatDateToWords(item.date)}</div> 
-                            <div className="bg-dark h-fit rounded-sm text-light px-2 font-semibold text-[10px]">{getWeekday(item.date)}</div>
-                        </div>
-                        {item.orders.map((subItem, index) => (
-                            <AccordionItem value={ String(subItem.orderId) } key={ index }>
-                                <AccordionTrigger className="rounded-none bg-light px-4 shadow-xs">
-                                    <div className="w-full grid grid-cols-4">
-                                        <div>Order ID: <span className="font-semibold">{ subItem.orderId || "None" }</span></div>
-                                        <div>Source: <span className="font-semibold">{ subItem.logs[0].source }</span></div>
-                                        <div>Type: <span className="font-semibold">{ subItem.logs[0].type === "IN" ? "INGOING" : "OUTGOING" }</span></div>
-                                        <div className="font-semibold">{ subItem.logs[0].branchName }</div>
-                                    </div>
-                                </AccordionTrigger> 
-                                <AccordionContent className="px-4 bg-light border-b-darkred border-1">
-                                    
-                                        {subItem.logs.map((subSubItem, index) => (
-                                            <Fragment key={ index }>
-                                                <div className="grid grid-cols-4 py-2">
-                                                    <div>{ subSubItem.rawMaterialCode }</div>
-                                                    <div>Qty: { subSubItem.quantityChanged }</div>
-                                                    <div>{ subSubItem.rawMaterialName }</div>
-                                                    <div>{ subSubItem.dateTime }</div>
-                                                </div>
-                                                <Separator />
-                                            </Fragment>
-                                        ))}
-                                    
-                                </AccordionContent>
-                            </AccordionItem>
-        
-                        ))}
-                    </Accordion>
-                    
-                </div>
-            ))}
+            {activeTab === 'Order Logs' && (
+                <OrderLogs logs={ filteredLogs.filter(i => i.source === 'ORDER') } />
+            )}
+            {activeTab === 'Input Logs' && (
+                <InputLogs logs={ filteredLogs.filter(i => i.source === 'INPUT') } />
+            )}
+
+            
         </section>
     );
 }
