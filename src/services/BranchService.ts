@@ -4,8 +4,8 @@ import { Branch } from "@/types/branch";
 const URL = `${BASE_URL}/branches`; 
 
 export class BranchService {
-	static async getAllBranches() {
-		const res = await fetch(`${URL}/get-branches`, {
+	static async getAllBranches(page : number, size : number) {
+		const res = await fetch(`${URL}/get-branches?page=${page}&size=${size}`, {
 			method: 'GET',
 			headers: {
 				'Content-Type' : 'application/json',

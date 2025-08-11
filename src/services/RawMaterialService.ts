@@ -5,8 +5,8 @@ import { Supply } from "@/types/supply";
 const URL = `${BASE_URL}/raw-materials`; 
 
 export class SupplyService {
-	static async getAllSupplies() {
-		const res = await fetch(`${URL}/get-all`, {
+	static async getAllSupplies(page : number, size : number) {
+		const res = await fetch(`${URL}/get-all?page=${page}&size=${size}`, {
 			method: 'GET',
 			headers: { 
 				'Content-Type': 'application/json',
@@ -90,14 +90,10 @@ export class SupplyService {
 	}
 
 	static async deleteSupply(code: string) {
-		console.log(code);
-		
 		const res = await fetch(`${URL}/delete-by-code?code=${code}`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json'},
 		});
-		console.log(res);
-		
 
 		if (!res.ok) {
 			const err = await res.json();

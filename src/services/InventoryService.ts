@@ -4,16 +4,14 @@ import { Inventory } from "@/types/inventory";
 const URL = `${BASE_URL}/inventory`;
 
 export class InventoryService {
-	static async getInventoryByBranch(id: number) {
-		const res = await fetch(`${URL}/get-by-branch?id=${id}`, {
+	static async getInventoryByBranch(id: number,page : number, size : number ) {
+		const res = await fetch(`${URL}/get-by-branch?id=${id}&page=${page}&size=${size}`, {
 			method: 'GET',
 			headers: { 
 				'Content-Type': 'application/json', 
 				'Authorization' : `Bearer ${getTokenFromLocalStorage()}`,
 			},
 		})
-		console.log(res);
-		
 
 		if (!res.ok) {
 			const err = await res.json();
@@ -23,8 +21,8 @@ export class InventoryService {
 		return res.json();
 	}
 
-	static async getInventoryAudits(id: number) {
-		const res = await fetch(`${URL}/get-audits?branchId=${id}`, {
+	static async getInventoryAudits(id: number, page : number, size : number) {
+		const res = await fetch(`${URL}/get-audits?branchId=${id}&page=${page}&size=${size}`, {
 			method: 'GET',
 			headers: { 
 				'Content-Type': 'application/json', 

@@ -34,7 +34,8 @@ export function AnnouncementSection() {
     if (loading)  return <PapiverseLoading />
     return(
         <section className="w-full py-4">
-            <button onClick={ () => setOpen(!open) } className="rounded-full w-10 h-10 shadow-sm"><Plus /></button>
+            <button onClick={ () => setOpen(!open) } className="rounded-full w-10 h-10  ring-1 ring-blue-300 flex items-center justify-center ">
+                <Plus className="w-7 h-7" /></button>
             {announcement.map((item, index) => (
                 <div className="bg-light rounded-md shadow-sm m-4 pt-4 py-2" key={ index }>
                     <div className="flex items-center gap-2 mb-2 px-4">

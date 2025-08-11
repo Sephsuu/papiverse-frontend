@@ -5,7 +5,7 @@ import { AnnouncementSection } from "./_components/AnnouncementSection";
 
 export default function AnnouncementPage() {
     return(
-        <section className="grid grid-cols-4 w-full">
+        <section className="grid grid-cols-4 w-full h-full overflow-y-auto">
             {/* <Toaster closeButton position="top-center" /> */}
             {/* <div className="absolute flex items-center w-full gap-2 p-4 z-10">
                 <Image
@@ -23,15 +23,15 @@ export default function AnnouncementPage() {
                     className="ms-auto"
                 />
             </div> */}
-            <div className="h-screen col-span-1">
+            <div className="col-span-1">
                 
             </div>
 
-            <div className="h-screen col-span-2">
+            <div className="col-span-2">
               <AnnouncementSection />
             </div>
 
-            <div className="h-screen col-span-1 bg-darkyellow">
+            <div className=" col-span-1">
               
             </div>
             
