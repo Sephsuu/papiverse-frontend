@@ -28,7 +28,7 @@ export default function InventoryTable() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const data = await InventoryService.getInventoryByBranch(claims.branch.branchId);
+                const data = await InventoryService.getInventoryByBranch(claims.branch.branchId, 0, 1000);
                 setInventories(data);
             } catch (error) { toast.error(`${error}`) }
             finally { setLoading(false) }
