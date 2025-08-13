@@ -41,7 +41,7 @@ export default function BranchesTable() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const data = await BranchService.getAllBranches();
+                const data = await BranchService.getAllBranches(0, 1000);
                 setBranches(data);
             } catch (error) { toast.error(`${error}`) }
             finally { setLoading(false) }
