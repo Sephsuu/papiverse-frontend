@@ -24,7 +24,7 @@ export default function OrderRequest() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const data = await SupplyService.getAllSupplies();
+                const data = await SupplyService.getAllSupplies(0, 1000);
                 const fixedPrice = data.map((supply: Supply) => ({
                     ...supply, unitPrice: claims.branch.isInternal ? supply.unitPriceInternal : supply.unitPriceExternal
                 }));
