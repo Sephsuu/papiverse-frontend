@@ -30,16 +30,16 @@ export function ViewFullOrder({ claims, selectedOrder, setSelectedOrder, setRelo
     const [meatApproved, setMeatApproved] = useState(selectedOrder.meatCategory?.isApproved);
     const [snowApproved, setSnowApproved] = useState(selectedOrder.snowfrostCategory?.isApproved);
 
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const data = await InventoryService.getInventoryByBranch(claims.branch.branchId);
-                setInventory(data);
-                setLoading(false);
-            } catch (error) { `${error}` }
-        }
-        fetchData();
-    }, []);
+    // useEffect(() => {
+    //     async function fetchData() {
+    //         try {
+    //             const data = await InventoryService.getInventoryByBranch(claims.branch.branchId);
+    //             setInventory(data);
+    //             setLoading(false);
+    //         } catch (error) { `${error}` }
+    //     }
+    //     fetchData();
+    // }, []);
 
     function enableSave(meatApproved: boolean, snowApproved: boolean) {
         if (meatApproved !== selectedOrder.meatCategory!.isApproved || snowApproved !== selectedOrder.snowfrostCategory!.isApproved) {

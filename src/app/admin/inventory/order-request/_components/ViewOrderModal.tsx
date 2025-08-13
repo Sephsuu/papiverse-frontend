@@ -35,16 +35,16 @@ export function ViewOrderModal({ claims, editable = true, toView, setToView, set
     const [meatApproved, setMeatApproved] = useState<boolean>(toView.meatCategory!.isApproved);
     const [snowApproved, setSnowApproved] = useState<boolean>(toView.snowfrostCategory!.isApproved);
 
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const data = await InventoryService.getInventoryByBranch(claims.branch.branchId);
-                setInventory(data);
-                setLoading(false);
-            } catch (error) { `${error}` }
-        }
-        fetchData();
-    }, []);
+    // useEffect(() => {
+    //     async function fetchData() {
+    //         try {
+    //             const data = await InventoryService.getInventoryByBranch(claims.branch.branchId);
+    //             setInventory(data);
+    //             setLoading(false);
+    //         } catch (error) { `${error}` }
+    //     }
+    //     fetchData();
+    // }, []);
 
     function enableSave(meatApproved: boolean, snowApproved: boolean) {
         if (meatApproved !== toView.meatCategory!.isApproved || snowApproved !== toView.snowfrostCategory!.isApproved) {
