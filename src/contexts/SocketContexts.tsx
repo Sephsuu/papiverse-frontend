@@ -30,7 +30,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    const socketInstance = io('https://x848qg05-3001.asse.devtunnels.ms/'); // Your NestJS server URL
+    const socketInstance = io('https://x848qg05-3001.asse.devtunnels.ms'); // Your NestJS server URL
 
     socketInstance.on('connect', () => {
       setIsConnected(true);

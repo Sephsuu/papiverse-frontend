@@ -116,4 +116,38 @@ function FullOorderSkeleton() {
   )
 }
 
+
+export function CreateModalSkeleton() {
+  return(
+    <DialogContent>
+      <DialogTitle>
+        <Skeleton className="w-50 h-5" />
+      </DialogTitle>
+      <div className="grid gap-4">
+        <div className="grid gap-2">
+          <Skeleton className="w-30 h-5" />
+          <Skeleton className="w-full h-8" />
+        </div>
+        <div className="grid gap-2">
+          <Skeleton className="w-30 h-5" />
+          <Skeleton className="w-full h-8" />
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="grid gap-2">
+            <Skeleton className="w-30 h-5" />
+            <Skeleton className="w-full h-8" />
+          </div>
+          <div className="grid gap-2">
+            <Skeleton className="w-30 h-5" />
+            <Skeleton className="w-full h-8" />
+          </div>
+        </div>
+        <div className="flex justify-end gap-2">
+          <Skeleton className="w-20 h-10" />
+          <Skeleton className="w-20 h-10" />
+        </div>
+      </div>
+    </DialogContent>
+  );
+}
 export { Skeleton, OrderModalSkeleton, FullOorderSkeleton }

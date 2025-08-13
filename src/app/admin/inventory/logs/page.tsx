@@ -27,7 +27,7 @@ export default function InventoryLogs() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const data = await InventoryService.getInventoryAudits(claims.branch.branchId);
+                const data = await InventoryService.getInventoryAudits(claims.branch.branchId, 0, 1000);
                 setLogs(data);                
             } catch (error) { toast.error(`${error}`) }
             finally { setLoading(false) }

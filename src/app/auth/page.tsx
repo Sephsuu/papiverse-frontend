@@ -19,6 +19,8 @@ export default function Login() {
 
     async function handleSubmit() {
         try {
+            console.log('cbnehbfe');
+            
             setProcess(true);
             const token = await AuthService.authenticateUser(credentials);
             if (token) {

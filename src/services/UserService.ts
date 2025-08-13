@@ -4,8 +4,8 @@ import { User } from "@/types/user";
 const URL = `${BASE_URL}/user`; 
 
 export class UserService {
-    static async getAllUsers() {
-        const res = await fetch(`${URL}/get-users`, {
+    static async getAllUsers(page: number, size: number) {
+        const res = await fetch(`${URL}/get-users?page=${page}&size=${size}`, {
             method: 'GET',
             headers: {
                 'Content-Type' : 'application/json' ,

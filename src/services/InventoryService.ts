@@ -4,7 +4,7 @@ import { Inventory } from "@/types/inventory";
 const URL = `${BASE_URL}/inventory`;
 
 export class InventoryService {
-	static async getInventoryByBranch(id: number,page : number, size : number ) {
+	static async getInventoryByBranch(id: number, page : number, size : number ) {
 		const res = await fetch(`${URL}/get-by-branch?id=${id}&page=${page}&size=${size}`, {
 			method: 'GET',
 			headers: { 
@@ -12,6 +12,8 @@ export class InventoryService {
 				'Authorization' : `Bearer ${getTokenFromLocalStorage()}`,
 			},
 		})
+		console.log(res);
+		
 
 		if (!res.ok) {
 			const err = await res.json();

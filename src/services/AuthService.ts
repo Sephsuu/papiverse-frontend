@@ -10,6 +10,8 @@ export class AuthService {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(credentials),
 		})
+		console.log(res);
+		
 
 		if (!res.ok) {
 			const error = await res.json();

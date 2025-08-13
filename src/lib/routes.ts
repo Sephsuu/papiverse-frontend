@@ -1,4 +1,4 @@
-import { ChartNoAxesCombined, Container, Store, UserRound, UsersRound, Wallet } from "lucide-react";
+import { ChartNoAxesCombined, Container, MessageCircleMore, Store, UserRound, UsersRound, Wallet } from "lucide-react";
 
 export const adminRoute = [
     { 
@@ -12,6 +12,14 @@ export const adminRoute = [
         icon: Store,
         href: '/admin/branches',
         children: []
+    },
+    { 
+        title: 'Messages', 
+        icon: MessageCircleMore,
+        children: [
+            { title: 'Users', href: '/admin/messages/users' },
+            { title: 'Group', href: '/admin/inventory/groups' },
+        ]
     },
     { 
         title: 'Inventory', 

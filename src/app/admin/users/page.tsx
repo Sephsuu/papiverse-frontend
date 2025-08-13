@@ -41,7 +41,7 @@ export default function UsersTable() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const data = await UserService.getAllUsers();
+                const data = await UserService.getAllUsers(0, 20);
                 setUsers(data);
             } catch (error) { toast.error(`${error}`) }
             finally { setLoading(false) }
