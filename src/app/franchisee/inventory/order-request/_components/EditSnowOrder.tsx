@@ -56,7 +56,7 @@ export function EditSnowOrder({ order, claims, setActiveTab, setReload }: Props)
                     unitPrice: item.price,
                     unitQuantity: item.quantity  
                 })) ?? [];
-                const data = await SupplyService.getAllSupplies();
+                const data = await SupplyService.getAllSupplies(0, 1000);
                 const fixedPrice = data.filter((i: Supply) => i.category === 'SNOWFROST').map((supply: Supply) => ({
                     ...supply, unitPrice: claims.branch.isInternal ? supply.unitPriceInternal : supply.unitPriceExternal
                 }));
