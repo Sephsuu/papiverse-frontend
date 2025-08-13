@@ -17,8 +17,18 @@ export const useSocket = ({ userId, onNewMessage, onUserTyping, onUserStoppedTyp
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
+    console.log('useSocket effect running with userId:', userId);
+    
+    // Don't initialize socket if userId is not available
+    if (!userId) {
+      console.log('No userId provided, skipping socket initialization');
+      return;
+    }
+
+    console.log('Initializing socket connection to:', `${process.env.NEXT_PUBLIC_API_URL}`);
+
     // Initialize socket connection
-    socketRef.current = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
+    socketRef.current = io(`${process.env.NEXT_PUBLIC_API_URL}messaging`, {
       transports: ['websocket'],
       autoConnect: true,
     });
@@ -30,8 +40,11 @@ export const useSocket = ({ userId, onNewMessage, onUserTyping, onUserStoppedTyp
       console.log('Socket connected:', socket.id);
       setIsConnected(true);
       
-      // Authenticate user
-      socket.emit('authenticate', { userId });
+      // Authenticate user only when userId is available
+      if (userId) {
+        console.log('Sending authenticate event with userId:', userId);
+        socket.emit('authenticate', { userId });
+      }
     });
 
     socket.on('disconnect', () => {
@@ -42,8 +55,13 @@ export const useSocket = ({ userId, onNewMessage, onUserTyping, onUserStoppedTyp
 
     // Authentication handlers
     socket.on('authenticated', (data) => {
-      console.log('User authenticated:', data);
+      console.log('User authenticated successfully:', data);
       setIsAuthenticated(true);
+    });
+
+    socket.on('error', (error) => {
+      console.error('Socket authentication error:', error);
+      setIsAuthenticated(false);
     });
 
     // Message handlers
@@ -68,11 +86,15 @@ export const useSocket = ({ userId, onNewMessage, onUserTyping, onUserStoppedTyp
     // Error handlers
     socket.on('error', (error) => {
       console.error('Socket error:', error);
+      setIsAuthenticated(false);
     });
 
     // Cleanup
     return () => {
+      console.log('Cleaning up socket connection');
       socket.disconnect();
+      setIsConnected(false);
+      setIsAuthenticated(false);
     };
   }, [userId, onNewMessage, onUserTyping, onUserStoppedTyping]);
 
