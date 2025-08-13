@@ -35,7 +35,7 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
     useEffect(() => {
         async function fetchData() {
             try {
-                const data = await SupplyService.getAllSupplies();
+                const data = await SupplyService.getAllSupplies(0, 1000);
                 setSupplies(data);
             } catch (error) { toast.error(`${error}`) }
             finally { setLoading(false) } 

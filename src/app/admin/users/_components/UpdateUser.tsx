@@ -37,7 +37,7 @@ export function UpdateUser({ toUpdate, setUpdate, setReload }: Props) {
     useEffect(() => {
         const fetchBranches = async () => {
             try {
-                const res = await BranchService.getAllBranches();
+                const res = await BranchService.getAllBranches(0, 1000);
                 if (res) {
                     setBranches(res);
                 }
