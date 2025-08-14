@@ -9,7 +9,7 @@ import { BranchService } from "@/services/BranchService";
 import { UserService } from "@/services/UserService";
 import { Branch } from "@/types/branch";
 import { SelectValue } from "@radix-ui/react-select";
-import { BadgeCheck, Download, Funnel, Info, Plus, SquarePen, Trash2 } from "lucide-react";
+import { BadgeCheck, ChevronLeft, ChevronRight, Download, Funnel, Info, Plus, SquarePen, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { CreateBranch } from "./_components/CreateBranch";
 import { Toaster } from "@/components/ui/sonner";
 import { UpdateBranch } from "./_components/UpdateBranch";
+import { Pagination } from "@/components/ui/pagination";
 
 const columns = [
     { title: "Branch Name", style: "" },
@@ -30,24 +31,29 @@ export default function BranchesTable() {
     const [reload, setReload] = useState(false);
     const [onProcess, setProcess] = useState(false);
     const [search, setSearch] = useState('');
-
+    const [paginationTotal, setPaginationTotal] = useState({totalPage : 0, totalElements : 0});
     const [open, setOpen] = useState(false);
     const [toUpdate, setUpdate] = useState<Branch | undefined>();
     const [toDelete, setDelete] = useState<Branch | undefined>();
-
+    const [pagination, setPagination] = useState({ page: 0, size: 10 });
     const [branches, setBranches] = useState<Branch[]>([]);
     const [filteredBranches, setFilteredBranches] = useState<Branch[]>([]);
 
     useEffect(() => {
-        async function fetchData() {
+        async function fetchData(page : number, size :number) {
             try {
-                const data = await BranchService.getAllBranches(0, 1000);
-                setBranches(data);
+                const data = await BranchService.getAllBranches(page, size);
+                setBranches(data.content);
+                setPaginationTotal(prev =>  ({
+                    ...prev,
+                    totalPage : data.totalPages,
+                    totalElements: data.totalElements
+                }))
             } catch (error) { toast.error(`${error}`) }
             finally { setLoading(false) }
         }
-        fetchData();
-    }, [reload]);
+        fetchData(pagination.page, pagination.size);
+    }, [reload, pagination]);
 
     useEffect(() => {
         const find = search.toLowerCase().trim();
@@ -157,7 +163,8 @@ export default function BranchesTable() {
                 ))
                 : (<div className="my-2 text-sm text-center col-span-6">There are no existing users yet.</div>)
             }
-            <div className="text-gray text-sm">Showing { filteredBranches.length.toString() } of { filteredBranches.length.toString() } results.</div>
+            <Pagination pagination={pagination} paginationTotal={paginationTotal} setPagination={setPagination}/>
+           
 
             {open && (
                 <CreateBranch 
