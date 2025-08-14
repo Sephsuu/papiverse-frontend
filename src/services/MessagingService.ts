@@ -38,4 +38,34 @@ export class MessagingService {
 
         return res.json();
    } 
+
+   static async createDirectConversation(participantIds: number[]) {
+    console.log(participantIds);
+    console.log({ 
+                participants: participantIds,
+                type: 'direct',
+                name: 'none'
+            });
+    
+    
+        const res = await fetch(`${URL}/conversations`, {
+            method: 'POST',
+            headers: {
+                'Content-Type' : 'application/json',
+            },
+            body: JSON.stringify({ 
+                participantIds: participantIds,
+                type: 'direct',
+                name: 'none'
+            })
+        });
+        console.log(res);
+        
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.message || err.error || 'Something went wrong.')
+        }
+
+        return res.json();
+   }
 }

@@ -30,6 +30,8 @@ export default function MessagesPage() {
     const [messageInput, setMessageInput] = useState('');
     const [typingUsers, setTypingUsers] = useState<Set<number>>(new Set());
     const [isTyping, setIsTyping] = useState(false);
+
+    const [reload, setReload] = useState(false);
     
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const typingTimeoutRef = useRef<NodeJS.Timeout>(null);
@@ -109,7 +111,7 @@ export default function MessagesPage() {
         if (claims.userId) {
             fetchData();
         }
-    }, [claims.userId]);
+    }, [claims.userId, reload]);
 
     useEffect(() => {
         async function fetchMessages() {
@@ -134,7 +136,7 @@ export default function MessagesPage() {
                 leaveConversation(selected.id);
             }
         };
-    }, [selected, claims.userId, isAuthenticated, joinConversation, leaveConversation]);
+    }, [selected?.id, messages]);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -201,6 +203,20 @@ export default function MessagesPage() {
         }
     };
 
+    const handleCreateDirectConversation = async (userId: number) => {
+        await MessagingService.createDirectConversation([claims.userId, userId]);
+        setReload(!reload);
+    }
+
+    // Step 1: Extract all participant IDs from all conversations
+    const allParticipantIds = conversations.flatMap(conv => conv.participants);
+
+    // Step 2: Create a Set for efficient lookup
+    const participantIdSet = new Set(allParticipantIds);
+
+    // Step 3: Filter users whose id is NOT in participantIdSet
+    const usersNotInConversations = users.filter(user => !participantIdSet.has(user.id!));
+
     if (loading || authLoading) return <PapiverseLoading />
     
     return(
@@ -252,7 +268,7 @@ export default function MessagesPage() {
                             <button 
                                 onClick={() => setSelected(item)}
                                 key={index}
-                                className={`grid grid-cols-10 p-2 shadow-sm bg-white rounded-md my-1.5 ${selected?.id === item.id && "!bg-orange-200"}`}
+                                className={`w-full flex p-2 shadow-sm bg-white rounded-md my-1.5 ${selected?.id === item.id && "!bg-orange-200"}`}
                             >
                                 <div className="flex col-span-2">
                                     <div className="mx-auto flex font-semibold justify-center items-center bg-darkbrown text-light w-9 h-9 rounded-full">
@@ -305,12 +321,13 @@ export default function MessagesPage() {
                             <div className="flex-col w-full flex-1 bg-white overflow-y-auto pb-8">
                                 {messages.map((item, index) => (
                                     <Fragment key={index}>
-                                        {item.senderId !== claims.userId ? (
-                                            <div className="w-fit max-w-6/10 text-xs bg-light p-2 my-2 ml-2 rounded-t-lg rounded-br-lg">
+                                        {item.senderId === claims.userId ? (
+                                            
+                                            <div className="ms-auto w-fit max-w-6/10 text-xs bg-darkorange p-2 text-light my-2 mr-2 rounded-t-lg rounded-bl-lg">
                                                 {item.content}
                                             </div>
                                         ) : (
-                                            <div className="ms-auto w-fit max-w-6/10 text-xs bg-darkorange p-2 text-light my-2 mr-2 rounded-t-lg rounded-bl-lg">
+                                            <div className="w-fit max-w-6/10 text-xs bg-light p-2 my-2 ml-2 rounded-t-lg rounded-br-lg">
                                                 {item.content}
                                             </div>
                                         )}
@@ -360,6 +377,35 @@ export default function MessagesPage() {
                             </div>
                         </>
                     )}
+                </div>
+
+                {/* NOTIF AND SUGGESTIONS */}
+                <div className="fle flex-col">
+                    <div className="p-4">
+                        <div className="text-lg font-semibold">Suggestions</div>
+                        <div>
+                            {usersNotInConversations.map((item, index) => (
+                                <div 
+                                    key={ index }
+                                    className="flex items-center gap-1 bg-white shadow-sm my-1 p-2 rounded-md"
+                                >
+                                    <div className="w-8 h-8 text-light rounded-full bg-darkbrown flex font-semibold justify-center items-center p-2">
+                                        KP
+                                    </div>
+                                    <div>
+                                        <div className="text-xs font-semibold truncate">{ `${item.firstName} ${item.lastName}` }</div>
+                                        <div className="text-[10px] text-gray truncate">{ item.branch?.branchName }</div>
+                                    </div>
+                                    <button
+                                        onClick={ () => handleCreateDirectConversation(item.id!) }
+                                        className="ms-auto bg-blue rounded-sm p-1"
+                                    >
+                                        <Send className="w-2.5 h-2.5 text-light" />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

@@ -14,11 +14,13 @@ export interface Conversation {
 }
 
 export interface Message {
-    id: number;
+    id: number | string;
     senderId: number;
     content: string;
     messageType: string;
     createdAt: string;
     updatedAt: string;
     parentMessage: number | null;
+    conversationId?: number;
+    isOptimistic?: boolean
 }
