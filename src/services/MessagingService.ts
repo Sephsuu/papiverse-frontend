@@ -39,25 +39,18 @@ export class MessagingService {
         return res.json();
    } 
 
-   static async createDirectConversation(participantIds: number[]) {
-    console.log(participantIds);
-    console.log({ 
-                participants: participantIds,
-                type: 'direct',
-                name: 'none'
-            });
-    
-    
+   static async createDirectConversation(conversation: any) {
+        const payload = {
+            name: conversation.name,
+            type: conversation.type,
+            participantIds: conversation.participantIds
+        }
         const res = await fetch(`${URL}/conversations`, {
             method: 'POST',
             headers: {
                 'Content-Type' : 'application/json',
             },
-            body: JSON.stringify({ 
-                participantIds: participantIds,
-                type: 'direct',
-                name: 'none'
-            })
+            body: JSON.stringify(conversation)
         });
         console.log(res);
         

@@ -115,6 +115,8 @@ export const useSocket = ({ userId, onNewMessage, onUserTyping, onUserStoppedTyp
   };
 
   const sendMessage = (conversationId: number, content: string, messageType: string = 'text') => {
+    console.log('CLAIMS ID: ', userId);
+    
     if (socketRef.current && isAuthenticated) {
       socketRef.current.emit('send_message', {
         conversationId,
