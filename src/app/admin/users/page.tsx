@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { CreateUser } from "./_components/CreateUser";
 import { UpdateUser } from "./_components/UpdateUser";
 import { DeleteUser } from "./_components/DeleteUser";
+import { Pagination } from "@/components/ui/pagination";
 
 const columns = [
     { title: "Full Name", style: "" },
@@ -30,7 +31,8 @@ export default function UsersTable() {
     const [reload, setReload] =  useState(false);
     const [onProcess, setProcess] = useState(false);
     const [search, setSearch] = useState('');
-
+    const [pagination, setPagination] = useState({page : 0, size : 10})
+    const [paginationTotal, setPaginationTotal] = useState({totalPage : 0, totalElements : 0})
     const [open, setOpen] = useState(false);
     const [toUpdate, setUpdate] = useState<User | undefined>();
     const [toDelete, setDelete] = useState<User | undefined>();
@@ -42,7 +44,12 @@ export default function UsersTable() {
         async function fetchData() {
             try {
                 const data = await UserService.getAllUsers(0, 20);
-                setUsers(data);
+                setUsers(data.content);
+                setPaginationTotal((prev) => ({
+                    ...prev,
+                    totalElements : data.totalElements,
+                    totalPage : data.totalPages
+                }))
             } catch (error) { toast.error(`${error}`) }
             finally { setLoading(false) }
         }
@@ -152,7 +159,7 @@ export default function UsersTable() {
                     : (<div className="my-2 text-sm text-center col-span-6">There are no existing users yet.</div>)
                 }
      
-            <div className="text-gray text-sm">Showing { filteredUsers.length.toString() } of { filteredUsers.length.toString() } results.</div>
+            <Pagination pagination={pagination} paginationTotal={paginationTotal} setPagination={setPagination}/>
 
             {open && (
                 <CreateUser 
