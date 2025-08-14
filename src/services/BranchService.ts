@@ -12,6 +12,8 @@ export class BranchService {
 				'Authorization' : `Bearer ${getTokenFromLocalStorage()}` 
 			}
 		});
+		console.log(res);
+		
 		
 		if (!res.ok) {
 			const err = await res.json();

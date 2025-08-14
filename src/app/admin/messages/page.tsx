@@ -87,12 +87,12 @@ export default function MessagesPage() {
             try {
                 const usersRes = await UserService.getAllUsers(0, 100);
                 const convoRes = await MessagingService.getConversations(claims.userId);
-                setUsers(usersRes);
+                setUsers(usersRes.content);
                 
                 const mappedConvos = convoRes.map((convo: Conversation) => ({
                     ...convo,
                     participant: convo.participants.map(item => {
-                        const user = usersRes.find((i: User) => i.id === item);
+                        const user = usersRes.content.find((i: User) => i.id === item);
                         return {
                             id: user?.id,
                             firstName: user?.firstName,
@@ -112,6 +112,7 @@ export default function MessagesPage() {
             fetchData();
         }
     }, [claims.userId, reload]);
+    
 
     useEffect(() => {
         async function fetchMessages() {
@@ -277,10 +278,13 @@ export default function MessagesPage() {
                                 </div>
                                 <div className="col-span-6 pl-1">
                                     <div className="text-start font-semibold text-sm truncate">
-                                        {item.participant[0].id !== claims.userId ? 
+                                        {item.name === 'none' ? (
+                                            item.participant[0].id !== claims.userId ? 
                                             `${item.participant[0].firstName} ${item.participant[0].lastName}` :
                                             `${item.participant[1].firstName} ${item.participant[1].lastName}`
-                                        }
+                                        ) : (
+                                            item.name
+                                        )}
                                     </div>
                                     <div className="text-start text-xs text-gray truncate">{"Message"}</div>
                                 </div>
