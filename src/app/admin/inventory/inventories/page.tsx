@@ -29,6 +29,7 @@ export default function InventoryTable() {
     const [open, setOpen] = useState(false);
     const [pagination, setPagination] = useState({ page: 0, size: 20 , numberOfElements : 0});
     const [paginationTotal, setPaginationTotal] = useState({totalPage : 0, totalElements : 0});
+    const [shown, setShown] = useState(Number)
     const [toDelete, setDelete] = useState<Inventory | undefined>();
 
     const [inventories, setInventories] = useState<Inventory[]>([]);
@@ -52,7 +53,12 @@ export default function InventoryTable() {
             finally { setLoading(false) }
         }
         fetchData(pagination.page, pagination.size);
-    }, [claims, reload, pagination]);
+    }, [claims, reload, pagination.page]);
+    
+    useEffect(() => {
+       setShown(pagination.page * pagination.size  + pagination.numberOfElements)
+    }, [inventories]);
+
 
     useEffect(() => {
         const find = search.toLowerCase().trim();
@@ -161,7 +167,8 @@ export default function InventoryTable() {
                     : (<div className="my-2 text-sm text-center col-span-6">There are no existing inventories yet.</div>)
                 }
             </div>
-           <Pagination pagination={pagination} paginationTotal={paginationTotal} setPagination={setPagination}/>
+           <Pagination pagination={pagination} paginationTotal={paginationTotal} 
+           shown={shown} setPagination={setPagination}/>
             {open && (
                 <CreateInventory 
                     claims={ claims }

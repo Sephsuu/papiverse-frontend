@@ -36,6 +36,7 @@ export default function SuppliesTable() {
     const [pagination, setPagination] = useState({page : 0, size : 20, numberOfElements: 0})
     const [paginationTotal, setPaginationTotal] = useState({totalPage: 0, totalElements : 0})
     const [supplies, setSupplies] = useState<Supply[]>([]);
+    const [shown, setShown] = useState(Number)
     const [filteredSupplies, setFilteredSupplies] = useState<Supply[]>([]);
 
     useEffect(() => {
@@ -55,8 +56,13 @@ export default function SuppliesTable() {
             } catch (error) { toast.error(`${error}`) }
             finally { setLoading(false) }
         }
+        console.log("nagbago na ko ");
         fetchData(pagination.page, pagination.size);
-    }, [reload, pagination]);
+    }, [reload, pagination.page]);
+
+    useEffect(() => {
+       setShown(pagination.page * pagination.size  + pagination.numberOfElements)
+    }, [supplies]);
 
     useEffect(() => {
         const find = search.toLowerCase().trim();
@@ -176,7 +182,8 @@ export default function SuppliesTable() {
                 ))
                 : (<div className="my-2 text-sm text-center col-span-6">There are no existing users yet.</div>)
             }
-           <Pagination pagination={pagination} paginationTotal={paginationTotal} setPagination={setPagination}/>
+           <Pagination pagination={pagination} paginationTotal={paginationTotal}
+           shown={shown} setPagination={setPagination}/>
 
             {open && (
                 <CreateSupply 
