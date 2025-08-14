@@ -4,25 +4,25 @@ import React from "react"
 interface Props {
     paginationTotal : {
         totalPage: number,
-        totalElements : number,
+        totalElements : number
     }
     pagination : {
         page : number,
-        size : number
+        size : number,
+        numberOfElements : number
     }
     setPagination : React.Dispatch<React.SetStateAction<{
         page : number,
-        size : number
+        size : number,
+        numberOfElements :number
     }>>
 }
 
 
 export function Pagination({paginationTotal, pagination, setPagination} : Props){
-    console.log(paginationTotal)
-    console.log(pagination)
     return(
         <div className="flex justify-between">   
-                 <div className="text-gray text-sm">Showing { pagination.size} of {paginationTotal.totalElements} results.</div>
+                 <div className="text-gray text-sm">Showing {pagination.page *  pagination.size + pagination.numberOfElements } of {paginationTotal.totalElements} results.</div>
                 <div className="mr-10 flex gap-5">
                     <button className="text-gray text-sm flex items-center hover:text-black transition-colors duration-75"
                     disabled={pagination.page === 0}

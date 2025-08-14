@@ -31,7 +31,7 @@ export default function UsersTable() {
     const [reload, setReload] =  useState(false);
     const [onProcess, setProcess] = useState(false);
     const [search, setSearch] = useState('');
-    const [pagination, setPagination] = useState({page : 0, size : 10})
+    const [pagination, setPagination] = useState({page : 0, size : 10, numberOfElements :0})
     const [paginationTotal, setPaginationTotal] = useState({totalPage : 0, totalElements : 0})
     const [open, setOpen] = useState(false);
     const [toUpdate, setUpdate] = useState<User | undefined>();
@@ -41,19 +41,23 @@ export default function UsersTable() {
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
 
     useEffect(() => {
-        async function fetchData() {
+        async function fetchData(page : number, size : number) {
             try {
-                const data = await UserService.getAllUsers(0, 20);
+                const data = await UserService.getAllUsers(page, size);
                 setUsers(data.content);
                 setPaginationTotal((prev) => ({
                     ...prev,
                     totalElements : data.totalElements,
                     totalPage : data.totalPages
                 }))
+                setPagination(prev =>  ({
+                    ...prev,
+                    numberOfElements : data.numberOfElements
+                }))
             } catch (error) { toast.error(`${error}`) }
             finally { setLoading(false) }
         }
-        fetchData();
+        fetchData(pagination.page, pagination.size);
     }, [reload]);
 
     useEffect(() => {

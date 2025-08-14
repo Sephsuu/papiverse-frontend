@@ -18,6 +18,7 @@ import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { CreateInventory } from "./_components/CreateInventory";
+import { Pagination } from "@/components/ui/pagination";
 
 export default function InventoryTable() {
     const { claims, loading: authLoading } = useAuth();
@@ -26,21 +27,32 @@ export default function InventoryTable() {
     const [onProcess, setProcess] = useState(false);
     const [search, setSearch] = useState('');
     const [open, setOpen] = useState(false);
+    const [pagination, setPagination] = useState({ page: 0, size: 20 , numberOfElements : 0});
+    const [paginationTotal, setPaginationTotal] = useState({totalPage : 0, totalElements : 0});
     const [toDelete, setDelete] = useState<Inventory | undefined>();
 
     const [inventories, setInventories] = useState<Inventory[]>([]);
     const [filteredInventories, setFilteredInventories] = useState<Inventory[]>([]);
 
     useEffect(() => {
-        async function fetchData() {
+        async function fetchData(page : number, size : number) {
             try {
-                const data = await InventoryService.getInventoryByBranch(claims.branch.branchId, 0, 100);
-                setInventories(data);
+                const data = await InventoryService.getInventoryByBranch(claims.branch.branchId, page, size);
+                setInventories(data.content);
+                 setPaginationTotal(prev =>  ({
+                    ...prev,
+                    totalPage : data.totalPages,
+                    totalElements: data.totalElements
+                }))
+                setPagination(prev =>  ({
+                    ...prev,
+                    numberOfElements : data.numberOfElements
+                }))
             } catch (error) { toast.error(`${error}`) }
             finally { setLoading(false) }
         }
-        fetchData();
-    }, [claims, reload]);
+        fetchData(pagination.page, pagination.size);
+    }, [claims, reload, pagination]);
 
     useEffect(() => {
         const find = search.toLowerCase().trim();
@@ -149,8 +161,7 @@ export default function InventoryTable() {
                     : (<div className="my-2 text-sm text-center col-span-6">There are no existing inventories yet.</div>)
                 }
             </div>
-            <div className="text-gray text-sm">Showing { filteredInventories.length.toString() } of { filteredInventories.length.toString() } results.</div>
-
+           <Pagination pagination={pagination} paginationTotal={paginationTotal} setPagination={setPagination}/>
             {open && (
                 <CreateInventory 
                     claims={ claims }

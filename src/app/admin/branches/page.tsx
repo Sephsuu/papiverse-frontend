@@ -35,7 +35,7 @@ export default function BranchesTable() {
     const [open, setOpen] = useState(false);
     const [toUpdate, setUpdate] = useState<Branch | undefined>();
     const [toDelete, setDelete] = useState<Branch | undefined>();
-    const [pagination, setPagination] = useState({ page: 0, size: 10 });
+    const [pagination, setPagination] = useState({ page: 0, size: 20 , numberOfElements : 0});
     const [branches, setBranches] = useState<Branch[]>([]);
     const [filteredBranches, setFilteredBranches] = useState<Branch[]>([]);
 
@@ -49,9 +49,14 @@ export default function BranchesTable() {
                     totalPage : data.totalPages,
                     totalElements: data.totalElements
                 }))
+                setPagination(prev =>  ({
+                    ...prev,
+                    numberOfElements : data.numberOfElements
+                }))
             } catch (error) { toast.error(`${error}`) }
             finally { setLoading(false) }
         }
+
         fetchData(pagination.page, pagination.size);
     }, [reload, pagination]);
 

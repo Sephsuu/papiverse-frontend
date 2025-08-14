@@ -23,30 +23,40 @@ import { CreateSupply } from "./_components/CreateSupply";
 import { UpdateSupply } from "./_components/UpdateSupply";
 import { DeleteSupply } from "./_components/DeleteSupply";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Pagination } from "@/components/ui/pagination";
 
 export default function SuppliesTable() {
     const [loading, setLoading] = useState(true);
     const [reload, setReload] = useState(false);
     const [onProcess, setProcess] = useState(false);
     const [search, setSearch] = useState('');
-
     const [open, setOpen] = useState(false);
     const [toUpdate, setUpdate] = useState<Supply>()
     const [toDelete, setDelete] = useState<Supply>();
-
+    const [pagination, setPagination] = useState({page : 0, size : 20, numberOfElements: 0})
+    const [paginationTotal, setPaginationTotal] = useState({totalPage: 0, totalElements : 0})
     const [supplies, setSupplies] = useState<Supply[]>([]);
     const [filteredSupplies, setFilteredSupplies] = useState<Supply[]>([]);
 
     useEffect(() => {
-        async function fetchData() {
+        async function fetchData(page: number, size : number) {
             try {
-                const data = await SupplyService.getAllSupplies(0, 1000);
-                setSupplies(data);
+                const data = await SupplyService.getAllSupplies(page, size);
+                setSupplies(data.content);
+                 setPaginationTotal(prev =>  ({
+                    ...prev,
+                    totalPage : data.totalPages,
+                    totalElements: data.totalElements
+                }))
+                setPagination(prev =>  ({
+                    ...prev,
+                    numberOfElements : data.numberOfElements
+                }))
             } catch (error) { toast.error(`${error}`) }
             finally { setLoading(false) }
         }
-        fetchData();
-    }, [reload]);
+        fetchData(pagination.page, pagination.size);
+    }, [reload, pagination]);
 
     useEffect(() => {
         const find = search.toLowerCase().trim();
@@ -166,7 +176,7 @@ export default function SuppliesTable() {
                 ))
                 : (<div className="my-2 text-sm text-center col-span-6">There are no existing users yet.</div>)
             }
-            <div className="text-gray text-sm mx-2">Showing { filteredSupplies.length.toString() } of { filteredSupplies.length.toString() } results.</div>
+           <Pagination pagination={pagination} paginationTotal={paginationTotal} setPagination={setPagination}/>
 
             {open && (
                 <CreateSupply 
