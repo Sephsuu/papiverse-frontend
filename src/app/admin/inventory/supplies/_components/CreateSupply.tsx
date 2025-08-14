@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { handleChange } from "@/lib/form-handle";
 import { BranchService } from "@/services/BranchService";
 import { SupplyService } from "@/services/RawMaterialService";
 import { Branch, branchFields, branchInit } from "@/types/branch";
@@ -12,6 +11,7 @@ import { Supply, supplyFields, supplyInit } from "@/types/supply";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { handleChange } from "@/lib/form-handle";
 
 const categories = ["MEAT", "SNOWFROST"];
 const units = ["kilograms", "grams", "milligrams", "piece", "oz"]
