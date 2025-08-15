@@ -17,8 +17,8 @@ export const adminRoute = [
         title: 'Messages', 
         icon: MessageCircleMore,
         children: [
-            { title: 'Users', href: '/admin/messages/users' },
-            { title: 'Group', href: '/admin/inventory/groups' },
+            { title: 'Users', href: '/admin/messages/' },
+            { title: 'Group', href: '/admin/messages/' },
         ]
     },
     { 
@@ -61,6 +61,14 @@ export const franchiseeRoute = [
             { title: 'Inventories', href: '/franchisee/inventory/inventories' },
             { title: 'Supply Orders', href: '/franchisee/inventory/supply-orders/' },
             { title: 'Inventory Logs', href: '/franchisee/inventory/logs' },
+        ]
+    },
+     { 
+        title: 'Messages', 
+        icon: MessageCircleMore,
+        children: [
+            { title: 'Users', href: '/admin/messages/' },
+            { title: 'Group', href: '/admin/messages/' },
         ]
     },
 ]

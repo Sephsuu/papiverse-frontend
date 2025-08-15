@@ -14,6 +14,7 @@ import { Fragment, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
+import dayjs from "dayjs"
 
 export default function InventoryLogs() {
     const { claims, loading: authLoading } = useAuth();
@@ -163,7 +164,7 @@ export default function InventoryLogs() {
                                                     <div>{ subSubItem.rawMaterialCode }</div>
                                                     <div>Qty: { subSubItem.quantityChanged }</div>
                                                     <div>{ subSubItem.rawMaterialName }</div>
-                                                    <div>{ subSubItem.dateTime }</div>
+                                                    <div> {dayjs(subSubItem.dateTime).format("dddd, MMMM D, YYYY h:mm A")}</div>
                                                 </div>
                                                 <Separator />
                                             </Fragment>
