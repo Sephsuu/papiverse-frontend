@@ -13,7 +13,6 @@ export class SupplyService {
 				'Authorization' : `Bearer ${getTokenFromLocalStorage()}`
 			},
 		});
-		console.log(res);
 		
 		if (!res.ok) {
 			const err = await res.json();

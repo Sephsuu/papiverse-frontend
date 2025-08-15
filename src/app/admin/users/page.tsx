@@ -33,6 +33,7 @@ export default function UsersTable() {
     const [search, setSearch] = useState('');
     const [pagination, setPagination] = useState({page : 0, size : 10, numberOfElements :0})
     const [paginationTotal, setPaginationTotal] = useState({totalPage : 0, totalElements : 0})
+    const [shown, setShown] = useState(Number)
     const [open, setOpen] = useState(false);
     const [toUpdate, setUpdate] = useState<User | undefined>();
     const [toDelete, setDelete] = useState<User | undefined>();
@@ -58,7 +59,12 @@ export default function UsersTable() {
             finally { setLoading(false) }
         }
         fetchData(pagination.page, pagination.size);
-    }, [reload]);
+    }, [reload, pagination.page]);
+
+    useEffect(() => {
+       setShown(pagination.page * pagination.size  + pagination.numberOfElements)
+    }, [users]);
+
 
     useEffect(() => {
         const find = search.toLowerCase().trim();
@@ -163,7 +169,8 @@ export default function UsersTable() {
                     : (<div className="my-2 text-sm text-center col-span-6">There are no existing users yet.</div>)
                 }
      
-            <Pagination pagination={pagination} paginationTotal={paginationTotal} setPagination={setPagination}/>
+            <Pagination pagination={pagination} paginationTotal={paginationTotal}
+            shown={shown} setPagination={setPagination}/>
 
             {open && (
                 <CreateUser 

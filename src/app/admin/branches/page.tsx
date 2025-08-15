@@ -36,6 +36,7 @@ export default function BranchesTable() {
     const [toUpdate, setUpdate] = useState<Branch | undefined>();
     const [toDelete, setDelete] = useState<Branch | undefined>();
     const [pagination, setPagination] = useState({ page: 0, size: 20 , numberOfElements : 0});
+    const [shown, setShown] = useState(Number)
     const [branches, setBranches] = useState<Branch[]>([]);
     const [filteredBranches, setFilteredBranches] = useState<Branch[]>([]);
 
@@ -57,8 +58,13 @@ export default function BranchesTable() {
             finally { setLoading(false) }
         }
 
-        fetchData(pagination.page, pagination.size);
-    }, [reload, pagination]);
+        fetchData(pagination.page, pagination.size)
+    }, [reload, pagination.page]);
+
+     useEffect(() => {
+       setShown(pagination.page * pagination.size  + pagination.numberOfElements)
+    }, [branches]);
+
 
     useEffect(() => {
         const find = search.toLowerCase().trim();
@@ -168,7 +174,8 @@ export default function BranchesTable() {
                 ))
                 : (<div className="my-2 text-sm text-center col-span-6">There are no existing users yet.</div>)
             }
-            <Pagination pagination={pagination} paginationTotal={paginationTotal} setPagination={setPagination}/>
+            <Pagination pagination={pagination} paginationTotal={paginationTotal} 
+            shown={shown} setPagination={setPagination}/>
            
 
             {open && (

@@ -12,8 +12,6 @@ export class BranchService {
 				'Authorization' : `Bearer ${getTokenFromLocalStorage()}` 
 			}
 		});
-		console.log(res);
-		
 		
 		if (!res.ok) {
 			const err = await res.json();
@@ -55,7 +53,6 @@ export class BranchService {
         	},
         	body: JSON.stringify(payload),
 		});	
-		console.log(res);
 		
 
 		if (!res.ok) {
@@ -71,7 +68,6 @@ export class BranchService {
 			...branch,
 			zipCode: Number(branch.zipCode),
 		}
-		console.log(payload);
 		
 		const res = await fetch(`${URL}/update-branch`, {
 			method: 'POST',
