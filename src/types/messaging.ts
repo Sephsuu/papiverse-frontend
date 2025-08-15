@@ -5,6 +5,7 @@ export interface Conversation {
     type: string;
     name: string;
     updated_at: string,
+    updated_message: string,
     participants: number[];
     participant: {
         id: number,
