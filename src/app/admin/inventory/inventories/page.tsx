@@ -12,7 +12,7 @@ import { InventoryService } from "@/services/InventoryService";
 import { SupplyService } from "@/services/RawMaterialService";
 import { Inventory } from "@/types/inventory";
 import { SelectValue } from "@radix-ui/react-select";
-import { Download, Funnel, Ham, Info, Plus, Snowflake, SquarePen, Trash2 } from "lucide-react";
+import { CirclePlus, Download, Funnel, Ham, Info, Plus, Snowflake, SquarePen, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
@@ -27,6 +27,7 @@ export default function InventoryTable() {
     const [onProcess, setProcess] = useState(false);
     const [search, setSearch] = useState('');
     const [open, setOpen] = useState(false);
+    const [toUpate, setToUpdate] = useState<Inventory>()
     const [pagination, setPagination] = useState({ page: 0, size: 20 , numberOfElements : 0});
     const [paginationTotal, setPaginationTotal] = useState({totalPage : 0, totalElements : 0});
     const [shown, setShown] = useState(Number)
@@ -118,12 +119,6 @@ export default function InventoryTable() {
                         <Download />
                         Export
                     </Button>
-                    <Button 
-                        onClick={ () => setOpen(!open) }
-                        className="!bg-darkorange text-light shadow-xs hover:opacity-90"
-                    >
-                        <Plus /> Add an inventory
-                    </Button>
                 </div>
                 
             </div>
@@ -154,13 +149,16 @@ export default function InventoryTable() {
                             </div>
                             <div className="data-table-td">{ formatToPeso(item.unitPrice!) }</div>
                             <div className="flex items-center gap-3 data-table-td">
-                                <button onClick={ () => setOpen(!open) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
+                                <button>
+                                    <CirclePlus  onClick={ () => setToUpdate(item)} className="w-4 h-4"/>
+                                </button>
                                 <button><Info className="w-4 h-4" /></button>
                                 <button
                                     onClick={ () => setDelete(item) }
                                 >
                                     <Trash2 className="w-4 h-4 text-darkred" />
                                 </button>
+                             
                             </div>
                         </Fragment>
                     ))
@@ -169,10 +167,11 @@ export default function InventoryTable() {
             </div>
            <Pagination pagination={pagination} paginationTotal={paginationTotal} 
            shown={shown} setPagination={setPagination}/>
-            {open && (
+            {toUpate && (
                 <CreateInventory 
                     claims={ claims }
-                    setOpen={ setOpen }
+                    toUpdate={toUpate!}
+                    setToUpdate={setToUpdate}
                     setReload={ setReload }
                 />
             )}

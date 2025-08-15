@@ -76,27 +76,14 @@ export class InventoryService {
 	}
 
 	static async createInventoryInput(inventory: Inventory, branchId: number) {
-		console.log(branchId);
-		
-		const payload = {
-			...inventory,
-			changedQuantity: Number(inventory.changedQuantity),
-			type: "IN",
-			source: "INPUT",
-			branchId: branchId
-		}
-		console.log(JSON.stringify(payload));
-		
 		const res = await fetch(`${URL}/process-transaction-input`, {
 			method: 'POST',
 			headers: { 
 				'Content-Type': 'application/json', 
 				'Authorization' : `Bearer ${getTokenFromLocalStorage()}`,
 			},
-			body: JSON.stringify(payload),
+			body: JSON.stringify(inventory),
 		})
-		console.log(res);
-		
 
 		if (!res.ok) {
 			const err = await res.json();

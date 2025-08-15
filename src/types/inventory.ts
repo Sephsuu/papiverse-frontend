@@ -23,6 +23,15 @@ export const inventoryInit: Inventory = {
     source: "",
 };
 
+export const inventoryUpdate : Inventory = {
+    rawMaterialCode : "",
+    branchId : 0,
+    changedQuantity : 0,
+    type : "IN",
+    source : "INPUT"
+
+}
+
 export const inventoryFields: (keyof Inventory)[] = [
     "rawMaterialCode",
     "changedQuantity",
