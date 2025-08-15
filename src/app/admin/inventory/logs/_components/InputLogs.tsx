@@ -3,6 +3,8 @@ import { Separator } from "@/components/ui/separator";
 import { flattenGroupedLogsWithOrders, formatDateToWords, getWeekday } from "@/lib/formatter";
 import { InventoryLog } from "@/types/inventory-log";
 import { Fragment } from "react";
+import dayjs from "dayjs"
+
 
 interface Props {
     logs: InventoryLog[];
@@ -52,7 +54,9 @@ export function InputLogs({ logs }: Props) {
                                                     <div>{ subSubItem.rawMaterialCode }</div>
                                                     <div>Qty: { subSubItem.quantityChanged }</div>
                                                     <div>{ subSubItem.rawMaterialName }</div>
-                                                    <div>{ subSubItem.dateTime }</div>
+                                                    <div>
+                                                        {dayjs(subSubItem.dateTime).format("dddd, MMMM D, YYYY h:mm A")}
+                                                    </div>
                                                 </div>
                                                 <Separator />
                                             </Fragment>
