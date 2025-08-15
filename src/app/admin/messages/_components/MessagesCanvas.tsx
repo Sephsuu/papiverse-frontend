@@ -1,4 +1,4 @@
-// MessagesCanvas.tsx - FIXED VERSION
+// MessagesCanvas.tsx - With Read Receipts
 "use client"
 
 import { Button } from "@/components/ui/button";
@@ -27,11 +27,18 @@ export function MessagesCanvas({ claims, users, selected }: Props) {
     const [typingUsers, setTypingUsers] = useState<Set<number>>(new Set());
     const [isTyping, setIsTyping] = useState(false);
 
+    console.log('SELECTED', selected);
+    
+
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const typingTimeoutRef = useRef<NodeJS.Timeout>(null);
+    const messagesContainerRef = useRef<HTMLDivElement>(null);
+    const readTimeoutRef = useRef<NodeJS.Timeout>(null);
 
     // Store pending optimistic messages to track them
     const pendingMessagesRef = useRef<Set<string>>(new Set());
+    // Track which messages we've already marked as read
+    const markedAsReadRef = useRef<Set<number | string>>(new Set());
 
     // Memoize callback functions to prevent infinite re-renders
     const handleNewMessage = useCallback((message: Message, conversationId: number) => {
@@ -67,6 +74,17 @@ export function MessagesCanvas({ claims, users, selected }: Props) {
                 // If it's our message but no optimistic version found, add it
                 return [...prev, message];
             });
+
+            // Mark new messages from others as read after a short delay
+            if (message.senderId !== claims.userId && !markedAsReadRef.current.has(message.id!)) {
+                if (readTimeoutRef.current) {
+                    clearTimeout(readTimeoutRef.current);
+                }
+                readTimeoutRef.current = setTimeout(() => {
+                    markMessageAsRead(Number(message.id));
+                    markedAsReadRef.current.add(message.id!);
+                }, 1000); // 1 second delay
+            }
         }
     }, [selected?.id, claims.userId]);
 
@@ -102,6 +120,49 @@ export function MessagesCanvas({ claims, users, selected }: Props) {
         onUserStoppedTyping: handleUserStoppedTyping,
     });
 
+    // Mark messages as read when they come into view
+    const markVisibleMessagesAsRead = useCallback(() => {
+        if (!selected?.id || !isAuthenticated) return;
+
+        const unreadMessages = messages.filter(msg => 
+            msg.senderId !== claims.userId && 
+            !markedAsReadRef.current.has(msg.id!)
+        );
+
+        console.log(messages);
+        
+
+        unreadMessages.forEach(message => {
+            markMessageAsRead(Number(message.id));
+            markedAsReadRef.current.add(message.id!);
+        });
+    }, [messages, selected?.id, claims.userId, isAuthenticated, markMessageAsRead]);
+
+    // Mark messages as read when conversation becomes active or messages change
+    useEffect(() => {
+        if (messages.length > 0 && selected?.id && isAuthenticated) {
+            // Small delay to ensure user is actually viewing the messages
+            const timer = setTimeout(() => {
+                markVisibleMessagesAsRead();
+            }, 500);
+
+            return () => clearTimeout(timer);
+        }
+    }, [messages, selected?.id, isAuthenticated, markVisibleMessagesAsRead]);
+
+    // Optional: Mark messages as read when user scrolls to bottom
+    const handleScroll = useCallback(() => {
+        const container = messagesContainerRef.current;
+        if (!container) return;
+
+        const { scrollTop, scrollHeight, clientHeight } = container;
+        const isNearBottom = scrollTop + clientHeight >= scrollHeight - 100;
+
+        if (isNearBottom) {
+            markVisibleMessagesAsRead();
+        }
+    }, [markVisibleMessagesAsRead]);
+
     useEffect(() => {
         async function fetchMessages() {
             setLoading(true);
@@ -110,6 +171,8 @@ export function MessagesCanvas({ claims, users, selected }: Props) {
             try {
                 const data = await MessagingService.getMessages(selected.id, claims.userId);
                 setMessages(data);
+                // Reset marked as read for new conversation
+                markedAsReadRef.current.clear();
             } catch (error) { 
                 toast.error(`${error}`) 
             }
@@ -127,6 +190,10 @@ export function MessagesCanvas({ claims, users, selected }: Props) {
         return () => {
             if (selected?.id && isAuthenticated) {
                 leaveConversation(selected.id);
+            }
+            // Clear timeouts on unmount
+            if (readTimeoutRef.current) {
+                clearTimeout(readTimeoutRef.current);
             }
         };
     }, [selected?.id, isAuthenticated, joinConversation, leaveConversation]);
@@ -250,21 +317,33 @@ export function MessagesCanvas({ claims, users, selected }: Props) {
                     </div>
 
                     {/* Messages */}
-                    <div className="flex-col w-full flex-1 bg-white overflow-y-auto pb-8">
+                    <div 
+                        ref={messagesContainerRef}
+                        className="flex-col w-full flex-1 bg-white overflow-y-auto pb-8"
+                        onScroll={handleScroll}
+                    >
                         {messages.map((message, index) => {
                             const isOwnMessage = message.senderId === claims.userId;
+                            const prevMessage = index > 0 ? messages[index - 1] : null;
+
+                            const showSenderName = !prevMessage || prevMessage.senderId !== message.senderId;
                             
                             return (
                                 <Fragment key={message.id || index}>
+                                    {showSenderName && (
+                                        <div className={`text-gray text-[10px] -mb-1.5 ${isOwnMessage ? "text-end pr-2" : "pl-2 text-start"}`}>
+                                            {selected.participant.find(i => i.id === message.senderId)?.firstName}
+                                        </div>
+                                    )}
                                 <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} my-2`}>
                                     <div 
-                                    className={`
-                                        w-fit max-w-[60%] text-xs p-2
-                                        ${isOwnMessage 
-                                        ? 'bg-darkorange text-light mr-2 rounded-t-lg rounded-bl-lg' 
-                                        : 'bg-light ml-2 rounded-t-lg rounded-br-lg'
-                                        }
-                                    `}
+                                        className={`
+                                            w-fit max-w-[60%] text-xs p-2
+                                            ${isOwnMessage 
+                                            ? 'bg-darkorange text-light mr-2 rounded-t-lg rounded-bl-lg' 
+                                            : 'bg-light ml-2 rounded-t-lg rounded-br-lg'
+                                            }
+                                        `}
                                     >
                                         {message.content}
                                     </div>
