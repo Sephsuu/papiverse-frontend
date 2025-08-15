@@ -1,5 +1,5 @@
-// hooks/useSocket.ts
-import { useEffect, useRef, useState } from 'react';
+// hooks/useSocket.ts - FIXED VERSION
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { Message } from '@/types/messaging';
 
@@ -15,6 +15,24 @@ export const useSocket = ({ userId, onNewMessage, onUserTyping, onUserStoppedTyp
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentConversationId, setCurrentConversationId] = useState<number | null>(null);
   const socketRef = useRef<Socket | null>(null);
+  
+  // Store callback refs to avoid dependency issues
+  const onNewMessageRef = useRef(onNewMessage);
+  const onUserTypingRef = useRef(onUserTyping);
+  const onUserStoppedTypingRef = useRef(onUserStoppedTyping);
+
+  // Update refs when callbacks change
+  useEffect(() => {
+    onNewMessageRef.current = onNewMessage;
+  }, [onNewMessage]);
+
+  useEffect(() => {
+    onUserTypingRef.current = onUserTyping;
+  }, [onUserTyping]);
+
+  useEffect(() => {
+    onUserStoppedTypingRef.current = onUserStoppedTyping;
+  }, [onUserStoppedTyping]);
 
   useEffect(() => {
     console.log('useSocket effect running with userId:', userId);
@@ -22,6 +40,12 @@ export const useSocket = ({ userId, onNewMessage, onUserTyping, onUserStoppedTyp
     // Don't initialize socket if userId is not available
     if (!userId) {
       console.log('No userId provided, skipping socket initialization');
+      return;
+    }
+
+    // Prevent multiple socket connections
+    if (socketRef.current?.connected) {
+      console.log('Socket already connected, skipping initialization');
       return;
     }
 
@@ -64,57 +88,53 @@ export const useSocket = ({ userId, onNewMessage, onUserTyping, onUserStoppedTyp
       setIsAuthenticated(false);
     });
 
-    // Message handlers
+    // Message handlers - Use refs to access current callbacks
     socket.on('new_message', (data: { message: Message; conversationId: number }) => {
       console.log('New message received:', data);
-      onNewMessage?.(data.message, data.conversationId);
+      onNewMessageRef.current?.(data.message, data.conversationId);
     });
 
     socket.on('message_sent', (data: { messageId: number }) => {
       console.log('Message sent confirmation:', data);
     });
 
-    // Typing handlers
+    // Typing handlers - Use refs to access current callbacks
     socket.on('user_typing_start', (data: { userId: number; conversationId: number }) => {
-      onUserTyping?.(data.userId, data.conversationId);
+      onUserTypingRef.current?.(data.userId, data.conversationId);
     });
 
     socket.on('user_typing_stop', (data: { userId: number; conversationId: number }) => {
-      onUserStoppedTyping?.(data.userId, data.conversationId);
-    });
-
-    // Error handlers
-    socket.on('error', (error) => {
-      console.error('Socket error:', error);
-      setIsAuthenticated(false);
+      onUserStoppedTypingRef.current?.(data.userId, data.conversationId);
     });
 
     // Cleanup
     return () => {
       console.log('Cleaning up socket connection');
-      socket.disconnect();
+      if (socket.connected) {
+        socket.disconnect();
+      }
       setIsConnected(false);
       setIsAuthenticated(false);
     };
-  }, [userId, onNewMessage, onUserTyping, onUserStoppedTyping]);
+  }, [userId]); // Only depend on userId, not the callback functions
 
-  const joinConversation = (conversationId: number) => {
+  const joinConversation = useCallback((conversationId: number) => {
     if (socketRef.current && isAuthenticated) {
       socketRef.current.emit('join_conversation', { conversationId });
       setCurrentConversationId(conversationId);
     }
-  };
+  }, [isAuthenticated]);
 
-  const leaveConversation = (conversationId: number) => {
+  const leaveConversation = useCallback((conversationId: number) => {
     if (socketRef.current && isAuthenticated) {
       socketRef.current.emit('leave_conversation', { conversationId });
       if (currentConversationId === conversationId) {
         setCurrentConversationId(null);
       }
     }
-  };
+  }, [isAuthenticated, currentConversationId]);
 
-  const sendMessage = (conversationId: number, content: string, messageType: string = 'text') => {
+  const sendMessage = useCallback((conversationId: number, content: string, messageType: string = 'text') => {
     console.log('CLAIMS ID: ', userId);
     
     if (socketRef.current && isAuthenticated) {
@@ -122,28 +142,28 @@ export const useSocket = ({ userId, onNewMessage, onUserTyping, onUserStoppedTyp
         conversationId,
         content,
         messageType,
-        senderId: userId, // This will be overridden by the server
+        senderId: userId,
       });
     }
-  };
+  }, [isAuthenticated, userId]);
 
-  const startTyping = (conversationId: number) => {
+  const startTyping = useCallback((conversationId: number) => {
     if (socketRef.current && isAuthenticated) {
       socketRef.current.emit('typing_start', { conversationId });
     }
-  };
+  }, [isAuthenticated]);
 
-  const stopTyping = (conversationId: number) => {
+  const stopTyping = useCallback((conversationId: number) => {
     if (socketRef.current && isAuthenticated) {
       socketRef.current.emit('typing_stop', { conversationId });
     }
-  };
+  }, [isAuthenticated]);
 
-  const markMessageAsRead = (messageId: number) => {
+  const markMessageAsRead = useCallback((messageId: number) => {
     if (socketRef.current && isAuthenticated) {
       socketRef.current.emit('mark_message_read', { messageId });
     }
-  };
+  }, [isAuthenticated]);
 
   return {
     isConnected,

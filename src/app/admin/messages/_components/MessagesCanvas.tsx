@@ -1,12 +1,15 @@
+// MessagesCanvas.tsx - FIXED VERSION
 "use client"
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { MessagesSkeleton } from "@/components/ui/skeleton";
 import { useSocket } from "@/hooks/use-socket";
 import { MessagingService } from "@/services/MessagingService";
 import { Claim } from "@/types/claims";
 import { Conversation, Message } from "@/types/messaging";
 import { User } from "@/types/user";
+import { Item } from "@radix-ui/react-dropdown-menu";
 import { EllipsisIcon, Info, Link, Mic, Send, SmilePlus } from "lucide-react";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -15,10 +18,10 @@ interface Props {
     claims: Claim;
     users: User[];
     selected: Conversation;
-    setConversations?: (i: Conversation[]) => void;
 }
 
-export function MessagesCanvas({ claims, users, selected, setConversations }: Props) {
+export function MessagesCanvas({ claims, users, selected }: Props) {
+    const [loading, setLoading] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [messageInput, setMessageInput] = useState('');
     const [typingUsers, setTypingUsers] = useState<Set<number>>(new Set());
@@ -26,6 +29,46 @@ export function MessagesCanvas({ claims, users, selected, setConversations }: Pr
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const typingTimeoutRef = useRef<NodeJS.Timeout>(null);
+
+    // Store pending optimistic messages to track them
+    const pendingMessagesRef = useRef<Set<string>>(new Set());
+
+    // Memoize callback functions to prevent infinite re-renders
+    const handleNewMessage = useCallback((message: Message, conversationId: number) => {
+        if (selected?.id === conversationId) {
+            // Create a key to identify this message
+            const messageKey = `${message.senderId}_${message.content}_${conversationId}`;
+            
+            setMessages(prev => {
+                // If this is our own message and we have a pending optimistic message
+                if (message.senderId === claims.userId && pendingMessagesRef.current.has(messageKey)) {
+                    // Find and replace the optimistic message
+                    const optimisticIndex = prev.findIndex(m => 
+                        m.senderId === claims.userId && 
+                        m.content === message.content && 
+                        m.conversationId === conversationId &&
+                        (typeof m.id === 'number' && m.id > Date.now() - 10000) // Recent timestamp ID
+                    );
+                    
+                    if (optimisticIndex !== -1) {
+                        // Remove from pending and replace the optimistic message
+                        pendingMessagesRef.current.delete(messageKey);
+                        const newMessages = [...prev];
+                        newMessages[optimisticIndex] = message;
+                        return newMessages;
+                    }
+                }
+                
+                // For other users' messages or if no optimistic message found
+                if (message.senderId !== claims.userId) {
+                    return [...prev, message];
+                }
+                
+                // If it's our message but no optimistic version found, add it
+                return [...prev, message];
+            });
+        }
+    }, [selected?.id, claims.userId]);
 
     const handleUserTyping = useCallback((userId: number, conversationId: number) => {
         if (selected?.id === conversationId && userId !== claims.userId) {
@@ -54,35 +97,39 @@ export function MessagesCanvas({ claims, users, selected, setConversations }: Pr
         markMessageAsRead,
     } = useSocket({
         userId: claims!.userId,
- 
+        onNewMessage: handleNewMessage,
         onUserTyping: handleUserTyping,
         onUserStoppedTyping: handleUserStoppedTyping,
     });
 
     useEffect(() => {
         async function fetchMessages() {
-            if (!selected) return;
+            setLoading(true);
+            if (!selected?.id) return;
             
             try {
                 const data = await MessagingService.getMessages(selected.id, claims.userId);
                 setMessages(data);
-                
-                if (isAuthenticated) {
-                    joinConversation(selected.id);
-                }
             } catch (error) { 
                 toast.error(`${error}`) 
             }
+            finally { setLoading(false) }
         }
         
         fetchMessages();
+    }, [selected?.id, claims.userId]);
+
+    useEffect(() => {
+        if (selected?.id && isAuthenticated) {
+            joinConversation(selected.id);
+        }
         
-        // return () => {
-        //     if (selected && isAuthenticated) {
-        //         leaveConversation(selected.id);
-        //     }
-        // };
-    }, [selected?.id]);
+        return () => {
+            if (selected?.id && isAuthenticated) {
+                leaveConversation(selected.id);
+            }
+        };
+    }, [selected?.id, isAuthenticated, joinConversation, leaveConversation]);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -111,12 +158,18 @@ export function MessagesCanvas({ claims, users, selected, setConversations }: Pr
         }, 2000);
     };
 
-    const handleSendMessage = () => {
+    const handleSendMessage = useCallback(() => {
         if (!messageInput.trim() || !selected || !isAuthenticated) return;
+
+        const messageContent = messageInput.trim();
+        const messageKey = `${claims.userId}_${messageContent}_${selected.id}`;
+        
+        // Add to pending messages
+        pendingMessagesRef.current.add(messageKey);
 
         const optimisticMessage: Message = {
             id: Date.now(), 
-            content: messageInput.trim(),
+            content: messageContent,
             senderId: claims.userId,
             conversationId: selected.id!,
             messageType: 'text',
@@ -125,7 +178,7 @@ export function MessagesCanvas({ claims, users, selected, setConversations }: Pr
         };
         setMessages(prev => [...prev, optimisticMessage]);
 
-        sendMessage(selected.id, messageInput.trim());
+        sendMessage(selected.id, messageContent);
         
         setMessageInput('');
         if (isTyping) {
@@ -136,7 +189,12 @@ export function MessagesCanvas({ claims, users, selected, setConversations }: Pr
         if (typingTimeoutRef.current) {
             clearTimeout(typingTimeoutRef.current);
         }
-    };
+
+        // Clean up pending message after timeout (in case WebSocket fails)
+        setTimeout(() => {
+            pendingMessagesRef.current.delete(messageKey);
+        }, 10000);
+    }, [messageInput, selected, isAuthenticated, claims.userId, sendMessage, isTyping, stopTyping]);
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -160,10 +218,7 @@ export function MessagesCanvas({ claims, users, selected, setConversations }: Pr
         }
     };
 
-    // const handleCreateDirectConversation = async (userId: number) => {
-    //     await MessagingService.createDirectConversation([claims.userId, userId]);
-    // }
-
+    if (loading) return <MessagesSkeleton />
     return(
         <section className="relative flex flex-col col-span-2 border-1 h-[95vh]">
             {selected && (
@@ -174,10 +229,17 @@ export function MessagesCanvas({ claims, users, selected, setConversations }: Pr
                             {"KP"}
                         </div>
                         <div className="my-auto font-semibold text-sm truncate text-[16px]">
-                            {selected.participant[0].id !== claims.userId ? 
-                                `${selected.participant[0].firstName ?? ''} ${selected.participant[0].lastName ?? ''}` :
-                                `${selected.participant[1].firstName ?? ''} ${selected.participant[1].lastName ?? ''}`
-                            }
+                            {selected.name === "none" ? (
+                                selected.participant.length > 2 ? (
+                                    selected.participant.slice(0, 3).map(p => p.lastName).join(', ')
+                                ) : (
+                                    selected.participant[0].id !== claims.userId
+                                        ? `${selected.participant[0].firstName ?? ''} ${selected.participant[0].lastName ?? ''}`
+                                        : `${selected.participant[1].firstName ?? ''} ${selected.participant[1].lastName ?? ''}`
+                                )
+                            ) : (
+                                selected.name
+                            )}
                         </div>
                         <div className="ms-auto flex gap-2">
                             <button>
@@ -195,11 +257,11 @@ export function MessagesCanvas({ claims, users, selected, setConversations }: Pr
                             const isOwnMessage = message.senderId === claims.userId;
                             
                             return (
-                                <Fragment key={message.id || index}> {/* Use message.id if available */}
+                                <Fragment key={message.id || index}>
                                 <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} my-2`}>
                                     <div 
                                     className={`
-                                        w-fit max-w-[60%] text-xs p-3 
+                                        w-fit max-w-[60%] text-xs p-2
                                         ${isOwnMessage 
                                         ? 'bg-darkorange text-light mr-2 rounded-t-lg rounded-bl-lg' 
                                         : 'bg-light ml-2 rounded-t-lg rounded-br-lg'
@@ -207,10 +269,6 @@ export function MessagesCanvas({ claims, users, selected, setConversations }: Pr
                                     `}
                                     >
                                         {message.content}
-                                    {/* Optional: Add timestamp
-                                    <div className={`text-xs mt-1 opacity-70 ${isOwnMessage ? 'text-right' : 'text-left'}`}>
-                                        {new Date(message.createdAt).toLocaleTimeString()}
-                                    </div> */}
                                     </div>
                                 </div>
                                 </Fragment>

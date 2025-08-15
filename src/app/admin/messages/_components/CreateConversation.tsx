@@ -22,7 +22,7 @@ interface CreateConversation {
 export function CreateConversation({ setOpen, claims }: { setOpen: (i: boolean) => void, claims: Claim }) {
     const [loading, setLoading] = useState(false);
     const [onProcess, setProcess] = useState(false);
-    const [conversation, setConversation] = useState<CreateConversation>({ name: "GROUP CHAT", type: "direct", participantIds: [] })
+    const [conversation, setConversation] = useState<CreateConversation>({ name: "none", type: "group", participantIds: [] })
     const [users, setUsers] = useState<User[]>([]);
     const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
 

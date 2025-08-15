@@ -150,4 +150,31 @@ export function CreateModalSkeleton() {
     </DialogContent>
   );
 }
+
+export function MessagesSkeleton() {
+  return(
+    <section className="relative flex flex-col col-span-2 border-1 h-[95vh]">
+      <div className="flex items-center px-4 py-2 gap-2 sticky top-0 shadow-sm bg-light">
+        <Skeleton className="flex font-semibold justify-center items-center bg-slate-300 text-light w-9 h-9 rounded-full" />
+        <Skeleton className="w-40 h-6 bg-slate-300" />
+          
+    </div>
+      <div className="flex-col p-4 flex-1 bg-white overflow-y-auto pb-8">
+        <Skeleton className="w-[60%] bg-slate-300 rounded-none rounded-t-lg rounded-br-lg h-6 my-1" />
+        <Skeleton className="w-[30%] bg-slate-300 rounded-none rounded-t-lg rounded-br-lg h-6 my-1" />
+        <Skeleton className="w-[40%] bg-slate-300 rounded-none rounded-t-lg rounded-bl-lg h-6 my-1 ms-auto" />
+        <Skeleton className="w-[50%] bg-slate-300 rounded-none rounded-t-lg rounded-bl-lg h-6 my-1 ms-auto" />
+        <Skeleton className="w-[50%] bg-slate-300 rounded-none rounded-t-lg rounded-br-lg h-10 my-1" />
+        <Skeleton className="w-[60%] bg-slate-300 rounded-none rounded-t-lg rounded-bl-lg h-10 my-1 ms-auto" />
+        <Skeleton className="w-[30%] bg-slate-300 rounded-none rounded-t-lg rounded-bl-lg h-10 my-1 ms-auto" />
+        <Skeleton className="w-[60%] bg-slate-300 rounded-none rounded-t-lg rounded-br-lg h-6 my-1" />
+        <Skeleton className="w-[30%] bg-slate-300 rounded-none rounded-t-lg rounded-br-lg h-6 my-1" />
+        <Skeleton className="w-[40%] bg-slate-300 rounded-none rounded-t-lg rounded-bl-lg h-6 my-1 ms-auto" />
+        <Skeleton className="w-[50%] bg-slate-300 rounded-none rounded-t-lg rounded-bl-lg h-6 my-1 ms-auto" />
+        <Skeleton className="w-[50%] bg-slate-300 rounded-none rounded-t-lg rounded-br-lg h-10 my-1" />
+      </div>
+    </section>
+  )
+}
+
 export { Skeleton, OrderModalSkeleton, FullOorderSkeleton }
