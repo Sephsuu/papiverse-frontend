@@ -1,24 +1,48 @@
 "use client"
 
 import { usePathname, useRouter } from "next/navigation";
-import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarProvider } from "../ui/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarProvider, SidebarTrigger } from "../ui/sidebar";
 import Link from "next/link";
 import Image from "next/image";
 import { adminRoute, franchiseeRoute } from "@/lib/routes";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, LucideIcon, User2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
-import { PapiverseLoading, SidebarLoading } from "../ui/loader";
+import { SidebarLoading } from "../ui/loader";
 import { AuthService } from "@/services/AuthService";
+import { useEffect, useState } from "react";
+import { User } from "@/types/user";
+import { UserService } from "@/services/UserService";
+import {Spinner} from "@/components/custom/Spinner";
+
 
 export function FranchiseeSidebar() {
-    const { claims, loading } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
     const hideSidebar = pathname === "/auth" || pathname === "/";
+    const { claims, loading } = useAuth();
+    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [user, setUser] = useState<User>();
+    
+    useEffect(() => {
+        async function fetchData(id: number) {
+            try {
+                const data = await UserService.getUserById(id);
+                if (data) {
+                    setUser(data);
+                }
+            } catch (e) {
+                console.log(e);
+            }
+        }
+        if (claims.userId && claims.userId !== 0) {
+            fetchData(claims.userId);
+        }
+    }, [claims])
+
 
     async function handleLogout() {
         await AuthService.deleteCookie();
@@ -27,7 +51,9 @@ export function FranchiseeSidebar() {
         router.push("/auth");
     }
 
-    if (loading) return <SidebarLoading />
+
+
+     if (loading) return <SidebarLoading />
     return(
         <>
         {!hideSidebar &&
@@ -35,11 +61,15 @@ export function FranchiseeSidebar() {
                 variant="floating" 
                 collapsible="icon"
             >
+                <SidebarTrigger 
+                    className="rounded-full shadow-6xl bg-white absolute z-50 right-[-20px] top-[47%] -translate-x-1/2 -translate-y-1/2"
+                    onClick={() => setIsCollapsed(!isCollapsed)}
+                />
                 <SidebarContent 
-                    className="rounded-md"
+                    className={ `rounded-md ${isCollapsed && "px-1"}` }
                     style={{ backgroundImage: "url(/images/sidebar_bg.svg)" }}
                 >
-                    <Link href="/franchisee">
+                    <Link href="/auth/login">
                         <Image
                             src="/images/papiverse_logo.png"
                             alt="Papiverse Logo"
@@ -48,7 +78,7 @@ export function FranchiseeSidebar() {
                             className="mx-auto mt-4"
                         />
                     </Link>
-                    <SidebarMenu className="mt-3">
+                    <SidebarMenu className={ `mt-3 ${isCollapsed && "flex flex-col justify-center items-center"}` }>
                         {franchiseeRoute.map((item, index) => (
                             item.children.length !== 0 ?
                             <Collapsible className="group/collapsible" key={ index }>
@@ -64,7 +94,7 @@ export function FranchiseeSidebar() {
                                         <SidebarMenuSub>
                                             {item.children.map((sub, index) => (
                                                 <SidebarMenuButton key={ index }>
-                                                    <Link href={ sub.href } className="w-full h-full">
+                                                    <Link href={ sub.href }>
                                                         { sub.title }
                                                     </Link>
                                                 </SidebarMenuButton>
@@ -77,7 +107,7 @@ export function FranchiseeSidebar() {
                             <SidebarMenuButton className="flex gap-2" key={ index }>
                                 <Link 
                                     href={ item.href! }
-                                    className="flex items-center gap-2 w-full h-full"
+                                    className="flex items-center gap-2"
                                 >
                                     <item.icon className="w-4 h-4" />
                                     { item.title }
@@ -87,26 +117,40 @@ export function FranchiseeSidebar() {
                         ))}
                     </SidebarMenu>
 
-                    <SidebarFooter className="mt-auto">
+                    <SidebarFooter className={`mt-auto ${isCollapsed ? "p-1" :  ""}`}>
                         <SidebarMenu>
                             <SidebarMenuItem>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                <SidebarMenuButton>
-                                    <Avatar>
-                                        <AvatarImage src={""} alt="" />
-                                        <AvatarFallback className="bg-amber-900 text-light">KP</AvatarFallback>
-                                    </Avatar>
-                                    { claims.sub }
-                                    <ChevronUp className="ml-auto" />
-                                </SidebarMenuButton>
+                                    <SidebarMenuButton
+                                        className={`h-10 mb-2 gap-3 flex items-center ${
+                                            isCollapsed ? "justify-center w-full h-10" : "justify-start w-full"
+                                        }`}  >
+                                        <Avatar className="h-10 w-10">
+                                            {user?.imageUrl ? (
+                                            <AvatarImage
+                                                src={`https://395z4m7f-8080.asse.devtunnels.ms${user.imageUrl}`}
+                                                alt=""
+                                            />
+                                            ) : (
+                                            <Spinner className="h-4 w-4 mt-1" />
+                                            )}
+                                        </Avatar>
+
+                                        {!isCollapsed && (
+                                            <>
+                                            <h1 className="text-md whitespace-nowrap">{claims.sub}</h1>
+                                            <ChevronUp className="ml-auto" />
+                                            </>
+                                        )}
+                                        </SidebarMenuButton>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent
                                 side="right"
                                 className="w-50"
                                 >
                                 <DropdownMenuItem>
-                                    <Link href='/franchisee/account'>Account</Link>
+                                    <Link href='/admin/account'>Account</Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
                                     <span>Billing</span>
@@ -120,6 +164,7 @@ export function FranchiseeSidebar() {
                         </SidebarMenu>
                     </SidebarFooter>
                 </SidebarContent>
+                
             </Sidebar>
         }
         </>

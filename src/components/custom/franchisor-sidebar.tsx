@@ -13,7 +13,11 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { SidebarLoading } from "../ui/loader";
 import { AuthService } from "@/services/AuthService";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { User } from "@/types/user";
+import { UserService } from "@/services/UserService";
+import {Spinner} from "@/components/custom/Spinner";
+
 
 export function AdminSidebar() {
     const router = useRouter();
@@ -21,6 +25,24 @@ export function AdminSidebar() {
     const hideSidebar = pathname === "/auth" || pathname === "/";
     const { claims, loading } = useAuth();
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [user, setUser] = useState<User>();
+    
+    useEffect(() => {
+        async function fetchData(id: number) {
+            try {
+                const data = await UserService.getUserById(id);
+                if (data) {
+                    setUser(data);
+                }
+            } catch (e) {
+                console.log(e);
+            }
+        }
+        if (claims.userId && claims.userId !== 0) {
+            fetchData(claims.userId);
+        }
+    }, [claims])
+
 
     async function handleLogout() {
         await AuthService.deleteCookie();
@@ -28,6 +50,8 @@ export function AdminSidebar() {
         localStorage.removeItem('token');
         router.push("/auth");
     }
+
+
 
      if (loading) return <SidebarLoading />
     return(
@@ -93,19 +117,33 @@ export function AdminSidebar() {
                         ))}
                     </SidebarMenu>
 
-                    <SidebarFooter className="mt-auto">
+                    <SidebarFooter className={`mt-auto ${isCollapsed ? "p-1" :  ""}`}>
                         <SidebarMenu>
                             <SidebarMenuItem>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                <SidebarMenuButton>
-                                    <Avatar>
-                                        <AvatarImage src={""} alt="" />
-                                        <AvatarFallback className="bg-amber-900 text-light">KP</AvatarFallback>
-                                    </Avatar>
-                                    { claims.sub }
-                                    <ChevronUp className="ml-auto" />
-                                </SidebarMenuButton>
+                                    <SidebarMenuButton
+                                        className={`h-10 mb-2 gap-3 flex items-center ${
+                                            isCollapsed ? "justify-center w-full h-10" : "justify-start w-full"
+                                        }`}  >
+                                        <Avatar className="h-10 w-10">
+                                            {user?.imageUrl ? (
+                                            <AvatarImage
+                                                src={`https://395z4m7f-8080.asse.devtunnels.ms${user.imageUrl}`}
+                                                alt=""
+                                            />
+                                            ) : (
+                                            <Spinner className="h-4 w-4 mt-1" />
+                                            )}
+                                        </Avatar>
+
+                                        {!isCollapsed && (
+                                            <>
+                                            <h1 className="text-md whitespace-nowrap">{claims.sub}</h1>
+                                            <ChevronUp className="ml-auto" />
+                                            </>
+                                        )}
+                                        </SidebarMenuButton>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent
                                 side="right"
