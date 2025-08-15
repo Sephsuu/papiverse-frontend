@@ -5,7 +5,7 @@ import { Claim } from "@/types/claims";
 import { Conversation } from "@/types/messaging";
 import { User } from "@/types/user";
 import { Plus, Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CreateConversation } from "./CreateConversation";
 
 const tabs = ['DIRECT', 'GROUPS', 'PUBLIC'];
@@ -20,6 +20,20 @@ interface Props {
 export function MessagesSidebar({ claims, conversations, selected, setSelected }: Props) {
     const [open, setOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('DIRECT');
+    const [selectedConversations, setSelectedConversations] = useState<Conversation[]>(conversations);
+
+    useEffect(() => {
+        if (activeTab === 'DIRECT') {
+            setSelectedConversations(conversations.filter(i => i.type === 'direct'));
+        } else if (activeTab === 'GROUPS') {
+            setSelectedConversations(conversations.filter(i => i.type === 'group'));
+        } else setSelectedConversations(conversations);
+    }, [activeTab])
+
+    useEffect(() => {
+        console.log(activeTab);
+        
+    }, [activeTab])
 
     return(
         <section className="flex flex-col border-1 py-2.5 h-[95vh]">
@@ -55,7 +69,7 @@ export function MessagesSidebar({ claims, conversations, selected, setSelected }
                 </div>
             </div>
             <div className="mt-2 pl-4 pr-0.5 pb-4 overflow-y-auto flex-1">
-                {conversations.map((item, index) => (
+                {selectedConversations.map((item, index) => (
                     <button 
                         onClick={() => setSelected(item)}
                         key={index}
@@ -68,10 +82,14 @@ export function MessagesSidebar({ claims, conversations, selected, setSelected }
                         </div>
                         <div className="col-span-6 pl-1">
                             <div className="text-start font-semibold text-sm truncate">
-                                {item.name === 'none' ? (
-                                    item.participant[0].id !== claims.userId ? 
-                                    `${item.participant[0].firstName} ${item.participant[0].lastName}` :
-                                    `${item.participant[1].firstName} ${item.participant[1].lastName}`
+                                {item.name === "none" ? (
+                                    item.participant.length > 2 ? (
+                                        item.participant.slice(0, 3).map(p => p.lastName).join(', ')
+                                    ) : (
+                                        item.participant[0].id !== claims.userId
+                                            ? `${item.participant[0].firstName ?? ''} ${item.participant[0].lastName ?? ''}`
+                                            : `${item.participant[1].firstName ?? ''} ${item.participant[1].lastName ?? ''}`
+                                    )
                                 ) : (
                                     item.name
                                 )}

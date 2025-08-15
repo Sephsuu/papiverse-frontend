@@ -66,14 +66,6 @@ export default function MessagesPage() {
     return(
         <section className="w-full px-2 py-4">
             <Toaster closeButton position="top-center" />
-            
-            {/* Connection status indicator */}
-            {/* {!isConnected && (
-                <div className="mb-2 p-2 bg-yellow-100 border border-yellow-400 rounded text-yellow-800 text-sm">
-                    Connecting to chat server...
-                </div>
-            )} */}
-            
             <div className="grid grid-cols-4 bg-light h-full rounded-md shadow-sm">
                 {/* Conversations List */}
                 <MessagesSidebar 
