@@ -164,7 +164,6 @@ export function MessagesCanvas({ claims, users, selected }: Props) {
         const messageContent = messageInput.trim();
         const messageKey = `${claims.userId}_${messageContent}_${selected.id}`;
         
-        // Add to pending messages
         pendingMessagesRef.current.add(messageKey);
 
         const optimisticMessage: Message = {
@@ -190,7 +189,6 @@ export function MessagesCanvas({ claims, users, selected }: Props) {
             clearTimeout(typingTimeoutRef.current);
         }
 
-        // Clean up pending message after timeout (in case WebSocket fails)
         setTimeout(() => {
             pendingMessagesRef.current.delete(messageKey);
         }, 10000);

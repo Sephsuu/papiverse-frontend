@@ -7,6 +7,7 @@ import { User } from "@/types/user";
 import { Plus, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CreateConversation } from "./CreateConversation";
+import { fromatMessageDateTime } from "@/lib/formatter";
 
 const tabs = ['DIRECT', 'GROUPS', 'PUBLIC'];
 
@@ -28,7 +29,7 @@ export function MessagesSidebar({ claims, conversations, selected, setSelected }
         } else if (activeTab === 'GROUPS') {
             setSelectedConversations(conversations.filter(i => i.type === 'group'));
         } else setSelectedConversations(conversations);
-    }, [activeTab])
+    }, [activeTab]);
 
     useEffect(() => {
         console.log(activeTab);
@@ -73,14 +74,14 @@ export function MessagesSidebar({ claims, conversations, selected, setSelected }
                     <button 
                         onClick={() => setSelected(item)}
                         key={index}
-                        className={`w-full flex p-2 shadow-sm bg-white rounded-md my-1.5 ${selected?.id === item.id && "!bg-orange-200"}`}
+                        className={`relative w-full flex p-2 shadow-sm bg-white rounded-md my-1.5 ${selected?.id === item.id && "!bg-orange-200"}`}
                     >
                         <div className="flex col-span-2">
                             <div className="mx-auto flex font-semibold justify-center items-center bg-darkbrown text-light w-9 h-9 rounded-full">
                                 {"KP"}
                             </div>
                         </div>
-                        <div className="col-span-6 pl-1">
+                        <div className="w-full pl-1">
                             <div className="text-start font-semibold text-sm truncate">
                                 {item.name === "none" ? (
                                     item.participant.length > 2 ? (
@@ -94,11 +95,9 @@ export function MessagesSidebar({ claims, conversations, selected, setSelected }
                                     item.name
                                 )}
                             </div>
-                            <div className="text-start text-xs text-gray truncate">{"Message"}</div>
+                            <div className="w-6/10 text-start text-xs text-gray truncate">{ item.updated_message || "No existing message" }</div>
                         </div>
-                        <div className="flex flex-col col-span-2">
-                            {/* TIME STAMP AND UNREAD */}
-                        </div>
+                        <div className="absolute bottom-2 right-2 text-[10px]">{ fromatMessageDateTime(item.updated_at) }</div>
                     </button>
                 ))}
             </div>
@@ -113,7 +112,7 @@ export function MessagesSidebar({ claims, conversations, selected, setSelected }
     );
 }
 
-//// Step 1: Extract all participant IDs from all conversations
+    // Step 1: Extract all participant IDs from all conversations
     // const allParticipantIds = conversations.flatMap(conv => conv.participants);
 
     // // Step 2: Create a Set for efficient lookup
