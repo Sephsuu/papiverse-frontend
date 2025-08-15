@@ -2,6 +2,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Separator } from "@/components/ui/separator";
 import { flattenGroupedLogsWithOrders, formatDateToWords, getWeekday } from "@/lib/formatter";
 import { InventoryLog } from "@/types/inventory-log";
+import dayjs from "dayjs"
 import { Fragment } from "react";
 
 interface Props {
@@ -52,7 +53,9 @@ export function OrderLogs({ logs }: Props) {
                                                     <div>{ subSubItem.rawMaterialCode }</div>
                                                     <div>Qty: { subSubItem.quantityChanged }</div>
                                                     <div>{ subSubItem.rawMaterialName }</div>
-                                                    <div>{ subSubItem.dateTime }</div>
+                                                    <div>
+                                                        {dayjs(subSubItem.dateTime).format("dddd, MMMM D, YYYY h:mm A")}
+                                                    </div>
                                                 </div>
                                                 <Separator />
                                             </Fragment>

@@ -36,7 +36,7 @@ export function Pagination({ paginationTotal, pagination, shown, setPagination }
             </div>
             <div className="mr-10 flex gap-5">
                 <button
-                    className="text-gray text-sm flex items-center hover:text-black transition-colors duration-75"
+                    className="text-gray text-sm flex items-center disabled:hover:text-gray hover:text-black transition-colors duration-75 "
                     disabled={pagination.page === 0}
                     onClick={() =>
                         setPagination(prev => ({
@@ -47,11 +47,11 @@ export function Pagination({ paginationTotal, pagination, shown, setPagination }
                 >
                     <ChevronLeft /> Back
                 </button>
-                <h1 className="text-gray font-sm">
+                <h1 className="text-gray text-sm mt-0.5">
                     Page {pagination.page + 1} of {paginationTotal.totalPage}
                 </h1>
                 <button
-                    className="text-gray text-sm flex items-center hover:text-black transition-colors duration-75"
+                    className="text-gray text-sm flex items-center disabled:hover:text-gray  hover:text-black transition-colors duration-75"
                     disabled={pagination.page + 1 === paginationTotal.totalPage}
                     onClick={handleNext}
                 >
