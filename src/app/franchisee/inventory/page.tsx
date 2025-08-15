@@ -38,7 +38,7 @@ export default function InventoryOverview() {
             try {
                 const orderRes = await SupplyOrderService.getSupplyOrderByBranch(claims.branch.branchId);
                 const inventoryRes = await InventoryService.getInventoryByBranch(claims.branch.branchId, 0, 1000);
-                setInventorories(inventoryRes);
+                setInventorories(inventoryRes.data);
                 setOrders(orderRes);
             } catch (error) { `${error}` }
             finally { setLoading(false) }

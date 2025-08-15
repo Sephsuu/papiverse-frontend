@@ -133,7 +133,7 @@ export function AdminSidebar() {
                                                 alt=""
                                             />
                                             ) : (
-                                            <Spinner className="h-4 w-4 mt-1" />
+                                            <Spinner className="h-10 w-10 mt-1" />
                                             )}
                                         </Avatar>
 
