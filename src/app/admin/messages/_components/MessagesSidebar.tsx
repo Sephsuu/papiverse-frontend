@@ -5,7 +5,7 @@ import { Claim } from "@/types/claims";
 import { Conversation } from "@/types/messaging";
 import { User } from "@/types/user";
 import { Plus, Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { CreateConversation } from "./CreateConversation";
 import { fromatMessageDateTime } from "@/lib/formatter";
 
@@ -13,12 +13,13 @@ const tabs = ['DIRECT', 'GROUPS', 'PUBLIC'];
 
 interface Props {
     claims: Claim;
+    setReload: Dispatch<SetStateAction<boolean>>;
     conversations: Conversation[];
     selected: Conversation;
     setSelected: (i: Conversation) => void;
 }
 
-export function MessagesSidebar({ claims, conversations, selected, setSelected }: Props) {
+export function MessagesSidebar({ claims, setReload, conversations, selected, setSelected }: Props) {
     const [open, setOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('DIRECT');
     const [selectedConversations, setSelectedConversations] = useState<Conversation[]>(conversations);
@@ -105,6 +106,7 @@ export function MessagesSidebar({ claims, conversations, selected, setSelected }
             {open && (
                 <CreateConversation 
                     claims={ claims }
+                    setReload={ setReload }
                     setOpen={ setOpen } 
                 />
             )}
@@ -112,11 +114,3 @@ export function MessagesSidebar({ claims, conversations, selected, setSelected }
     );
 }
 
-    // Step 1: Extract all participant IDs from all conversations
-    // const allParticipantIds = conversations.flatMap(conv => conv.participants);
-
-    // // Step 2: Create a Set for efficient lookup
-    // const participantIdSet = new Set(allParticipantIds);
-
-    // // Step 3: Filter users whose id is NOT in participantIdSet
-    // const usersNotInConversations = users.filter(user => !participantIdSet.has(user.id!));

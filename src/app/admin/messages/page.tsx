@@ -18,6 +18,7 @@ import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { MessagesSidebar } from "./_components/MessagesSidebar";
 import { MessagesCanvas } from "./_components/MessagesCanvas";
+import MessageSuggestions from "./_components/MessageSuggestions";
 
 const tabs = ['DIRECT', 'GROUPS', 'PUBLIC'];
 
@@ -27,8 +28,6 @@ export default function MessagesPage() {
     const [selected, setSelected] = useState<Conversation>();
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [users, setUsers] = useState<User[]>([]);
-    const [messages, setMessages] = useState<Message[]>([]);
-
     const [reload, setReload] = useState(false);
 
     useEffect(() => {
@@ -70,6 +69,7 @@ export default function MessagesPage() {
                 {/* Conversations List */}
                 <MessagesSidebar 
                     claims={ claims }
+                    setReload={ setReload }
                     conversations={ conversations }
                     selected={ selected! }
                     setSelected={ setSelected }
@@ -82,35 +82,16 @@ export default function MessagesPage() {
                     users={ users }
                 />
 
-                {/* NOTIF AND SUGGESTIONS */}
-                {/* <div className="fle flex-col">
-                    <div className="p-4">
-                        <div className="text-lg font-semibold">Suggestions</div>
-                        <div>
-                            {usersNotInConversations.map((item, index) => (
-                                <div 
-                                    key={ index }
-                                    className="flex items-center gap-1 bg-white shadow-sm my-1 p-2 rounded-md"
-                                >
-                                    <div className="w-8 h-8 text-light rounded-full bg-darkbrown flex font-semibold justify-center items-center p-2">
-                                        KP
-                                    </div>
-                                    <div>
-                                        <div className="text-xs font-semibold truncate">{ `${item.firstName} ${item.lastName}` }</div>
-                                        <div className="text-[10px] text-gray truncate">{ item.branch?.branchName }</div>
-                                    </div>
-                                    <button
-                                        onClick={ () => handleCreateDirectConversation(item.id!) }
-                                        className="ms-auto bg-blue rounded-sm p-1"
-                                    >
-                                        <Send className="w-2.5 h-2.5 text-light" />
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div> */}
+                <MessageSuggestions 
+                    userId={ claims.userId }
+                    users={ users }
+                    conversations={ conversations }
+                    setRealod={ setReload }
+                />
             </div>
+
+                {/* NOTIF AND SUGGESTIONS */}
+                
         </section>
     );
 }

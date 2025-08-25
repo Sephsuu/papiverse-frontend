@@ -10,7 +10,7 @@ import { Conversation } from "@/types/messaging";
 import { User } from "@/types/user";
 import { Plus, X } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 interface CreateConversation {
@@ -19,7 +19,15 @@ interface CreateConversation {
     participantIds: number[];
 }
 
-export function CreateConversation({ setOpen, claims }: { setOpen: (i: boolean) => void, claims: Claim }) {
+export function CreateConversation({ 
+    setOpen, 
+    claims,
+    setReload,
+}: { 
+    setOpen: (i: boolean) => void, 
+    claims: Claim,
+    setReload: Dispatch<SetStateAction<boolean>>
+}) {
     const [loading, setLoading] = useState(false);
     const [onProcess, setProcess] = useState(false);
     const [conversation, setConversation] = useState<CreateConversation>({ name: "none", type: "group", participantIds: [] })
@@ -67,6 +75,7 @@ export function CreateConversation({ setOpen, claims }: { setOpen: (i: boolean) 
             }
         } catch (error) { toast.error(`${error}`) }
         finally {
+            setReload(prev => !prev);
             setProcess(false);
             setOpen(!open);
         }

@@ -27,9 +27,6 @@ export function MessagesCanvas({ claims, users, selected }: Props) {
     const [typingUsers, setTypingUsers] = useState<Set<number>>(new Set());
     const [isTyping, setIsTyping] = useState(false);
 
-    console.log('SELECTED', selected);
-    
-
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const typingTimeoutRef = useRef<NodeJS.Timeout>(null);
     const messagesContainerRef = useRef<HTMLDivElement>(null);

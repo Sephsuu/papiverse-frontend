@@ -40,6 +40,8 @@ export class MessagingService {
    } 
 
    static async createDirectConversation(conversation: any) {
+    console.log('Conversation', conversation);
+    
         const payload = {
             name: conversation.name,
             type: conversation.type,
