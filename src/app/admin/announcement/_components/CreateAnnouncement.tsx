@@ -189,46 +189,46 @@ export function CreateAnnouncement({ setOpen }: Props) {
 
                 {/* Image previews */}
                 {previews.length > 0 && (
-                <div>
-                    <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium text-gray-700">
-                        Selected Images ({previews.length})
-                    </span>
-                    <button
-                        type="button"
-                        onClick={() => {
-                        previews.forEach(preview => URL.revokeObjectURL(preview.url));
-                        setSelectedImages([]);
-                        setPreviews([]);
-                        }}
-                        className="text-xs text-red-500 hover:text-red-700"
-                    >
-                        Remove All
-                    </button>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {previews.map((preview, idx) => (
-                        <div key={idx} className="relative group">
-                        <img
-                            src={preview.url}
-                            alt={`Preview ${idx + 1}`}
-                            className="w-full h-24 object-cover rounded-md border border-gray-200"
-                        />
-                        <button
-                            type="button"
-                            onClick={() => removeImage(idx)}
-                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
-                        >
-                            <X className="h-3 w-3" />
-                        </button>
-                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-xs p-1 rounded-b-md">
-                            <div className="truncate">{preview.name}</div>
-                            <div className="text-gray-300">{formatFileSize(preview.size)}</div>
+                    <div>
+                        <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm font-medium text-gray-700">
+                                Selected Images ({previews.length})
+                            </span>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                previews.forEach(preview => URL.revokeObjectURL(preview.url));
+                                setSelectedImages([]);
+                                setPreviews([]);
+                                }}
+                                className="text-xs text-red-500 hover:text-red-700"
+                            >
+                                Remove All
+                            </button>
                         </div>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {previews.map((preview, idx) => (
+                            <div key={idx} className="relative group">
+                            <img
+                                src={preview.url}
+                                alt={`Preview ${idx + 1}`}
+                                className="w-full h-24 object-cover rounded-md border border-gray-200"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => removeImage(idx)}
+                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                            >
+                                <X className="h-3 w-3" />
+                            </button>
+                            <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-xs p-1 rounded-b-md">
+                                <div className="truncate">{preview.name}</div>
+                                <div className="text-gray-300">{formatFileSize(preview.size)}</div>
+                            </div>
+                            </div>
+                        ))}
                         </div>
-                    ))}
                     </div>
-                </div>
                 )}
 
                 {/* Upload area when no images */}

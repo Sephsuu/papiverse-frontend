@@ -10,14 +10,13 @@ import { toast } from "sonner";
 interface Props {
     userId: number;
     conversations: Conversation[];
-    users: User[];
     setRealod: Dispatch<SetStateAction<boolean>>
 }
 
-export default function MessageSuggestions({ userId, users, conversations, setRealod }: Props) {
+export default function MessageSuggestions({ userId, conversations, setRealod }: Props) {
     const allParticipantIds = conversations.filter(i => i.type === 'direct').flatMap(conv => conv.participants);
     const participantIdSet = new Set(allParticipantIds);
-    const usersNotInConversations = users.filter(user => !participantIdSet.has(user.id!) && userId !== user.id);
+    // const usersNotInConversations = users.filter(user => !participantIdSet.has(user.id!) && userId !== user.id);
     
     async function handleCreateConversation(otherUser: User) {
         try {
@@ -35,7 +34,7 @@ export default function MessageSuggestions({ userId, users, conversations, setRe
                 <div className="p-4">
                     <div className="text-lg font-semibold">Suggestions</div>
                     <div>
-                        {usersNotInConversations.map((item, index) => (
+                        {/* {usersNotInConversations.map((item, index) => (
                             <div 
                                 key={ index }
                                 className="flex items-center gap-1 bg-white shadow-sm my-1 p-2 rounded-md"
@@ -54,7 +53,7 @@ export default function MessageSuggestions({ userId, users, conversations, setRe
                                     <Send className="w-2.5 h-2.5 text-light" />
                                 </button>
                             </div>
-                        ))}
+                        ))} */}
                     </div>
                 </div>
             </div>

@@ -3,7 +3,6 @@
 import { Input } from "@/components/ui/input";
 import { Claim } from "@/types/claims";
 import { Conversation } from "@/types/messaging";
-import { User } from "@/types/user";
 import { Plus, Search } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { CreateConversation } from "./CreateConversation";
@@ -85,12 +84,12 @@ export function MessagesSidebar({ claims, setReload, conversations, selected, se
                         <div className="w-full pl-1">
                             <div className="text-start font-semibold text-sm truncate">
                                 {item.name === "none" ? (
-                                    item.participant.length > 2 ? (
-                                        item.participant.slice(0, 3).map(p => p.lastName).join(', ')
+                                    item.participants.length > 2 ? (
+                                        item.participants.slice(0, 3).map(p => p.lastName).join(', ')
                                     ) : (
-                                        item.participant[0].id !== claims.userId
-                                            ? `${item.participant[0].firstName ?? ''} ${item.participant[0].lastName ?? ''}`
-                                            : `${item.participant[1].firstName ?? ''} ${item.participant[1].lastName ?? ''}`
+                                        item.participants[0].id !== claims.userId
+                                            ? `${item.participants[0].firstName ?? ''} ${item.participants[0].lastName ?? ''}`
+                                            : `${item.participants[1].firstName ?? ''} ${item.participants[1].lastName ?? ''}`
                                     )
                                 ) : (
                                     item.name

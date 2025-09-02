@@ -27,28 +27,13 @@ export default function MessagesPage() {
     const [loading, setLoading] = useState(true);
     const [selected, setSelected] = useState<Conversation>();
     const [conversations, setConversations] = useState<Conversation[]>([]);
-    const [users, setUsers] = useState<User[]>([]);
     const [reload, setReload] = useState(false);
 
     useEffect(() => {
         async function fetchData() {
             try {
-                const usersRes = await UserService.getAllUsers(0, 100);
-                const convoRes = await MessagingService.getConversations(claims.userId);
-                setUsers(usersRes.content);
-                
-                const mappedConvos = convoRes.map((convo: Conversation) => ({
-                    ...convo,
-                    participant: convo.participants.map(item => {
-                        const user = usersRes.content.find((i: User) => i.id === item);
-                        return {
-                            id: user?.id,
-                            firstName: user?.firstName,
-                            lastName: user?.lastName
-                        }
-                    }),
-                }));
-                setConversations(mappedConvos);
+                const res = await MessagingService.getConversations(claims.userId);
+                setConversations(res);
             } catch (error) { 
                 toast.error(`${error}`) 
             } finally { 
@@ -79,12 +64,10 @@ export default function MessagesPage() {
                 <MessagesCanvas
                     claims={ claims }
                     selected={ selected! }
-                    users={ users }
                 />
 
                 <MessageSuggestions 
                     userId={ claims.userId }
-                    users={ users }
                     conversations={ conversations }
                     setRealod={ setReload }
                 />

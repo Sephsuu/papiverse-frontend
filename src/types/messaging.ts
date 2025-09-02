@@ -1,14 +1,11 @@
-import { User } from "./user";
-
 export interface Conversation {
     id: number;
     type: string;
     name: string;
     updated_at: string,
     updated_message: string,
-    participants: number[];
-    participant: {
-        id: number,
+    participants: {
+        id: number;
         firstName: string;
         lastName: string;
     }[];

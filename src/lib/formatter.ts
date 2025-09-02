@@ -150,3 +150,14 @@ export const fromatMessageDateTime = (messageDateTime: string): string => {
         return date.toLocaleDateString("en-US", { weekday: "short" });
     }
 };
+
+export function displayCurrentDate() {
+    const d = new Date();
+
+    const weekday = d.toLocaleString("en-US", { weekday: "long" });
+    const month = d.toLocaleString("en-US", { month: "long" });
+    const day = d.getDate();
+    const year = d.getFullYear();
+
+    return `${weekday}, ${month} ${day}, ${year}`;
+}

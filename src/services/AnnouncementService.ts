@@ -35,17 +35,13 @@ export class AnnouncementService {
     }
 
     static async createAnnouncement(announcement: Announcement, images: File[]) {
-        console.log(announcement.datePosted);
-        console.log(images);
-        
-        
         const formData = new FormData();
         formData.append('userId', announcement.userId.toString());
         images.forEach(file => {
             formData.append('images', file); 
         });
         formData.append('content', announcement.content);
-        formData.append('datePosted', announcement.datePosted)
+        formData.append('datePosted', announcement.datePosted);
 
         const res = await fetch(`${URL}/create`, {
             method: 'POST',

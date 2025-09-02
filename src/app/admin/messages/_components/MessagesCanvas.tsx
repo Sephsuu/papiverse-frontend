@@ -16,11 +16,10 @@ import { toast } from "sonner";
 
 interface Props {
     claims: Claim;
-    users: User[];
     selected: Conversation;
 }
 
-export function MessagesCanvas({ claims, users, selected }: Props) {
+export function MessagesCanvas({ claims, selected }: Props) {
     const [loading, setLoading] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [messageInput, setMessageInput] = useState('');
@@ -265,14 +264,16 @@ export function MessagesCanvas({ claims, users, selected }: Props) {
         }
     };
 
-    const getTypingIndicator = () => {
+    const getTypingIndicator = (conversation: Conversation) => {
+        if (!conversation || !conversation.participants) return null;
         if (typingUsers.size === 0) return null;
-        
-        const typingUserNames = Array.from(typingUsers).map(userId => {
-            const user = users.find(u => u.id === userId);
-            return user ? `${user.firstName} ${user.lastName}` : 'Someone';
-        });
-        
+
+        const typingUserNames = Array.from(typingUsers)
+            .map(userId => {
+                const user = conversation.participants.find((p) => p.id === userId);
+                return user ? `${user.firstName} ${user.lastName}` : 'Someone';
+            });
+
         if (typingUserNames.length === 1) {
             return `${typingUserNames[0]} is typing...`;
         } else {
@@ -292,12 +293,12 @@ export function MessagesCanvas({ claims, users, selected }: Props) {
                         </div>
                         <div className="my-auto font-semibold text-sm truncate text-[16px]">
                             {selected.name === "none" ? (
-                                selected.participant.length > 2 ? (
-                                    selected.participant.slice(0, 3).map(p => p.lastName).join(', ')
+                                selected.participants.length > 2 ? (
+                                    selected.participants.slice(0, 3).map(p => p.lastName).join(', ')
                                 ) : (
-                                    selected.participant[0].id !== claims.userId
-                                        ? `${selected.participant[0].firstName ?? ''} ${selected.participant[0].lastName ?? ''}`
-                                        : `${selected.participant[1].firstName ?? ''} ${selected.participant[1].lastName ?? ''}`
+                                    selected.participants[0].id !== claims.userId
+                                        ? `${selected.participants[0].firstName ?? ''} ${selected.participants[0].lastName ?? ''}`
+                                        : `${selected.participants[1].firstName ?? ''} ${selected.participants[1].lastName ?? ''}`
                                 )
                             ) : (
                                 selected.name
@@ -329,7 +330,7 @@ export function MessagesCanvas({ claims, users, selected }: Props) {
                                 <Fragment key={message.id || index}>
                                     {showSenderName && (
                                         <div className={`text-gray text-[10px] -mb-1.5 ${isOwnMessage ? "text-end pr-2" : "pl-2 text-start"}`}>
-                                            {selected.participant.find(i => i.id === message.senderId)?.firstName}
+                                            {selected.participants.find(i => i.id === message.senderId)?.firstName}
                                         </div>
                                     )}
                                 <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} my-2`}>
@@ -350,9 +351,9 @@ export function MessagesCanvas({ claims, users, selected }: Props) {
                         })}
                         
                         {/* TYPING INDICATOR */}
-                        {getTypingIndicator() && (
+                        {getTypingIndicator(selected) && (
                             <div className="w-fit max-w-6/10 text-xs bg-gray-200 p-2 my-2 ml-2 rounded-t-lg rounded-br-lg italic">
-                                {getTypingIndicator()}
+                                {getTypingIndicator(selected)}
                             </div>
                         )}
                         

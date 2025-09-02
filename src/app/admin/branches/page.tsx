@@ -41,7 +41,7 @@ export default function BranchesTable() {
     const [filteredBranches, setFilteredBranches] = useState<Branch[]>([]);
 
     useEffect(() => {
-        async function fetchData(page : number, size :number) {
+        async function fetchData(page: number, size: number) {
             try {
                 const data = await BranchService.getAllBranches(page, size);
                 setBranches(data.content);
@@ -60,6 +60,8 @@ export default function BranchesTable() {
 
         fetchData(pagination.page, pagination.size)
     }, [reload, pagination.page]);
+    console.log(branches);
+    
 
      useEffect(() => {
        setShown(pagination.page * pagination.size  + pagination.numberOfElements)
