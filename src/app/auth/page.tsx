@@ -43,7 +43,7 @@ export default function Login() {
             style={{ backgroundImage: "url('/images/kp_login.jpg')" }}
         >
             <Toaster position="top-center" />
-            <div className='flex flex-col gap-4 bg-light w-[400px] shadow-lg rounded-xl max-md:shadow-none max-md:border-0 px-8 py-12'>
+            <div className='flex flex-col gap-4 bg-light w-[400px] shadow-lg rounded-xl max-md:shadow-none max-md:border-0 px-8 py-12 max-sm:mx-2'>
    
                 <div>
                     <Image

@@ -1,19 +1,18 @@
 "use client"
 
-import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { brownColors, sales, topSelling } from "@/lib/data-array";
-import { formatDateTime, formatDateToWords, formatToPeso } from "@/lib/formatter"
-import { SelectValue } from "@radix-ui/react-select";
+import { formatDateTime, formatDateToWords, formatToPeso } from "@/lib/formatter";
 import { NotepadText } from "lucide-react";
 import { Fragment, useState } from "react";
-import { Area, AreaChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 const chartTabs = ['Daily', 'Weekly', 'Monthly']
 
-export default function SalesPage() {
+export function BranchSalesOverview()  {
     const [chartTab, setChartTab] = useState('Daily')
+
     const summary = [
-        { title: 'Total Orders', date: formatDateTime('2025-08-21 22:45:19'), count: 78  },
+            { title: 'Total Orders', date: formatDateTime('2025-08-21 22:45:19'), count: 78  },
         { title: 'Payment Methods', date: formatDateTime('2025-08-21 22:45:19'), count: 78, type: "Cash"  },
         { title: 'Payment Methods', date: formatDateTime('2025-08-21 22:45:19'), count: 78, type: "G-cash"  },
         { title: 'Type of Orders', date: formatDateTime('2025-08-21 22:45:19'), count: 78, type: "Dine in"  },
@@ -27,13 +26,13 @@ export default function SalesPage() {
         acc[item.title].push(item);
         return acc;
     }, {} as Record<string, typeof summary>);
-    
+
     return(
-        <section className="flex flex-col gap-2 w-full py-4 px-2 overflow-x-hidden">
+        <section className="flex flex-col gap-2">
             <div className="flex items-stretch gap-2">
                 {Object.entries(grouped).map(([key, value]) => (
                     <div 
-                        className="flex flex-col gap-2 flex-1 w-full p-4 bg-white shadow-sm rounded-md"
+                        className="flex flex-col gap-2 flex-1 w-full py-2 px-4 bg-white shadow-sm rounded-md"
                         key={key}
                     >
                         <div className="font-semibold flex items-center justify-between">
@@ -120,12 +119,12 @@ export default function SalesPage() {
             <div className="grid grid-cols-10 gap-2">
                 <div className="relative col-span-3 border-1 flex flex-col justify-center items-center bg-white shadow-sm rounded-md">
                     <div className="absolute top-2 text-lg scale-x-110 font-semibold">Top Selling Summary</div>
-                    <PieChart width={300} height={300} className="mt-2">
+                    <PieChart width={250} height={250} className="mt-2">
                         <Pie
-                            data={topSelling}
+                            data={topSelling.sort((a, b) => b.orders - a.orders)}
                             dataKey="orders"
                             nameKey="name"
-                            innerRadius={60}
+                            innerRadius={50}
                             cx="50%"
                             cy="50%"
                             fill="#8884d8"
@@ -163,7 +162,7 @@ export default function SalesPage() {
                                 <div className="data-table-td">{ item.orders }</div>
                             </div>
                         ))}
-                  
+                    
                     <div>
 
                     </div>

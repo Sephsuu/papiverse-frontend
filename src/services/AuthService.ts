@@ -4,7 +4,7 @@ import { User } from "@/types/user";
 const URL = `${BASE_URL}/auth`
 
 export class AuthService {
-	static async authenticateUser(credentials: object) {
+	static async authenticateUser(credentials: object) {		
 		const res = await fetch(`${URL}/login`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -12,7 +12,6 @@ export class AuthService {
 		})
 		console.log(res);
 		
-
 		if (!res.ok) {
 			const error = await res.json();
 			throw new Error(error.error || error.message || "Bad Response");

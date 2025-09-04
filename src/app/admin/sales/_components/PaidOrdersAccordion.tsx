@@ -7,7 +7,7 @@ export function PaidOrdersAccordion() {
     const grandTotal = paidOrders.reduce((acc, order) => acc + order.totalPaid, 0);
 
     return(
-        <section className="px-2">
+        <section>
             <Accordion type="multiple">
                 <AccordionItem value="1">
                     <AccordionTrigger className="flex justify-between bg-white p-4 !h-fit border-1 shadow-sm font-semibold">
